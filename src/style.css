@@ -1397,12 +1397,12 @@ button.swatch:active { cursor: grabbing; }
   .s9-body { grid-template-columns: 1fr; justify-items: start; }
   .tag--big { width: 96px; }
   .nodes li { font-size: clamp(1.25rem, 5.4vw, 2rem); }
-  .s8 .nodes li:nth-child(1) { --x: 8% !important; --y: 36% !important; }
-  .s8 .nodes li:nth-child(2) { --x: 44% !important; --y: 45% !important; }
-  .s8 .nodes li:nth-child(3) { --x: 12% !important; --y: 54% !important; }
-  .s8 .nodes li:nth-child(4) { --x: 50% !important; --y: 63% !important; }
-  .s8 .nodes li:nth-child(5) { --x: 8% !important; --y: 71% !important; }
-  .s8 .nodes li:nth-child(6) { --x: 28% !important; --y: 80% !important; }
+  .s8 .nodes li:nth-child(1) { --x: 6% !important; --y: 33% !important; }
+  .s8 .nodes li:nth-child(2) { --x: 40% !important; --y: 42% !important; }
+  .s8 .nodes li:nth-child(3) { --x: 8% !important; --y: 51% !important; }
+  .s8 .nodes li:nth-child(4) { --x: 30% !important; --y: 60% !important; }
+  .s8 .nodes li:nth-child(5) { --x: 6% !important; --y: 69% !important; }
+  .s8 .nodes li:nth-child(6) { --x: 26% !important; --y: 78% !important; }
 }
 
 @media (max-width: 600px) {
@@ -1437,7 +1437,15 @@ button.swatch:active { cursor: grabbing; }
   .piece:nth-child(n) { width: min(100%, 19vh); }
   .piece .tag { width: 2rem; }
   .s9 .lede { font-size: 1.05rem; }
-  .turn { width: min(100%, 44vh); }
+  .turn { width: min(100%, 34vh); }
+  .turn-hint { display: none; }
+  .turn figcaption { gap: 0.4rem 0.6rem; }
+  .s6 .lede { font-size: 1rem; }
+  .s6 .facts li { padding: 0.55rem 0; font-size: 0.92rem; }
+  .s8 .hand { font-size: 1.15em; }
+  /* screen 2: the scissors fit into the space under the text on every phone */
+  .s2-body { gap: 1.1rem; }
+  .s2 .cutout { scale: 0.72; margin-top: -1.6rem; }
   .s6 { gap: 0.9rem; }
   .turn { gap: 0.6rem; }
   .tag--big { width: 80px; }
@@ -1446,12 +1454,12 @@ button.swatch:active { cursor: grabbing; }
   .readout > span { padding: 0.45rem; }
   #r-title { display: none; }
   .hint { display: none; }
-  .wordmark { font-size: 23vw; }
-  .jeans { height: 21vw; }
+  .wordmark { font-size: 18.5vw; }
+  .jeans { height: min(42vw, 190px); margin-bottom: 0.3rem; }
+  .mark-row { column-gap: 0.5rem; }
   /* on phones the patch sits beside the name and the hint wraps underneath */
   .bench--jeans { display: contents; }
   .bench-note { flex-basis: 100%; max-width: none; display: flex; flex-wrap: wrap; align-items: center; gap: 0.4rem 0.7rem; }
-  .bench-note { max-width: 7.5rem; margin-bottom: 0; }
   .bench-note .label { font-size: 0.66rem; }
   .cut-btn { font-size: 0.8rem; }
   .board { right: var(--pad); width: calc(74px + 3.4rem); gap: 0.3rem; }
@@ -1489,11 +1497,12 @@ button.swatch:active { cursor: grabbing; }
   .rows h3, .stages h3 { font-size: 1.05rem; }
   .s2-body { gap: 1.1rem; }
   .etym dt, .etym dd { padding-block: 0.45rem; }
-  .s2 .cutout { display: none; }
+  .s2 .cutout { scale: 0.6; margin-top: -2.4rem; }
+  .s2 .aside { font-size: 0.875rem; }
   .made-copy p { display: none; }
   .s9 .lede { font-size: 0.92rem; }
   .s9-body { gap: 1rem; }
-  .turn { width: min(92%, 36vh); }
+  .turn { width: min(88%, 30vh); }
   .turn-hint { display: none; }
   .s6 .facts li { padding: 0.5rem 0; font-size: 0.9rem; }
 }
