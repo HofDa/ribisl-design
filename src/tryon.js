@@ -48,6 +48,7 @@ export async function openTryOn({ tr, reduced }) {
   // where the hat is: its anchor point on screen, its width and its tilt
   const pose = { x: innerWidth / 2, y: innerHeight * 0.35, w: innerWidth * 0.7, r: 0, seen: 0 };
   let manual = false;
+  let preview = null; // the photo just taken, while it's on screen
 
   /* ---------- the hats to choose from ---------- */
 
@@ -83,15 +84,24 @@ export async function openTryOn({ tr, reduced }) {
   /* ---------- camera ---------- */
 
   let stream = null;
-  say('tryon.starting');
-  try {
-    stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user', width: { ideal: 1280 }, height: { ideal: 720 } }, audio: false });
-    video.srcObject = stream;
-    await video.play();
-  } catch {
-    say('tryon.denied');
-    ui.classList.add('is-denied');
+  async function startCamera() {
+    try {
+      stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user', width: { ideal: 1280 }, height: { ideal: 720 } }, audio: false });
+      video.srcObject = stream;
+      await video.play();
+      return true;
+    } catch {
+      say('tryon.denied');
+      ui.classList.add('is-denied');
+      return false;
+    }
   }
+  function stopCamera() {
+    stream?.getTracks().forEach((t) => t.stop());
+    stream = null;
+  }
+  say('tryon.starting');
+  await startCamera();
 
   /* ---------- tracking ---------- */
 
@@ -200,6 +210,7 @@ export async function openTryOn({ tr, reduced }) {
     sheet.className = 'tryon-preview';
     sheet.innerHTML = `
       <img alt="" src="${url}">
+      <button type="button" class="tryon-close btn tryon-preview-close" aria-label="${tr('tryon.back')}">×</button>
       <div class="tryon-preview-bar">
         <button type="button" class="btn tryon-ig"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="3.5" width="17" height="17" rx="5" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="17.2" cy="6.8" r="1.2" fill="currentColor"/></svg><span>${tr('tryon.shareIg')}</span></button>
         <button type="button" class="btn tryon-save">${tr('tryon.save')}</button>
@@ -207,6 +218,9 @@ export async function openTryOn({ tr, reduced }) {
         <p class="tryon-preview-note" aria-live="polite"></p>
       </div>`;
     ui.append(sheet);
+    // the phone's back button (or gesture) returns from the photo to the camera
+    history.pushState({ ribisl: 'preview' }, '');
+    preview = { sheet, url };
     const note = sheet.querySelector('.tryon-preview-note');
     const save = () => {
       const a = document.createElement('a');
@@ -233,27 +247,47 @@ export async function openTryOn({ tr, reduced }) {
       window.open('https://www.instagram.com/ribisl_design/', '_blank', 'noopener');
     });
     sheet.querySelector('.tryon-save').addEventListener('click', () => { save(); note.textContent = tr('tryon.savedOnly'); });
-    sheet.querySelector('.tryon-again').addEventListener('click', () => { sheet.remove(); URL.revokeObjectURL(url); });
+    sheet.querySelector('.tryon-again').addEventListener('click', () => history.back());
+    sheet.querySelector('.tryon-preview-close').addEventListener('click', () => history.back());
     sheet.querySelector('.tryon-ig').focus();
   }
 
   /* ---------- closing ---------- */
 
   const opener = document.activeElement;
+  // Back steps out one level at a time: photo → camera → site. Every way out goes through history,
+  // so the phone's back button and the on-screen buttons always agree.
+  history.pushState({ ribisl: 'tryon' }, '');
+  function closePreview() {
+    if (!preview) return;
+    preview.sheet.remove();
+    URL.revokeObjectURL(preview.url);
+    preview = null;
+    if (!stream) startCamera();
+    ui.querySelector('.tryon-shot').focus();
+  }
   function close() {
     cancelAnimationFrame(raf);
-    stream?.getTracks().forEach((t) => t.stop());
+    stopCamera();
+    if (preview) { URL.revokeObjectURL(preview.url); preview = null; }
     removeEventListener('keydown', onKey, true);
-    document.removeEventListener('visibilitychange', onHide);
+    removeEventListener('popstate', onPop);
+    document.removeEventListener('visibilitychange', onVisibility);
     ui.remove();
     root.classList.remove('is-tryon');
     opener?.focus?.({ preventScroll: true });
   }
-  const onKey = (e) => { if (e.key === 'Escape') { e.stopPropagation(); close(); } };
-  const onHide = () => { if (document.hidden) close(); };
+  const onPop = () => { if (preview) closePreview(); else close(); };
+  const onKey = (e) => { if (e.key === 'Escape') { e.stopPropagation(); history.back(); } };
+  // in the background (another app, the share sheet) the camera rests; it starts again on return
+  const onVisibility = () => {
+    if (document.hidden) stopCamera();
+    else if (!preview && !stream) startCamera();
+  };
+  addEventListener('popstate', onPop);
   addEventListener('keydown', onKey, true);
-  document.addEventListener('visibilitychange', onHide);
-  ui.querySelector('.tryon-close').addEventListener('click', close);
+  document.addEventListener('visibilitychange', onVisibility);
+  ui.querySelector('.tryon-close').addEventListener('click', () => history.back());
   ui.querySelector('.tryon-close').focus();
 }
 
