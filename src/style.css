@@ -1960,13 +1960,18 @@ button.swatch:active { cursor: grabbing; }
 }
 @media (min-width: 901px) and (max-height: 710px) { .katrin { --kh: 104px; } }
 
-/* phones: Katrin comes after the text, bottom left, beside the ribisl label */
+/* phones: Katrin beside the heading, top right, big enough to see the sunglasses; the text starts below both */
 @media (max-width: 900px) {
-  .s2 { grid-template-columns: minmax(0, 1fr) auto; }
-  .s2 .display { grid-column: 1 / -1; grid-row: 1; }
+  .s2 { grid-template-columns: minmax(0, 1fr) max-content; }
+  .s2 .display { grid-column: 1; grid-row: 1; align-self: center; }
+  .katrin { --kh: clamp(130px, 20vh, 200px); grid-column: 2; grid-row: 1; justify-self: end; align-self: start; margin: -0.4rem 0.2rem 0 0; rotate: 3deg; }
   .s2-body { grid-column: 1 / -1; grid-row: 2; }
-  .katrin { --kh: clamp(120px, 22vh, 200px); grid-column: 1; grid-row: 3; justify-self: start; align-self: end; margin: 0.4rem 0 0 0.2rem; rotate: -3deg; }
-  .s2 .cutout { grid-column: 2; grid-row: 3; align-self: end; }
+  .s2 .cutout { grid-column: 1 / -1; grid-row: 3; }
   .katrin .katrin-name { display: block; }
 }
-@media (max-width: 900px) and (max-height: 720px) { .katrin { --kh: 104px; } }
+@media (max-width: 900px) and (max-height: 720px) {
+  .katrin { --kh: 108px; margin-top: -0.6rem; }
+  .s2 { row-gap: 0.7rem; }
+  .s2-body { gap: 0.8rem; }
+  .s2 .cutout { margin-top: -2.8rem; }
+}
