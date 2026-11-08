@@ -1979,3 +1979,40 @@ button.swatch:active { cursor: grabbing; }
 /* "Dein Hut" belongs to your own hat only: it steps aside while the toadstool hat is on top */
 .piece--hat .yours-label { transition: opacity 0.3s; }
 .piece--hat:not(:has(.hat-turn.is-top)) .yours-label { opacity: 0; }
+
+/* ---------- 7 on phones: envelopes two by two; the one you open comes up big in the middle ---------- */
+@media (max-width: 600px) {
+  .s7 .envelopes { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.6rem; }
+  .s7 .envelopes li.env, .s7 .envelopes li.env.is-open { height: 86px; transition: none; }
+  .s7 .env-front { grid-template: auto 1fr / 1fr auto; align-content: end; padding: 0.5rem 0.6rem 0.55rem; gap: 0.1rem 0.3rem; }
+  .s7 .env-no { font-size: 0.56rem; }
+  .s7 .env-title { font-size: 0.88rem; line-height: 1.1; grid-column: 1; }
+  .s7 .env-art { grid-row: 2; width: 26px; align-self: end; }
+  /* opened: lifted out of the grid (its place stays empty), centred over the screen */
+  .s7 .envelopes li.env.is-open { perspective: none; z-index: 20; }
+  .s7 .envelopes li.env.is-open .env-inner {
+    position: absolute;
+    left: var(--pad);
+    right: var(--pad);
+    top: 50%;
+    height: 210px;
+    translate: 0 -50%;
+    transform: perspective(900px) rotateY(180deg);
+    z-index: 20;
+  }
+  .s7 .env.is-open .env-back { padding: 1.1rem 2.8rem 1.1rem 1.1rem; gap: 0.5rem; align-content: center; }
+  .s7 .env.is-open .env-back h3 { position: static; width: auto; height: auto; overflow: visible; clip: auto; font-size: 1.1rem; }
+  .s7 .env.is-open .env-back p, .s7 .env.is-open .env-back .textlink { font-size: 0.92rem; }
+  /* lifted well off the cloth */
+  .s7 .env.is-open .env-back { box-shadow: 0 6px 3px rgba(10, 20, 40, 0.3), 0 30px 60px rgba(10, 20, 40, 0.55), 0 0 0 100vmax rgba(10, 20, 40, 0.35); }
+  .s7 .refs { margin-top: 1.3rem; }
+}
+@media (max-width: 600px) and (max-height: 700px) {
+  .s7 .head .sub { font-size: 0.82rem; }
+  .s7 .envelopes li.env, .s7 .envelopes li.env.is-open { height: 70px; }
+  .s7 .env-no { display: none; }
+  .s7 .refs { margin-top: 0.8rem; gap: 0.45rem; }
+  .s7 .refs h3.label { display: none; }
+  .s7 .patch-badge { width: 56px; }
+  .s7 .stall-copy { font-size: 0.76rem; padding: 0.7rem 0.7rem 0.45rem; }
+}
