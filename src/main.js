@@ -75,7 +75,7 @@ function fitArcs() {
   for (const text of document.querySelectorAll('.patch-badge text.arc')) {
     text.style.fontSize = '';
     const path = document.querySelector(text.firstElementChild.getAttribute('href'));
-    const room = path.getTotalLength() * 0.9;
+    const room = path.getTotalLength() * 0.93;
     const len = text.getComputedTextLength();
     if (len > room) text.style.fontSize = `${(10 * room) / len}px`;
   }
