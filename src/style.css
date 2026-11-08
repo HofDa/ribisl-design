@@ -2052,3 +2052,27 @@ button.swatch:active { cursor: grabbing; }
 @media (max-width: 600px) and (max-height: 700px) {
   .s7 .patch-badge { width: 60px; }
 }
+
+/* screen 6: the heading also scales with the window height, so a longer title never reaches the hat */
+@media (min-width: 901px) { .s6 .display { font-size: clamp(3rem, min(8.4vw, 11.5vh), 6rem); } }
+/* screen 7: the four patches share the width of the references column and never spill into the envelopes */
+.patches { width: 100%; }
+.patch-badge { flex: 1 1 0; min-width: 0; max-width: 150px; }
+@media (max-width: 900px) { .s7 .patch-badge, .s7 .patch-badge:first-child { max-width: 96px; } }
+@media (max-width: 600px) and (max-height: 700px) { .s7 .patch-badge { max-width: 60px; } }
+.refs { grid-template-columns: minmax(0, 1fr); }
+.refs > * { max-width: 100%; }
+@media (max-width: 900px) {
+  .s7 .patch-badge { flex: none; width: clamp(68px, 21vw, 96px); max-width: none; }
+  .refs { grid-template-columns: none; }
+}
+@media (max-width: 600px) and (min-height: 760px) { .s7 .patch-badge { width: 84px; } }
+@media (max-width: 600px) and (max-height: 700px) { .s7 .patch-badge { width: 60px; } }
+
+/* the empty sides say what to do; the words wrap inside the square */
+.cell-empty > span { max-width: 88%; text-align: center; line-height: 1.15; }
+@media (max-width: 900px) { .cell-empty { font-size: 0.42rem; letter-spacing: 0; } }
+
+/* Katrin's name label is sewn on so it sticks out a little past the left edge of the photo */
+.katrin .katrin-name { left: -9%; }
+@media (max-width: 900px) { .katrin .katrin-name { left: -12%; } }
