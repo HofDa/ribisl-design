@@ -2083,3 +2083,10 @@ button.swatch:active { cursor: grabbing; }
 .s7 .envelopes { z-index: 2; }
 .s7 .stall-copy { position: relative; z-index: 1; }
 @media (max-width: 600px) { .stall-bunting { height: 38px; } }
+
+/* screen 7: more air between the envelopes, the event patches and the pennant chain */
+.refs { row-gap: 1.6rem; }
+@media (max-width: 900px) { .s7 .refs { margin-top: 2.6rem; row-gap: 1.6rem; } }
+@media (max-width: 600px) and (max-height: 700px) { .s7 .refs { margin-top: 1.5rem; row-gap: 1rem; } }
+.refs .stall { margin-top: 1.4rem; }
+@media (max-width: 600px) and (max-height: 700px) { .refs .stall { margin-top: 0.8rem; } }
