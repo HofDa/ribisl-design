@@ -2,7 +2,7 @@
 // Loaded only when someone taps "Try it on". Nothing leaves the phone: the face model and its runtime
 // are served with the site, and the picture is only saved or shared if you take one.
 import { FaceDetector, FilesetResolver } from '@mediapipe/tasks-vision';
-import { drawHat, madeCells, fabricSrc } from './workbench.js';
+import { drawHat, madeSides, fabricSrc } from './workbench.js';
 
 // Seen from the front: the real fabric of each side of the reversible hat, sewn onto a frontal hat shape,
 // so it sits straight on a face looking into the camera.
@@ -53,11 +53,14 @@ export async function openTryOn({ tr, reduced }) {
   /* ---------- the hats to choose from ---------- */
 
   const hats = {};
-  for (const [key, src] of Object.entries(SIDES)) hats[key] = await frontalHat(null, await loadImg(src));
-  // the patchwork hat is always there; it's "yours" once you've placed a fabric on screen 3
-  const { cells, mine } = madeCells();
-  hats.yours = await yourHat(cells);
-  const yoursLabel = tr(mine ? 'tryon.yours' : 'tryon.patch');
+  for (const [key, src] of Object.entries(SIDES)) hats[key] = await frontalHat(await loadImg(src));
+  // the toadstool hat is photographed, not drawn: it goes on as it is
+  hats.toadstool = { src: `${BASE}pieces/hat-toadstool-cut.webp`, bottom: 0.95 };
+  // the reversible hat from screen 3, both its sides; it's "yours" once you've chosen a fabric there
+  const made = madeSides();
+  const { mine } = made;
+  for (const side of ['out', 'in']) hats[side] = await frontalHat(await loadImg(fabricSrc(made[side])));
+  const label = (key) => (key === 'out' || key === 'in' ? tr(`tryon.${mine ? 'yours' : 'sample'}.${key}`) : tr(`tryon.${key}`));
   let current = 'swirl';
   const hatImg = new Image();
   for (const [key, h] of Object.entries(hats)) {
@@ -65,8 +68,8 @@ export async function openTryOn({ tr, reduced }) {
     b.type = 'button';
     b.className = 'tryon-choice';
     b.dataset.hat = key;
-    b.setAttribute('aria-label', key === 'yours' ? yoursLabel : tr(`tryon.${key}`));
-    if (key === 'yours') b.classList.add('tryon-choice--yours');
+    b.setAttribute('aria-label', label(key));
+    if (key === 'out' || key === 'in') b.classList.add('tryon-choice--yours');
     b.style.backgroundImage = `url(${h.src})`;
     b.addEventListener('click', () => choose(key));
     pick.append(b);
@@ -79,7 +82,7 @@ export async function openTryOn({ tr, reduced }) {
     hatBox.style.backgroundImage = `url(${hats[key].src})`;
     pick.querySelectorAll('button').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.hat === key)));
   }
-  choose(mine ? 'yours' : 'swirl');
+  choose(mine ? 'out' : 'swirl');
 
   /* ---------- camera ---------- */
 
@@ -299,19 +302,11 @@ function loadImg(src) {
   });
 }
 
-// the patchwork hat from screen 3
-async function yourHat(cells) {
-  const imgs = {};
-  for (const f of cells) imgs[f] = await loadImg(fabricSrc(f));
-  return frontalHat(cells, imgs);
-}
-
-// draw a frontal hat (patchwork cells, or one fabric) and crop it to the hat itself
-async function frontalHat(cells, imgsOrFabric) {
+// draw a frontal hat from one fabric and crop it to the hat itself
+async function frontalHat(fabric) {
   const c = document.createElement('canvas');
   c.width = 800; c.height = 600;
-  if (cells) drawHat(c, cells, imgsOrFabric);
-  else drawHat(c, [], {}, false, imgsOrFabric);
+  drawHat(c, fabric);
   // crop to the hat itself, so it sits like the photographed ones
   const crop = document.createElement('canvas');
   crop.width = 704; crop.height = 470;

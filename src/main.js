@@ -19,10 +19,10 @@ const PATCHES = [
   { fabric: 'mint', base: '#86DEC9', scale: 0.8 },
   { fabric: 'denim', base: '#4D718D', scale: 0.9 },
   { fabric: 'orange', base: '#E5770F', scale: 0.8 },
-  { fabric: 'gingham', base: '#799083', scale: 0.75 },
+  { fabric: 'gingham', base: '#C85047', scale: 0.75 },
   { fabric: 'lime', base: '#B6D363', scale: 0.8 },
   { fabric: 'cobalt', base: '#054896', scale: 0.8 },
-  { fabric: 'plaid', base: '#756C60', scale: 0.7 },
+  { fabric: 'plaid', base: '#8EA390', scale: 0.55 },
   { fabric: 'linen', base: '#91ABCD', scale: 0.8 },
 ];
 const MAT = '#3D6A5A'; // the cutting mat beyond the cloth, seen in dips and the overview
@@ -64,10 +64,23 @@ function applyLang(l) {
   for (const el of document.querySelectorAll('[data-i18n-label]')) el.setAttribute('aria-label', t(l, el.dataset.i18nLabel));
   for (const b of document.querySelectorAll('[data-lang]')) b.setAttribute('aria-pressed', String(b.dataset.lang === l));
   if (thread) thread.phew = t(l, 'thread.phew');
+  fitArcs();
   buildMap();
   updateHud();
   updateNext();
 }
+
+// the names sewn round the patches on screen 7: shrink any that would run past their half of the circle
+function fitArcs() {
+  for (const text of document.querySelectorAll('.patch-badge text.arc')) {
+    text.style.fontSize = '';
+    const path = document.querySelector(text.firstElementChild.getAttribute('href'));
+    const room = path.getTotalLength() * 0.9;
+    const len = text.getComputedTextLength();
+    if (len > room) text.style.fontSize = `${(10 * room) / len}px`;
+  }
+}
+document.fonts?.ready.then(fitArcs);
 
 /* ---------- spiral map ---------- */
 
@@ -308,10 +321,53 @@ function step(d) {
   go(current + d);
 }
 
+// Screen 2: tap Katrin and she pushes her sunglasses up into her hair (and back down)
+const katrinBtn = document.querySelector('.katrin-btn');
+katrinBtn?.addEventListener('click', () => {
+  const up = katrinBtn.classList.toggle('is-up');
+  katrinBtn.setAttribute('aria-pressed', String(up));
+  sound.pop?.();
+});
+
+// Screen 5: some frames hold a little stack of pieces. Tap one, or wait a moment, and the next comes to the top
+for (const stack of document.querySelectorAll('.piece--stack')) {
+  const photos = [...stack.querySelectorAll('.piece-photo')];
+  const notes = [...stack.querySelectorAll('.piece-note')];
+  const show = (k) => {
+    stack.dataset.show = String(k);
+    photos.forEach((p, i) => p.classList.toggle('is-top', i === k));
+    // one note for the whole stack stays put; otherwise each piece brings its own
+    notes.forEach((n, i) => n.classList.toggle('is-top', notes.length === 1 || i === k));
+  };
+  show(0);
+  const flip = () => show((Number(stack.dataset.show) + 1) % photos.length);
+  let timer = 0;
+  const autoFlip = (delay) => {
+    clearInterval(timer);
+    timer = setInterval(() => {
+      if (document.querySelector('.s5.is-here') && !reducedQuery.matches && !document.hidden) flip();
+    }, delay);
+  };
+  // a tap turns to the next piece and gives you the full wait before it turns again on its own
+  stack.querySelector('.piece-flip').addEventListener('click', () => { flip(); sound.pop?.(); autoFlip(4500); });
+  // the stacks take turns, so the screen never flips everything at once
+  autoFlip(4500 + [...document.querySelectorAll('.piece--stack')].indexOf(stack) * 1300);
+}
+
+// Screen 8: tap the Schmunzelsteinchen and it turns once all the way round and lands
+const stoneBtn = document.querySelector('.stone-btn');
+stoneBtn?.addEventListener('click', () => {
+  stoneBtn.classList.remove('is-turning');
+  void stoneBtn.offsetWidth; // restart the turn if it's tapped again mid-spin
+  stoneBtn.classList.add('is-turning');
+  sound.pop?.();
+});
+stoneBtn?.addEventListener('animationend', (e) => { if (e.animationName === 'stone-turn') stoneBtn.classList.remove('is-turning'); });
+
 // Screen 4: the numbered steps come out one by one as the needle sews along beneath them.
 const STEPS_AT = 3; // spiral index of the process screen
 const steps = [...document.querySelectorAll('.stages li')];
-const STEP_AT = (k) => LEAD + k * 0.2; // progress at which step k appears
+const STEP_AT = (k) => LEAD + k * (0.8 / steps.length); // progress at which step k appears, spread over the screen
 const stepsShown = () => steps.filter((li) => li.classList.contains('is-shown')).length;
 function updateSteps() {
   const p = current === STEPS_AT ? progress : current > STEPS_AT ? 1 : 0;
@@ -532,7 +588,7 @@ for (const env of envelopes) {
   });
 }
 
-/* ---------- the lost button: find it in the plaid and it gets sewn onto the label ---------- */
+/* ---------- the lost button: find it in the cobalt terry and it gets sewn onto the label ---------- */
 
 const lostBtn = document.getElementById('lost-button');
 lostBtn.addEventListener('click', () => {
@@ -591,8 +647,16 @@ function makeGrain() {
   });
 }
 
-function loadFabrics() {
-  PATCHES.forEach((p, i) => {
+// The screen you land on gets its fabric first, then its neighbours along the spiral; the rest come
+// once the page is idle. Until a scan arrives, its patch is painted in the fabric's average colour.
+let siteShown;
+const shown = new Promise((r) => { siteShown = r; });
+function loadFabrics(first) {
+  const loaded = new Set();
+  const load = (i) => new Promise((resolve) => {
+    if (i < 0 || i >= PATCHES.length || loaded.has(i)) return resolve();
+    loaded.add(i);
+    const p = PATCHES[i];
     const img = new Image();
     img.decoding = 'async';
     img.onload = () => {
@@ -600,9 +664,15 @@ function loadFabrics() {
       pat.setTransform(new DOMMatrix().scale(p.scale));
       fabrics[i] = pat;
       kick();
+      resolve();
     };
+    img.onerror = resolve;
     img.src = `${import.meta.env.BASE_URL}fabric/${p.fabric}.webp`;
   });
+  const idle = window.requestIdleCallback || ((f) => setTimeout(f, 300));
+  load(first)
+    .then(() => Promise.all([load(first - 1), load(first + 1), shown]))
+    .then(() => idle(() => PATCHES.forEach((_, i) => load(i))));
 }
 
 // the thread's inset from the screen edge: inside the padding, clear of the copy
@@ -820,11 +890,16 @@ if (navigator.mediaDevices?.getUserMedia) {
   });
 }
 grain = makeGrain();
-loadFabrics();
+loadFabrics(start);
 Object.assign(cam, target(start));
 setInert();
-document.fonts.ready.then(() => {
+// show the site once its fonts are in, but never wait longer than a moment on a slow line:
+// a late font simply swaps in, and the layout is measured again when it does
+const fontsOrTimeout = Promise.race([document.fonts.ready, new Promise((r) => setTimeout(r, 1500))]);
+fontsOrTimeout.then(() => {
   relayout(false);
   go(start, { instant: true, focus: false });
   root.classList.add('is-ready');
+  siteShown();
 });
+document.fonts.ready.then(() => { if (root.classList.contains('is-ready')) relayout(false); });

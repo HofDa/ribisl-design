@@ -406,57 +406,56 @@ p { text-wrap: pretty; }
   justify-items: start;
   z-index: 2;
 }
-.board-grid {
+/* two sides of the hat, side by side: tap one to photograph a fabric for it */
+.board { width: min(30vh, 260px); }
+.board-sides { display: grid; grid-template-columns: 1fr auto 1fr; align-items: start; gap: 0.5rem; width: 100%; }
+.side { display: grid; gap: 0.45rem; justify-items: center; min-width: 0; }
+.side-name { font: 700 0.68rem/1 var(--font); letter-spacing: 0.08em; text-transform: uppercase; }
+.side-turn { align-self: center; margin-top: -1.2rem; font-size: 1.3rem; font-weight: 700; opacity: 0.85; }
+.board.is-sewn .side-turn { animation: spin-once 0.7s 0.2s cubic-bezier(0.34, 1.56, 0.64, 1) both; }
+@keyframes spin-once { from { rotate: -360deg; } }
+.cell {
   position: relative;
   width: 100%;
   aspect-ratio: 1;
   display: grid;
-  grid-template: 1fr 1fr / 1fr 1fr;
-  outline: 2px dashed rgba(251, 249, 244, 0.75);
-  outline-offset: 5px;
-  background: rgba(251, 249, 244, 0.12);
-  transition: rotate 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.4s;
-}
-.cell {
+  place-items: center;
   padding: 0;
-  border: 1px dashed rgba(251, 249, 244, 0.5);
-  background: transparent center / cover no-repeat;
-  cursor: default;
+  border: 0;
+  outline: 2px dashed rgba(251, 249, 244, 0.75);
+  outline-offset: 3px;
+  background: rgba(251, 249, 244, 0.12) center / cover no-repeat;
+  color: inherit;
+  cursor: pointer;
+  transition: background-color 0.15s, rotate 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s;
 }
-.cell.is-filled { border-color: transparent; cursor: pointer; }
-.cell.is-target { background-color: rgba(245, 205, 211, 0.55); border: 2px solid var(--red-soft); }
-.board-stitch { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; overflow: visible; }
-.zig { fill: none; stroke: #FBF9F4; stroke-width: 2.2; vector-effect: non-scaling-stroke; stroke-linejoin: round; stroke-dasharray: 100; stroke-dashoffset: 100; filter: drop-shadow(0 1px 0 rgba(0, 0, 0, 0.4)); }
-.board.is-sewn .zig { stroke-dashoffset: 0; transition: stroke-dashoffset 0.9s ease-in-out; }
-.board.is-sewn .board-grid { rotate: -3deg; box-shadow: 0 4px 0 rgba(10, 20, 40, 0.2), 0 18px 30px rgba(10, 20, 40, 0.35); outline-color: transparent; }
+.cell:hover { background-color: rgba(251, 249, 244, 0.26); rotate: -2deg; }
+.cell-empty { display: grid; justify-items: center; gap: 0.25rem; font: 700 0.7rem/1 var(--font); letter-spacing: 0.06em; text-transform: uppercase; text-shadow: inherit; }
+.cell-empty svg { width: 1.7rem; height: 1.7rem; }
+.cell.is-filled { outline-color: transparent; box-shadow: 0 4px 2px rgba(10, 20, 40, 0.28), 0 16px 20px rgba(10, 20, 40, 0.32); }
+.cell.is-filled .cell-empty { display: none; }
+.cell[data-side='out'] { rotate: -2deg; }
+.cell[data-side='in'] { rotate: 2.5deg; }
+.cell.is-filled:hover { rotate: 0deg; }
+/* once a side is filled, a small camera in the corner says you can photograph another one */
+.cell-again {
+  position: absolute;
+  right: -0.45rem;
+  bottom: -0.45rem;
+  display: none;
+  place-items: center;
+  width: 1.6rem;
+  height: 1.6rem;
+  border-radius: 50%;
+  background: var(--tag);
+  color: var(--ink);
+  box-shadow: 0 2px 4px rgba(10, 20, 40, 0.35);
+}
+.cell-again svg { width: 0.95rem; height: 0.95rem; }
+.cell.is-filled .cell-again { display: grid; }
+.cell.is-target { background-color: rgba(245, 205, 211, 0.55); outline: 2px solid var(--red-soft); }
 .board-hint { font-size: 0.85rem; font-weight: 600; max-width: 16rem; }
 .board.is-sewn .board-hint { animation: drop-in 0.5s cubic-bezier(0.34, 1.56, 0.64, 1); }
-
-/* your own fabric sits to the left of the board */
-.board-main { display: flex; align-items: flex-end; gap: 0.8rem; width: 100%; }
-.board-main .board-grid { flex: 1; min-width: 0; }
-.board { width: calc(min(24vh, 210px) + 4.6rem); }
-.own { display: grid; gap: 0.5rem; justify-items: center; width: 3.8rem; flex: none; }
-.own-add {
-  display: grid;
-  justify-items: center;
-  gap: 0.2rem;
-  padding: 0.45rem 0.3rem;
-  border: 1.5px dashed rgba(251, 249, 244, 0.75);
-  background: rgba(251, 249, 244, 0.12);
-  color: inherit;
-  font: 700 0.62rem/1.15 var(--font);
-  letter-spacing: 0.03em;
-  text-transform: uppercase;
-  text-align: center;
-  cursor: pointer;
-  transition: background-color 0.15s, transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-.own-add svg { width: 1.5rem; height: 1.5rem; }
-.own-add:hover { background: rgba(251, 249, 244, 0.28); transform: rotate(-3deg) scale(1.05); }
-button.swatch.swatch--own { width: 3.6rem; margin: 0; }
-button.swatch.swatch--own[hidden] { display: none; }
-button.swatch.swatch--own:not([hidden]) { animation: toss 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) both; }
 
 /* the cutter: a full-screen table with your photo and a square to cut */
 .cutter {
@@ -522,8 +521,9 @@ button.swatch:active { cursor: grabbing; }
 
 /* ---------- the workbench, part 3: your hat (screens 5 and 9) ---------- */
 
-.hat-canvas { position: absolute; left: 3%; width: 94%; top: 50%; translate: 0 -46%; height: auto; display: none; }
-.piece--hat.has-hat .hat-canvas { display: block; }
+.hat-turn { position: absolute; inset: 0; display: none; padding: 0; border: 0; background: none; cursor: pointer; }
+.hat-canvas { position: absolute; left: 3%; width: 94%; top: 50%; translate: 0 -46%; height: auto; }
+.piece--hat.has-hat .hat-turn { display: block; }
 .piece--hat.has-hat .soon { display: none; }
 .piece.piece--hat .yours-label { position: absolute; top: auto; right: auto; left: 0.7rem; bottom: 0.9rem; display: none; background: var(--red); color: var(--tag); outline-color: rgba(251, 249, 244, 0.6); }
 .piece--hat.is-yours .yours-label { display: inline-flex; animation: stick 0.5s cubic-bezier(0.34, 1.9, 0.6, 1) both; }
@@ -1462,12 +1462,15 @@ button.swatch:active { cursor: grabbing; }
   .bench-note { flex-basis: 100%; max-width: none; display: flex; flex-wrap: wrap; align-items: center; gap: 0.4rem 0.7rem; }
   .bench-note .label { font-size: 0.66rem; }
   .cut-btn { font-size: 0.8rem; }
-  .board { right: var(--pad); width: calc(74px + 3.4rem); gap: 0.3rem; }
-  .board-main { gap: 0.4rem; }
-  .own { width: 3rem; gap: 0.3rem; }
-  .own-add { font-size: 0.5rem; padding: 0.3rem 0.15rem; }
-  .own-add svg { width: 1.1rem; height: 1.1rem; }
-  button.swatch.swatch--own { width: 2.6rem; }
+  .board { right: var(--pad); width: 136px; gap: 0.35rem; }
+  .board-sides { gap: 0.25rem; }
+  .side { gap: 0.35rem; }
+  .side-name { font-size: 0.55rem; }
+  .side-turn { font-size: 0.95rem; margin-top: -0.9rem; }
+  .cell-empty { font-size: 0.5rem; gap: 0.15rem; }
+  .cell-empty svg { width: 1.15rem; height: 1.15rem; }
+  .cell-again { width: 1.25rem; height: 1.25rem; right: -0.35rem; bottom: -0.35rem; }
+  .cell-again svg { width: 0.75rem; height: 0.75rem; }
   .s3 .head { min-height: 100px; }
   .board-label { font-size: 0.58rem; padding: 0.35em 0.5em; }
   .board-hint { display: none; }
@@ -1510,3 +1513,436 @@ button.swatch:active { cursor: grabbing; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; }
 }
+
+/* ---------- colour and life: every screen as fresh as the market hats ---------- */
+
+/* big headings take a deep shade of the colour opposite their cloth (6 keeps its ink: lime already sings) */
+.s2 .display { color: #6E1650; }              /* plum on mint */
+.s3 .display { color: #FFD36E; }              /* butter on denim */
+.s4 .display, .s4 .stages .n { color: #16246B; } /* navy on orange */
+.s5 .display { color: #17603A; }              /* green on the red check */
+.s7 .display { color: #FFC066; }              /* apricot on cobalt */
+.s8 .display { color: #A80F2B; }              /* thread red on the teal tartan */
+.s9 .display { color: #8A0C24; }              /* the finale in redcurrant */
+
+/* the hat's two-layer shadow: a tight contact shadow and a soft one far below */
+.patch, .nodes li, .piece {
+  box-shadow: 0 4px 2px rgba(30, 24, 26, 0.2), 0 20px 24px rgba(30, 24, 26, 0.26);
+  transition: translate 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), scale 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s;
+}
+.patch:hover, .nodes li:hover { translate: 0 -5px; }
+.patch:hover, .nodes li:hover, .piece:hover {
+  box-shadow: 0 8px 4px rgba(30, 24, 26, 0.16), 0 30px 30px rgba(30, 24, 26, 0.28);
+}
+.env-front, .env-back { box-shadow: 0 4px 2px rgba(10, 20, 40, 0.28), 0 22px 24px rgba(10, 20, 40, 0.34); }
+.swatch { filter: drop-shadow(0 4px 2px rgba(10, 20, 40, 0.3)) drop-shadow(0 20px 20px rgba(10, 20, 40, 0.32)); }
+
+/* idle: every few seconds one thing after another stirs, only on the screen you're on */
+:is(.rows, .stages, .pieces, .nodes) > :nth-child(2) { --k: 1; }
+:is(.rows, .stages, .pieces, .nodes) > :nth-child(3) { --k: 2; }
+:is(.rows, .stages, .pieces, .nodes) > :nth-child(4) { --k: 3; }
+:is(.rows, .stages, .pieces, .nodes) > :nth-child(5) { --k: 4; }
+:is(.rows, .stages, .pieces, .nodes) > :nth-child(6) { --k: 5; }
+
+.s3.is-here .rows .swatch { animation: idle-wiggle 6s calc(1.4s + var(--k, 0) * 1.5s) ease-in-out infinite; }
+.s5.is-here .piece { animation: idle-sway 6s calc(1.2s + var(--k, 0) * 1.5s) ease-in-out infinite; }
+.s8.is-here .nodes li { animation: idle-wiggle 7.2s calc(3.6s + var(--k, 0) * 1.2s) ease-in-out infinite; }
+.s7.is-here .env:not(.is-tearing):not(.is-open) .env-flap { animation: flap-twitch 6s calc(1.4s + var(--k, 0) * 1.5s) ease-in-out infinite; }
+.is-ready .s4.is-here .stages li.is-shown .n {
+  animation: number-pop 0.5s cubic-bezier(0.34, 1.9, 0.6, 1), idle-hop 6s calc(2s + var(--k, 0) * 1.5s) ease-in-out infinite;
+}
+.envelopes > :nth-child(2) { --k: 1; }
+.envelopes > :nth-child(3) { --k: 2; }
+.envelopes > :nth-child(4) { --k: 3; }
+
+@keyframes idle-wiggle {
+  0%, 12%, 100% { transform: none; }
+  3% { transform: rotate(-4deg) translateY(-4px); }
+  6% { transform: rotate(3deg); }
+  9% { transform: rotate(-1.5deg); }
+}
+@keyframes idle-sway {
+  0%, 14%, 100% { transform: none; }
+  4% { transform: translateY(-8px) rotate(-1.5deg); }
+  9% { transform: translateY(0) rotate(1deg); }
+}
+@keyframes idle-hop {
+  0%, 10%, 100% { transform: none; }
+  4% { transform: translateY(-14px) rotate(-6deg); }
+  7% { transform: translateY(0) rotate(2deg); }
+}
+/* someone lifts the corner to peek, then lets it drop */
+@keyframes flap-twitch {
+  0%, 12%, 100% { transform: none; }
+  4% { transform: rotateX(-38deg); }
+  7% { transform: rotateX(-6deg); }
+  9% { transform: rotateX(-14deg); }
+}
+/* the red check would show through a see-through frame as pink */
+.s5 .piece { background: var(--tag); }
+
+/* ---------- 4 · the steps, drawn; and to finish, a Schmunzelsteinchen ---------- */
+
+.step-art { display: block; width: clamp(76px, min(11vw, 17vh), 190px); height: auto; overflow: visible; filter: drop-shadow(0 3px 2px rgba(60, 20, 0, 0.22)) drop-shadow(0 12px 14px rgba(60, 20, 0, 0.18)); }
+.stages li { position: relative; }
+
+/* each drawing does its job once, as its step comes out */
+.step-art .art-glass { transform-box: view-box; }
+.is-ready .stages li.is-shown .art-glass { animation: art-search 1.4s 0.3s ease-in-out both; }
+@keyframes art-search { 0%, 100% { translate: 0 0; } 30% { translate: -26px -10px; } 65% { translate: -12px 14px; } }
+.art-ripper { transform-box: view-box; }
+.is-ready .stages li.is-shown .art-ripper { animation: art-rip 0.9s 0.3s cubic-bezier(0.45, 0, 0.55, 1) both; }
+@keyframes art-rip { from { translate: 0 22px; } }
+.art-scissors .blade { transform-box: view-box; }
+.is-ready .stages li.is-shown .art-scissors .blade--a { animation: art-snip-a 0.16s 0.3s ease-in-out 6 alternate both; }
+.is-ready .stages li.is-shown .art-scissors .blade--b { animation: art-snip-b 0.16s 0.3s ease-in-out 6 alternate both; }
+@keyframes art-snip-a { from { rotate: -14deg; } to { rotate: 0deg; } }
+@keyframes art-snip-b { from { rotate: 14deg; } to { rotate: 0deg; } }
+
+/* the steps flow under the heading (so they never run into it) and sit at the bottom when there's room */
+.s4 { display: flex; flex-direction: column; }
+.s4 .stages {
+  position: static;
+  margin-top: auto;
+  padding-top: clamp(1rem, 4vh, 3rem);
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: clamp(1rem, 2.4vw, 2.6rem);
+}
+.stone-art { height: auto; overflow: visible; }
+
+/* phones */
+@media (max-width: 900px) {
+  .s4 .stages { grid-template-columns: repeat(2, minmax(0, 1fr)); margin-top: 1.4rem; padding-top: 0; }
+  .step-art { width: clamp(56px, 9vh, 84px); margin: -0.1rem 0 0.1rem; }
+}
+
+/* short laptop windows: no stagger, smaller numbers and drawings, so all five fit without scrolling */
+@media (min-width: 901px) and (max-height: 780px) {
+  .s4 .stages li:nth-child(even) { margin-top: 0; }
+  .s4 .stages .n { font-size: clamp(2.4rem, 7vh, 4rem); }
+  .s4 .step-art { width: clamp(70px, 13vh, 120px); }
+  .s4 .stages { padding-top: 1rem; }
+}
+
+
+/* ---------- 7 · where Katrin has been: embroidered patches, and a market stall for your event ---------- */
+
+.refs {
+  position: absolute;
+  left: var(--pad);
+  bottom: var(--pad-bottom);
+  width: min(30rem, calc(100% - min(48rem, 58%) - 3 * var(--pad)));
+  display: grid;
+  gap: 0.9rem;
+  justify-items: start;
+  z-index: 1;
+}
+.refs h3.label { color: var(--ink); text-shadow: none; font-size: 0.72rem; }
+
+/* four round patches, sewn on a little crooked and overlapping, like on a market jacket */
+.patches { display: flex; align-items: center; padding-left: 0.4rem; }
+.patch-badge { width: clamp(84px, min(7.4vw, 13vh), 118px); flex: none; margin-left: -0.55rem; filter: drop-shadow(0 3px 2px rgba(10, 20, 40, 0.35)) drop-shadow(0 12px 14px rgba(10, 20, 40, 0.3)); transition: rotate 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), translate 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), scale 0.35s cubic-bezier(0.34, 1.56, 0.64, 1); }
+.patch-badge:first-child { margin-left: 0; }
+.patch-badge svg { display: block; width: 100%; height: auto; overflow: visible; }
+.patch-badge--1 { rotate: -8deg; }
+.patch-badge--2 { rotate: 6deg; translate: 0 10px; z-index: 1; }
+.patch-badge--3 { rotate: -4deg; translate: 0 -6px; }
+.patch-badge--4 { rotate: 9deg; translate: 0 8px; scale: 0.9; }
+.patch-badge:hover { rotate: 0deg; translate: 0 -8px; scale: 1.08; z-index: 2; }
+/* satin-stitch border: dense short stitches all round the edge */
+.patch-badge .satin { stroke: rgba(30, 24, 26, 0.55); stroke-width: 7; stroke-dasharray: 0.9 0.7; }
+.patch-badge--2 .satin { stroke: rgba(80, 6, 20, 0.75); }
+.patch-badge .arc { font: 700 10px/1 var(--font); letter-spacing: 0.06em; text-transform: uppercase; text-anchor: middle; }
+/* the patches are sewn on one after another when you arrive */
+.s7.is-here .patch-badge { animation: patch-on 0.5s cubic-bezier(0.34, 1.7, 0.6, 1) both; }
+.s7.is-here .patch-badge--2 { animation-delay: 0.12s; }
+.s7.is-here .patch-badge--3 { animation-delay: 0.24s; }
+.s7.is-here .patch-badge--4 { animation-delay: 0.36s; }
+@keyframes patch-on { from { opacity: 0; transform: scale(0.3) rotate(-30deg); } }
+
+/* the invitation, under a striped market-stall awning */
+.stall { width: 100%; max-width: 27rem; background: rgba(251, 249, 244, 0.1); outline: 1.5px dashed rgba(251, 249, 244, 0.55); outline-offset: -5px; }
+.stall-bunting { display: block; width: 100%; height: auto; overflow: visible; margin-bottom: -0.6rem; filter: drop-shadow(0 3px 2px rgba(10, 20, 40, 0.35)); }
+/* the pennants flutter one after another, as if a breeze went down the line */
+.stall-bunting .pennant { transform-box: fill-box; transform-origin: 50% 0; }
+.s7.is-here .stall-bunting .pennant { animation: flutter 5s calc(var(--i) * 0.09s) ease-in-out infinite; }
+@keyframes flutter { 0%, 18%, 100% { rotate: 0deg; } 5% { rotate: 7deg; } 11% { rotate: -4deg; } }
+.stall-copy { padding: 1rem 1rem 0.8rem; font-size: 0.95rem; line-height: 1.4; }
+.stall-copy .textlink { font-weight: 700; white-space: nowrap; display: inline-flex; align-items: center; gap: 0.2em; }
+.refs-motto { font-family: var(--hand); font-size: clamp(1.5rem, 2.2vw, 2.1rem); line-height: 1; font-weight: 600; color: #FFC066; rotate: -2deg; }
+
+/* phones and narrow windows: the references follow the envelopes */
+@media (max-width: 900px) {
+  .refs { position: static; width: auto; margin-top: 1.2rem; gap: 0.6rem; }
+  .patch-badge { width: clamp(64px, 21vw, 92px); }
+  .stall { max-width: none; }
+  .stall-copy { font-size: 0.85rem; padding: 0.45rem 0.8rem 0.6rem; }
+  .refs-motto { font-size: 1.3rem; }
+}
+@media (max-width: 600px) {
+  .s7 .envelopes li.env { height: 62px; }
+  .s7 .envelopes { gap: 0.5rem; }
+  .refs { margin-top: 0.9rem; gap: 0.45rem; }
+  .stall-copy { font-size: 0.8rem; line-height: 1.35; }
+  .refs-motto { font-size: 1.2rem; }
+}
+
+/* the Schmunzelsteinchen turns round when tapped */
+.stone-btn { display: block; padding: 0; border: 0; background: none; color: inherit; cursor: pointer; perspective: 500px; -webkit-tap-highlight-color: transparent; }
+.stone-btn .stone-art { transition: scale 0.25s cubic-bezier(0.34, 1.56, 0.64, 1); }
+.stone-btn:hover .stone-art { scale: 1.06; }
+.stone-btn.is-turning { animation: stone-turn 0.95s cubic-bezier(0.34, 1.3, 0.64, 1); }
+@keyframes stone-turn {
+  0% { transform: none; }
+  20% { transform: translateY(-16px) rotateY(0deg); }
+  70% { transform: translateY(-16px) rotateY(360deg); }
+  85% { transform: translateY(2px) rotateY(360deg) scale(1.04, 0.94); }
+  100% { transform: rotateY(360deg); }
+}
+
+
+/* step 3, the spark: the bulb flickers, then lights up and glows */
+.bulb-rays, .bulb-glow { opacity: 0; }
+.bulb-glow { filter: blur(6px); }
+.bulb-glass { transition: fill 0.2s; }
+.is-ready .stages li.is-shown .bulb-glass { animation: bulb-on 1.2s 0.5s steps(1, end) both; }
+.is-ready .stages li.is-shown .bulb-glow { animation: bulb-glow-on 1.2s 0.5s steps(1, end) both, bulb-pulse 3s 1.8s ease-in-out infinite; }
+.is-ready .stages li.is-shown .bulb-rays { animation: bulb-rays 0.5s 1.6s cubic-bezier(0.34, 1.7, 0.6, 1) both; transform-box: view-box; transform-origin: 60px 38px; }
+.is-ready .stages li.is-shown .bulb-wire { animation: bulb-wire 1.2s 0.5s steps(1, end) both; }
+@keyframes bulb-on { 0% { fill: #FBF9F4; } 15% { fill: #FFE27A; } 25% { fill: #FBF9F4; } 40% { fill: #FFE27A; } 50% { fill: #FBF9F4; } 75%, 100% { fill: #FFD84D; } }
+@keyframes bulb-glow-on { 0% { opacity: 0; } 15% { opacity: 0.7; } 25% { opacity: 0; } 40% { opacity: 0.8; } 50% { opacity: 0; } 75%, 100% { opacity: 1; } }
+@keyframes bulb-pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.65; } }
+@keyframes bulb-wire { 0% { stroke: #1E181A; } 75%, 100% { stroke: #C4122F; } }
+@keyframes bulb-rays { from { opacity: 0; scale: 0.6; } to { opacity: 1; scale: 1; } }
+/* without the reveal (no JavaScript, or after the steps): simply lit */
+.stages li:not(.is-shown) .bulb-glass { fill: #FBF9F4; }
+@media (prefers-reduced-motion: reduce) {
+  .bulb-rays, .bulb-glow { opacity: 1; }
+  .bulb-glass { fill: #FFD84D; }
+}
+
+/* phones: five steps as one list, drawing on the left, number, title and text beside it */
+@media (max-width: 900px) {
+  .s4 .stages { grid-template-columns: 1fr; gap: 0.55rem; margin-top: 1rem; }
+  .s4 .stages li:not(.stone) { grid-template-columns: clamp(48px, 15vw, 64px) 1fr; column-gap: 0.75rem; row-gap: 0.05rem; align-items: start; padding-top: 0.5rem; }
+  .s4 .stages li:not(.stone) .step-art { grid-column: 1; grid-row: 1 / span 2; width: 100%; margin: 0.15rem 0 0; }
+  .s4 .stages li:not(.stone) .n { grid-column: 2; grid-row: 1; justify-self: start; align-self: center; font-size: 1.35rem; line-height: 1; }
+  .s4 .stages li:not(.stone) h3 { grid-column: 2; grid-row: 1; padding-left: 1.5rem; }
+  .s4 .stages li:not(.stone) p { grid-column: 2; grid-row: 2; max-width: none; }
+}
+@media (max-width: 900px) and (max-height: 720px) {
+  .s4 .stages { gap: 0.3rem; margin-top: 0.6rem; }
+  .s4 .stages li:not(.stone) { padding-top: 0.35rem; grid-template-columns: 46px 1fr; }
+  .s4 .stages li:not(.stone) p { font-size: 0.8rem; line-height: 1.3; }
+  .s4 .stages li:not(.stone) h3 { font-size: 0.98rem; }
+  .s4 .sub { font-size: 0.85rem; }
+}
+
+/* ---------- 8 · the Schmunzelsteinchen, sitting right beside the "Mit Schmunzeln" label ---------- */
+.s8 .stone {
+  position: absolute;
+  right: -0.4rem;
+  bottom: calc(100% - 0.7rem);
+  z-index: 2;
+  display: grid;
+  justify-items: center;
+  gap: 0.1rem;
+  rotate: 0deg;
+  font-size: 1rem;
+  letter-spacing: 0;
+}
+.s8 .stone-art { width: clamp(64px, min(6vw, 11vh), 100px); filter: drop-shadow(0 6px 8px rgba(30, 24, 26, 0.3)); }
+.s8 .stone-note {
+  font-family: var(--hand);
+  font-size: clamp(0.95rem, 1.2vw, 1.2rem);
+  line-height: 1;
+  font-weight: 600;
+  rotate: -4deg;
+  background: var(--tag);
+  padding: 0.2em 0.5em 0.25em;
+  outline: 1px dashed rgba(30, 24, 26, 0.45);
+  outline-offset: -3px;
+  box-shadow: 0 2px 0 rgba(30, 24, 26, 0.12), 0 5px 12px rgba(30, 24, 26, 0.16);
+}
+/* it rolls in once the labels are written */
+.s8.is-here .stone { animation: stone-drop 0.7s 3.4s cubic-bezier(0.34, 1.56, 0.64, 1) both; }
+@keyframes stone-drop { from { opacity: 0; translate: 0 -60px; rotate: -25deg; } 60% { opacity: 1; } }
+@media (max-width: 900px) {
+  .s8 .stone { right: -0.3rem; bottom: calc(100% - 0.5rem); }
+  .s8 .stone-art { width: 48px; }
+  .s8 .stone-note { font-size: 0.78rem; }
+}
+
+/* screen 7: a blue button, lost in the blue terry, so you really have to look for it */
+.s7 .lost-button { left: 89%; top: 30%; }
+.s7 .lost-button circle:first-child { fill: #2C62B0; stroke: #0B2C66; }
+.s7 .lost-button circle:nth-child(2) { stroke: #1A4C94; }
+.s7 .lost-button g { fill: #0B2C66; }
+.s7 .found-note { top: calc(30% + 34px); }
+@media (max-width: 900px) {
+  .s7 .lost-button { left: 86%; top: 12%; }
+  .s7 .found-note { top: calc(12% + 34px); }
+}
+@media (max-width: 600px) {
+  .stall-bunting { margin-bottom: -0.9rem; }
+  .stall-copy { padding: 0.75rem 0.8rem 0.55rem; }
+  .s7 .refs { gap: 0.35rem; }
+}
+
+/* step 5: the sewing machine runs while you're on the screen: needle up and down, wheel turning, stitches running through */
+.sm-needle, .sm-wheel { transform-box: fill-box; }
+.sm-wheel { transform-origin: 50% 50%; }
+.s4.is-here .stages li.is-shown .sm-needle { animation: sm-needle 0.22s ease-in-out infinite alternate; }
+.s4.is-here .stages li.is-shown .sm-wheel { animation: sm-wheel 0.9s linear infinite; }
+.s4.is-here .stages li.is-shown .sm-stitch { animation: sm-stitch 0.44s linear infinite; }
+@keyframes sm-needle { from { translate: 0 -5px; } to { translate: 0 1px; } }
+@keyframes sm-wheel { to { rotate: -360deg; } }
+@keyframes sm-stitch { to { stroke-dashoffset: -7; } }
+
+/* the German label already says it ("Mit Schmunzel(steinchen)"), so there the stone needs no note of its own;
+   on phones there's no room for one in any language */
+.s8 .stone-note:empty { display: none; }
+@media (max-width: 900px) { .s8 .stone-note { display: none; } }
+
+/* ---------- 2 · Katrin, cut out, in giant round sunglasses ---------- */
+/* desktop: in the right column, sitting on top of the text block about her */
+.katrin {
+  position: relative;
+  grid-column: 2;
+  grid-row: 1;
+  justify-self: start;
+  align-self: end;
+  height: clamp(150px, calc(100vh - 592px), 330px);
+  max-width: 100%;
+  aspect-ratio: 395 / 510;
+  margin: 0 0 -0.6rem 0.4rem;
+  rotate: -2deg;
+  z-index: 1;
+}
+@media (min-width: 901px) {
+  .s2 .s2-body { grid-row: 2; align-self: start; padding-top: 0; }
+  /* the big heading spans the left column, so its height never pushes the text down */
+  .s2 .display { grid-row: 1 / 3; align-self: start; }
+  .katrin-name { left: auto; right: -1.4rem; bottom: 18%; rotate: 5deg; }
+}
+.katrin-btn { position: relative; display: block; width: 100%; height: 100%; padding: 0; border: 0; background: none; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.katrin-btn img { display: block; width: 100%; height: 100%; filter: drop-shadow(0 4px 2px rgba(30, 24, 26, 0.25)) drop-shadow(0 18px 22px rgba(30, 24, 26, 0.28)); user-select: none; }
+.katrin-shades { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; }
+.katrin-shades .shades { transform-box: view-box; transition: translate 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), scale 0.5s cubic-bezier(0.34, 1.56, 0.64, 1); filter: drop-shadow(0 6px 4px rgba(30, 24, 26, 0.35)); }
+/* pushed up into her hair */
+.katrin-btn.is-up .shades { translate: 0 -118px; scale: 0.92; }
+.katrin-name { position: absolute; left: -0.6rem; bottom: 12%; rotate: -6deg; font-size: 0.75rem; }
+/* they drop onto her nose when you arrive, and now and then catch the light */
+.katrin-shades .shades-drop { transform-box: view-box; }
+.s2.is-here .katrin-shades .shades-drop { animation: shades-on 0.8s 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both; }
+@keyframes shades-on { from { translate: 0 -170px; opacity: 0; } 50% { opacity: 1; } }
+.shades-glint { transform-box: view-box; }
+.s2.is-here .shades-glint { animation: glint 5s 2s ease-in-out infinite; }
+@keyframes glint { 0%, 70% { translate: -60px 0; } 85%, 100% { translate: 300px 0; } }
+.katrin-btn:hover img { scale: 1.02; transition: scale 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
+
+@media (max-width: 900px) {
+  /* phones: Katrin shares the heading's row, the text starts below both */
+  .s2 { grid-template-columns: 1fr auto; }
+  .s2 .display { grid-column: 1; grid-row: 1; align-self: center; }
+  .katrin { grid-column: 2; grid-row: 1; justify-self: end; align-self: center; height: clamp(90px, 15vh, 140px); margin: 0 0.2rem 0 0; }
+  .s2-body { grid-column: 1 / -1; grid-row: 2; }
+  .s2 .cutout { grid-column: 1 / -1; grid-row: 3; }
+  .katrin-name { font-size: 0.6rem; left: -0.8rem; bottom: 6%; }
+  .katrin-btn.is-up .shades { translate: 0 -118px; }
+}
+
+@media (max-width: 900px) and (max-height: 720px) {
+  .katrin { height: 76px; }
+  .katrin-name { display: none; }
+}
+
+/* phones: the small swatches can't carry a long one-line tag, so it wraps and stays inside the screen */
+@media (max-width: 900px) {
+  .s3 .yours-tag { white-space: normal; width: 4.6rem; text-align: center; font-size: 0.5rem; line-height: 1.15; padding: 0.25em 0.3em; bottom: -0.7rem; }
+}
+
+/* phones: screen 7 gets room to breathe. An open envelope grows so its back is readable,
+   and the references below get space of their own */
+@media (max-width: 600px) {
+  .s7 .envelopes { gap: 0.7rem; }
+  .s7 .envelopes li.env { height: 64px; transition: height 0.35s cubic-bezier(0.34, 1.3, 0.64, 1); }
+  .s7 .envelopes li.env.is-open { height: 128px; }
+  .s7 .env-back { padding: 0.7rem 2.6rem 0.7rem 0.9rem; gap: 0.35rem; }
+  .s7 .env-back p { font-size: 0.85rem; line-height: 1.35; }
+  .s7 .refs { margin-top: 2rem; gap: 0.8rem; }
+  .s7 .patches { gap: 0.25rem; padding-left: 0.2rem; }
+  .s7 .patch-badge { width: clamp(62px, 19vw, 82px); margin-left: 0; }
+  .s7 .stall-copy { padding: 1rem 0.9rem 0.8rem; }
+  .s7 .refs-motto { margin-top: 0.2rem; }
+}
+@media (max-width: 600px) { .s7 .refs-motto { display: none; } }
+/* short laptop windows: a little less air in the text block so Katrin can stay a decent size */
+@media (min-width: 901px) and (max-height: 780px) {
+  .s2 .s2-body { gap: 1.1rem; }
+}
+@media (min-width: 901px) and (max-height: 710px) { .katrin { height: 104px; } }
+
+/* ---------- 5 · real pieces in their pattern-piece frames: cut out, lying on the paper ---------- */
+.piece img.piece-photo { inset: 9% 7% 14%; width: 86%; height: 77%; object-fit: contain; filter: drop-shadow(0 3px 2px rgba(30, 24, 26, 0.22)) drop-shadow(0 12px 14px rgba(30, 24, 26, 0.22)); transition: rotate 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), scale 0.35s cubic-bezier(0.34, 1.56, 0.64, 1); }
+.piece:hover img.piece-photo { scale: 1.05; rotate: -2deg; }
+.piece-note {
+  position: absolute;
+  left: 0.7rem;
+  right: 2.4rem;
+  bottom: 0.8rem;
+  font-family: var(--hand);
+  font-size: clamp(0.9rem, 1.15vw, 1.15rem);
+  line-height: 1.05;
+  font-weight: 600;
+  color: var(--red-deep);
+  rotate: -2deg;
+  z-index: 1;
+}
+@media (max-width: 900px) {
+  .piece img.piece-photo { inset: 16% 6% 18%; width: 88%; height: 66%; }
+  .piece-note { font-size: 0.78rem; right: 1.8rem; bottom: 0.55rem; }
+}
+@media (max-width: 600px) { .piece-note { display: none; } }
+/* short windows: smaller frames, so the Instagram link below never sits on them */
+@media (min-width: 901px) and (max-height: 800px) {
+  .piece:nth-child(1) { width: min(100%, 28vh); }
+  .piece:nth-child(2) { width: min(88%, 23vh); }
+  .piece:nth-child(3) { width: min(96%, 26vh); }
+  .piece:nth-child(4) { width: min(84%, 22vh); margin-top: 2vh; }
+}
+@media (max-width: 900px) and (max-height: 700px) {
+  .piece:nth-child(n) { width: min(100%, 17vh); }
+}
+
+/* Katrin's name label: just as long as her name, sewn onto her arm (bottom left of the photo) */
+.katrin .katrin-name { left: 3%; right: auto; bottom: 10%; width: auto; rotate: -9deg; font-size: 0.72rem; }
+@media (max-width: 900px) { .katrin .katrin-name { left: -4%; bottom: 8%; font-size: 0.58rem; } }
+
+/* very short desktop windows and small phones: the frames on screen 5 a touch smaller again */
+@media (min-width: 901px) and (max-height: 720px) {
+  .piece:nth-child(1) { width: min(100%, 25vh); }
+  .piece:nth-child(2) { width: min(88%, 21vh); }
+  .piece:nth-child(3) { width: min(96%, 23vh); }
+  .piece:nth-child(4) { width: min(84%, 20vh); }
+}
+@media (max-width: 900px) and (max-height: 660px) { .piece:nth-child(n) { width: min(100%, 16vh); } }
+
+/* stacks: the piece on top shows, the others wait underneath */
+.piece--stack .piece-photo { transition: opacity 0.35s, rotate 0.45s cubic-bezier(0.34, 1.56, 0.64, 1), scale 0.45s cubic-bezier(0.34, 1.56, 0.64, 1); }
+.piece--stack .piece-photo:not(.is-top) { opacity: 0; rotate: 14deg; scale: 0.8; }
+.piece--stack .piece-photo.is-top:nth-of-type(odd) { rotate: -3deg; }
+.piece--stack .piece-photo.is-top:nth-of-type(even) { rotate: 3deg; }
+.piece--stack .piece-note { transition: opacity 0.3s; }
+.piece--stack .piece-note:not(.is-top) { opacity: 0; }
+.piece-flip { position: absolute; inset: 0; z-index: 2; padding: 0; border: 0; background: none; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+
+/* the hats frame: your reversible hat (tap turns it inside out) takes turns with the toadstool hat (tap shows the next) */
+.piece--hat .hat-turn.piece-photo { z-index: 3; }
+.piece--stack .piece-photo:not(.is-top) { pointer-events: none; }
+.piece--hat:has(.hat-turn.is-top) .piece-flip { pointer-events: none; }
+.piece--hat .hat-turn.is-top { rotate: 0deg; }
+.piece img.piece-photo--toad { inset: 22% 8% 22%; width: 84%; height: 56%; }
+
+/* the backpack is tall: give it the height of the frame */
+.piece img.piece-photo--pack { inset: 12% 14% 15%; width: 72%; height: 73%; rotate: 3deg; }

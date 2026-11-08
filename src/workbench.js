@@ -1,22 +1,25 @@
 // The workbench: the visitor makes something on the way through the spiral.
-// Screen 1: cut a piece out of a jeans leg. Screen 3: tap or drag fabrics into a patchwork.
-// Screen 5: the patchwork becomes a bucket hat. Screen 9: save the hat as a picture to send to Katrin.
-// Nothing is stored: every visit starts with an uncut pair of jeans and an empty patchwork.
+// Screen 1: cut a piece out of a jeans leg. Screen 3: a reversible hat, one old fabric outside and
+// another inside, each photographed from a garment of yours (or a sample). Screen 5: the hat, tap to turn it.
+// Screen 9: save the hat as a picture to send to Katrin.
+// Nothing is stored: every visit starts with an uncut pair of jeans and an empty hat.
 
 import { sound } from './sound.js';
 
 const FABRICS = ['denim', 'scraps', 'rope', 'knit'];
-let made = { cells: [null, null, null, null] };
+// a side the visitor hasn't filled yet is sewn from Katrin's default
+const DEFAULT = { out: 'scraps', in: 'denim' };
+let made = { out: null, in: null };
 
-// a square the visitor cut from a photo of their own old garment (a data URL, in memory only)
-let ownSrc = null;
+// squares the visitor cut from photos of their own old garments, one per side (data URLs, in memory only)
+const ownSrc = { out: null, in: null };
 export function fabricSrc(f) {
-  return f === 'own' ? ownSrc : `${import.meta.env.BASE_URL}swatch/${f}.webp`;
+  return f.startsWith('own-') ? ownSrc[f.slice(4)] : `${import.meta.env.BASE_URL}swatch/${f}.webp`;
 }
 
-// the patchwork for the try-on: whatever the visitor has placed, the empty squares in Katrin's default mix
-export function madeCells() {
-  return { cells: made.cells.map((c, i) => c || FABRICS[i]), mine: made.cells.some(Boolean) };
+// the reversible hat for the try-on: whatever the visitor has chosen, the empty sides in the default
+export function madeSides() {
+  return { out: made.out || DEFAULT.out, in: made.in || DEFAULT.in, mine: !!(made.out || made.in) };
 }
 
 export function initWorkbench({ tr, reduced }) {
@@ -131,40 +134,30 @@ export function initWorkbench({ tr, reduced }) {
 
   placeScissors();
 
-  /* ---------- 3 · patchwork ---------- */
+  /* ---------- 3 · the reversible hat: outside and inside ---------- */
 
   const board = document.querySelector('.board');
   const cells = [...board.querySelectorAll('.cell')];
   const hint = board.querySelector('.board-hint');
+  const ownFile = board.querySelector('.own-file');
   const swatches = [...document.querySelectorAll('.swatch[data-fabric]')];
-
-  // the two seams across the board, in zigzag stitch
-  board.querySelectorAll('.zig').forEach((pl) => {
-    const vertical = pl.classList.contains('zig--v');
-    const p = [];
-    for (let i = 0; i <= 20; i++) {
-      const a = i * 5, b = 50 + (i % 2 ? 3 : -3);
-      p.push(vertical ? `${b},${a}` : `${a},${b}`);
-    }
-    pl.setAttribute('points', p.join(' '));
-    pl.setAttribute('pathLength', '100');
-  });
+  const other = (side) => (side === 'out' ? 'in' : 'out');
 
   function markCutSwatch() {
     document.querySelector('.swatch[data-fabric="denim"]')?.classList.toggle('is-yours', !!state.cut);
   }
 
-  function renderBoard(flashIndex = -1) {
-    cells.forEach((c, i) => {
-      const f = state.cells[i];
+  function renderBoard(flashSide = null) {
+    for (const c of cells) {
+      const f = state[c.dataset.side];
       c.style.backgroundImage = f ? `url(${fabricSrc(f)})` : '';
       c.classList.toggle('is-filled', !!f);
-      if (i === flashIndex && !reduced()) {
+      if (c.dataset.side === flashSide && !reduced()) {
         c.animate([{ transform: 'scale(0.4) rotate(-14deg)' }, { transform: 'scale(1.12) rotate(3deg)', offset: 0.6 }, { transform: 'none' }],
           { duration: 420, easing: 'cubic-bezier(0.34, 1.56, 0.64, 1)' });
       }
-    });
-    const full = state.cells.every(Boolean);
+    }
+    const full = !!(state.out && state.in);
     if (full && !board.classList.contains('is-sewn')) sound.pop();
     board.classList.toggle('is-sewn', full);
     hint.dataset.i18n = full ? 's3.boardDone' : 's3.boardHint';
@@ -172,23 +165,40 @@ export function initWorkbench({ tr, reduced }) {
     refreshHat();
   }
 
-  function place(fabric, at) {
-    let i = at ?? state.cells.findIndex((c) => !c);
-    if (i < 0) { i = state.next ?? 0; state.next = (i + 1) % 4; } // full: replace round the board
-    state.cells[i] = fabric;
+  // a sample tapped without a side goes to the empty one; once both are sewn, it takes turns
+  function place(fabric, side) {
+    if (!side) {
+      side = !state.out ? 'out' : !state.in ? 'in' : (state.next || 'out');
+      if (state.out && state.in) state.next = other(side);
+    }
+    state[side] = fabric;
     sound.stitch();
     save();
-    renderBoard(i);
+    renderBoard(side);
   }
 
-  cells.forEach((c, i) => c.addEventListener('click', () => {
-    if (!state.cells[i]) return;
-    state.cells[i] = null;
-    save();
-    renderBoard();
+  // tap a side to photograph an old garment and cut that side's fabric out of it
+  let photoSide = null;
+  cells.forEach((c) => c.addEventListener('click', () => {
+    photoSide = c.dataset.side;
+    ownFile.click();
   }));
+  ownFile.addEventListener('change', async () => {
+    const file = ownFile.files?.[0];
+    const side = photoSide;
+    ownFile.value = '';
+    if (!file || !side) return;
+    const url = await openCutter(file, { tr, reduced });
+    board.querySelector(`.cell[data-side="${side}"]`).focus({ preventScroll: true });
+    if (!url) return;
+    ownSrc[side] = url;
+    const im = new Image();
+    await new Promise((res) => { im.onload = im.onerror = res; im.src = url; });
+    imgs[`own-${side}`] = im;
+    place(`own-${side}`, side);
+  });
 
-  // tap a swatch to put it in the next free square, or drag it onto a square
+  // tap a sample to put it on the next side, or drag it onto one
   for (const sw of swatches) {
     let drag = null;
     sw.addEventListener('pointerdown', (e) => {
@@ -221,7 +231,7 @@ export function initWorkbench({ tr, reduced }) {
       if (ghost) {
         ghost.remove();
         const over = !cancelled && cellAt(e.clientX, e.clientY);
-        if (over) place(sw.dataset.fabric, cells.indexOf(over));
+        if (over) place(sw.dataset.fabric, over.dataset.side);
       } else if (!cancelled) {
         place(sw.dataset.fabric);
       }
@@ -244,31 +254,43 @@ export function initWorkbench({ tr, reduced }) {
   /* ---------- 5 + 9 · the hat ---------- */
 
   const hatFrame = document.querySelector('.piece--hat');
+  const hatTurn = hatFrame.querySelector('.hat-turn');
   const hatCanvas = hatFrame.querySelector('canvas');
   const madeBox = document.querySelector('.made');
   const thumb = madeBox.querySelector('canvas');
   const saveBtn = document.getElementById('save-hat');
 
-  function hatCells() {
-    // squares not filled yet use Katrin's default mix
-    return state.cells.map((c, i) => c || FABRICS[i]);
-  }
+  const sideImgs = () => {
+    const { out, in: inside } = madeSides();
+    return [imgs[out], imgs[inside]];
+  };
 
   function refreshHat() {
-    const mine = state.cells.every(Boolean);
+    const mine = !!(state.out && state.in);
     ready.then(() => {
-      drawHat(hatCanvas, hatCells(), imgs);
+      drawReversible(hatCanvas, ...sideImgs(), hatTurn.dataset.front);
       hatFrame.classList.add('has-hat');
       hatFrame.classList.toggle('is-yours', mine);
       madeBox.hidden = !mine;
-      if (mine) drawHat(thumb, hatCells(), imgs);
+      if (mine) drawReversible(thumb, ...sideImgs());
     });
   }
+
+  // tap the hat on screen 5 and it turns inside out
+  hatTurn.addEventListener('click', async () => {
+    const front = other(hatTurn.dataset.front);
+    hatTurn.dataset.front = front;
+    hatTurn.setAttribute('aria-pressed', String(front === 'in'));
+    sound.pop();
+    if (!reduced()) await hatCanvas.animate([{ transform: 'none' }, { transform: 'scaleX(0) rotate(-6deg)' }], { duration: 170, easing: 'ease-in' }).finished;
+    drawReversible(hatCanvas, ...sideImgs(), front);
+    if (!reduced()) hatCanvas.animate([{ transform: 'scaleX(0) rotate(6deg)' }, { transform: 'none' }], { duration: 320, easing: 'cubic-bezier(0.34, 1.56, 0.64, 1)' });
+  });
 
   saveBtn.addEventListener('click', () => {
     const c = document.createElement('canvas');
     c.width = 1200; c.height = 900;
-    drawHat(c, hatCells(), imgs, true);
+    drawReversible(c, ...sideImgs(), 'out', true);
     c.toBlob((blob) => {
       if (!blob) return;
       const a = document.createElement('a');
@@ -277,31 +299,6 @@ export function initWorkbench({ tr, reduced }) {
       a.click();
       setTimeout(() => URL.revokeObjectURL(a.href), 2000);
     }, 'image/png');
-  });
-
-  /* ---------- 3 · upcycle anything: your own fabric ---------- */
-
-  const own = board.querySelector('.own');
-  const ownAdd = own.querySelector('.own-add');
-  const ownFile = own.querySelector('.own-file');
-  const ownSwatch = own.querySelector('.swatch--own');
-  ownAdd.addEventListener('click', () => ownFile.click());
-  ownFile.addEventListener('change', async () => {
-    const file = ownFile.files?.[0];
-    ownFile.value = '';
-    if (!file) return;
-    const url = await openCutter(file, { tr, reduced });
-    ownAdd.focus({ preventScroll: true });
-    if (!url) return;
-    ownSrc = url;
-    const im = new Image();
-    await new Promise((res) => { im.onload = im.onerror = res; im.src = url; });
-    imgs.own = im;
-    ownSwatch.querySelector('img').src = url;
-    ownSwatch.hidden = false;
-    // a new fabric replaces any older one already in the patchwork
-    state.cells = state.cells.map((c) => (c === 'own' ? null : c));
-    place('own');
   });
 
   markCutSwatch();
@@ -319,62 +316,44 @@ const BAND = new Path2D('M100 168 Q200 184 300 168 L305 193 Q200 210 95 193 Z');
 const BRIM = new Path2D('M95 193 Q200 210 305 193 Q356 206 374 234 Q378 264 300 276 Q200 292 100 276 Q22 264 26 234 Q44 206 95 193 Z');
 const SMILE = [new Path2D('M42 15v35M59 15v35'), new Path2D('M19 37v9a31 31 0 0 0 62 0v-9')];
 
-// A bucket hat seen from the front, in a 400 × 300 box: sewn from four squares of fabric,
-// or, when `fabric` is given, from one fabric all over (used for the try-on).
-export function drawHat(canvas, cells, imgs, withBackground = false, fabric = null) {
+// A bucket hat seen from the front, sewn from one fabric all over, in a 400 × 300 box.
+export function drawHat(canvas, fabric, { shadow = true } = {}) {
   const ctx = canvas.getContext('2d');
   const k = canvas.width / 400;
   ctx.setTransform(1, 0, 0, 1, 0, 0);
   ctx.clearRect(0, 0, canvas.width, canvas.height);
-  if (withBackground) {
-    ctx.fillStyle = '#B6D363';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-  }
   ctx.setTransform(k, 0, 0, k, 0, (canvas.height / k - 300) / 2 * k);
 
   // shadow on the table
-  ctx.save();
-  ctx.filter = `blur(${7 * k}px)`;
-  ctx.fillStyle = 'rgba(30, 24, 26, 0.28)';
-  ctx.beginPath();
-  ctx.ellipse(200, 284, 168, 14, 0, 0, Math.PI * 2);
-  ctx.fill();
-  ctx.restore();
+  if (shadow) {
+    ctx.save();
+    ctx.filter = `blur(${7 * k}px)`;
+    ctx.fillStyle = 'rgba(30, 24, 26, 0.28)';
+    ctx.beginPath();
+    ctx.ellipse(200, 284, 168, 14, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  }
 
-  const quads = [[0, 40, 200, 146], [200, 40, 200, 146], [0, 186, 200, 114], [200, 186, 200, 114]];
   const fill = (path) => {
     ctx.save();
     ctx.clip(path);
     if (fabric?.naturalWidth) {
-      // one fabric, scaled to cover the whole hat
+      // the fabric, scaled to cover the whole hat
       const s = Math.max(360 / fabric.naturalWidth, 250 / fabric.naturalHeight);
       ctx.drawImage(fabric, 200 - (fabric.naturalWidth * s) / 2, 172 - (fabric.naturalHeight * s) / 2, fabric.naturalWidth * s, fabric.naturalHeight * s);
-      ctx.restore();
-      return;
+    } else {
+      ctx.fillStyle = '#ccc';
+      ctx.fillRect(0, 0, 400, 300);
     }
-    quads.forEach(([x, y, w, h], i) => {
-      const im = imgs[cells[i]];
-      if (im?.naturalWidth) {
-        const s = Math.max(w, h);
-        ctx.drawImage(im, x + (w - s) / 2, y + (h - s) / 2, s, s);
-      } else {
-        ctx.fillStyle = '#ccc';
-        ctx.fillRect(x, y, w, h);
-      }
-    });
-    // the seams where the four squares meet
-    ctx.strokeStyle = 'rgba(30, 24, 26, 0.55)';
-    ctx.lineWidth = 1.4;
-    ctx.beginPath(); ctx.moveTo(200, 0); ctx.lineTo(200, 300); ctx.moveTo(0, 186); ctx.lineTo(400, 186); ctx.stroke();
     ctx.restore();
   };
   fill(BRIM);
   fill(CROWN);
   fill(BAND);
 
-  // light and shade, so it reads as a hat and not a flat shape
-  // a printed fabric keeps its colour better under lighter shading
-  const shade = (path, g) => { ctx.save(); ctx.clip(path); ctx.globalAlpha = fabric ? 0.5 : 1; ctx.fillStyle = g; ctx.fillRect(0, 0, 400, 300); ctx.restore(); };
+  // light and shade, so it reads as a hat and not a flat shape, light enough that a print keeps its colour
+  const shade = (path, g) => { ctx.save(); ctx.clip(path); ctx.globalAlpha = 0.55; ctx.fillStyle = g; ctx.fillRect(0, 0, 400, 300); ctx.restore(); };
   let g = ctx.createLinearGradient(97, 0, 303, 0);
   g.addColorStop(0, 'rgba(20, 12, 16, 0.38)'); g.addColorStop(0.45, 'rgba(255, 255, 255, 0.08)'); g.addColorStop(1, 'rgba(20, 12, 16, 0.34)');
   shade(CROWN, g);
@@ -421,6 +400,38 @@ export function drawHat(canvas, cells, imgs, withBackground = false, fabric = nu
   ctx.strokeStyle = '#1E181A';
   for (const p of SMILE) ctx.stroke(p);
   ctx.restore();
+}
+
+// The reversible hat, as on the market screen: both sides, one in front, the other turned behind it.
+// `front` says which side faces you; drawn into a 400 × 300 box.
+export function drawReversible(canvas, outside, inside, front = 'out', withBackground = false) {
+  const side = (fabric) => {
+    const c = document.createElement('canvas');
+    c.width = canvas.width; c.height = canvas.width * 0.75;
+    drawHat(c, fabric);
+    return c;
+  };
+  const [first, second] = front === 'out' ? [outside, inside] : [inside, outside];
+  const ctx = canvas.getContext('2d');
+  const k = canvas.width / 400;
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  if (withBackground) {
+    ctx.fillStyle = '#B6D363';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+  }
+  ctx.setTransform(k, 0, 0, k, 0, (canvas.height / k - 300) / 2 * k);
+  const put = (c, x, y, scale, deg, dim) => {
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.rotate((deg * Math.PI) / 180);
+    if (dim) ctx.filter = 'brightness(0.92)';
+    ctx.drawImage(c, -200 * scale, -150 * scale, 400 * scale, 300 * scale);
+    ctx.restore();
+  };
+  // behind: smaller, raised and turned the other way; in front: big and a little cocky
+  put(side(second), 262, 112, 0.62, 9, true);
+  put(side(first), 168, 168, 0.8, -4, false);
 
   if (withBackground) {
     ctx.fillStyle = '#1E181A';

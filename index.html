@@ -15,6 +15,7 @@
     <symbol id="i-smile" viewBox="0 0 100 100"><g fill="none" stroke="currentColor" stroke-width="10" stroke-linecap="round"><path d="M42 15v35M59 15v35"/><path d="M19 37v9a31 31 0 0 0 62 0v-9"/></g></symbol>
     <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M12 4v15M5.5 12.5 12 19l6.5-6.5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
     <symbol id="i-out" viewBox="0 0 24 24"><path d="M7 17 17 7M8.5 7H17v8.5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-cam" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M4 8.5h3l1.6-2.5h6.8L17 8.5h3v10H4z"/><circle cx="12" cy="13.2" r="3.3"/></g></symbol>
     <symbol id="i-plate" viewBox="0 0 24 24"><path d="M3.5 3.5h17v17h-17zM9.2 3.5v17M14.8 3.5v17M3.5 9.2h17M3.5 14.8h17" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></symbol>
   </svg>
 
@@ -81,6 +82,34 @@
         </dl>
         <p class="aside" data-i18n="s2.p2"></p>
       </div>
+      <!-- Katrin, cut out with pinking shears, in giant round sunglasses: tap and she pushes them up into her hair -->
+      <figure class="katrin">
+        <button type="button" class="katrin-btn" data-hands aria-pressed="false" data-i18n-label="s2.shades" aria-label="Sonnenbrille hoch und runter">
+          <img loading="lazy" fetchpriority="low" src="/katrin/katrin.webp" width="395" height="510" alt="" decoding="async" draggable="false">
+          <svg class="katrin-shades" viewBox="0 0 395 510" aria-hidden="true">
+            <defs>
+              <linearGradient id="lens" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3B1626"/><stop offset="0.55" stop-color="#1E181A"/><stop offset="1" stop-color="#4A1A2C"/></linearGradient>
+              <clipPath id="lens-clip"><circle cx="165" cy="182" r="47"/><circle cx="272" cy="175" r="47"/></clipPath>
+            </defs>
+            <g class="shades" transform="rotate(-3.7 218.5 178.5)">
+              <g class="shades-drop" transform="rotate(3.7 218.5 178.5)">
+                <path d="M115 176l-30 -10M322 169l30 -10" stroke="#9E0E26" stroke-width="7" stroke-linecap="round"/>
+                <circle cx="165" cy="182" r="52" fill="url(#lens)" fill-opacity="0.93" stroke="#C4122F" stroke-width="10"/>
+                <circle cx="272" cy="175" r="52" fill="url(#lens)" fill-opacity="0.93" stroke="#C4122F" stroke-width="10"/>
+                <circle cx="165" cy="182" r="57" fill="none" stroke="#1E181A" stroke-width="1.6"/>
+                <circle cx="272" cy="175" r="57" fill="none" stroke="#1E181A" stroke-width="1.6"/>
+                <path d="M211 168q8 -16 15 -7" fill="none" stroke="#C4122F" stroke-width="8" stroke-linecap="round"/>
+                <g clip-path="url(#lens-clip)">
+                  <path d="M135 160a34 34 0 0 1 26 -20M242 153a34 34 0 0 1 26 -20" fill="none" stroke="rgba(255,255,255,0.55)" stroke-width="5" stroke-linecap="round"/>
+                  <rect class="shades-glint" x="60" y="80" width="26" height="220" fill="rgba(255,255,255,0.35)" transform="rotate(25 218.5 178.5)"/>
+                </g>
+              </g>
+            </g>
+          </svg>
+        </button>
+        <figcaption class="label katrin-name">Katrin</figcaption>
+        <span class="sr-only" data-i18n="s2.photo">Foto: Katrin mit riesiger runder Sonnenbrille</span>
+      </figure>
       <!-- a label being cut out: the scissors trim along the dashed line, then it lifts off the cloth -->
       <div class="cutout" aria-hidden="true">
         <div class="cut-label">
@@ -112,34 +141,32 @@
     <!-- 3 · bottom left -->
     <section class="screen s3" id="materials" data-i="3" data-next="right" aria-labelledby="h3">
       <header class="head">
-        <h2 id="h3" class="display" tabindex="-1" data-i18n="t3">Aus Altem</h2>
+        <h2 id="h3" class="display" tabindex="-1" data-i18n="t3">Alter Stoff. Neuer Hut.</h2>
         <p class="sub" data-i18n="s3.sub"></p>
       </header>
-      <!-- the workbench, part 2: sew your own patchwork from the samples -->
+      <!-- the workbench, part 2: a reversible hat, one old fabric outside and another inside.
+           Tap a side to photograph a garment and cut a square out of it, or tap / drag a sample onto it. -->
       <div class="board" data-hands>
-        <span class="label board-label" data-i18n="s3.board">Dein Patchwork</span>
-        <div class="board-main">
-          <!-- upcycle anything: photograph an old garment and cut your own square out of it -->
-          <div class="own">
-            <button type="button" class="own-add"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8.5h3l1.6-2.5h6.8L17 8.5h3v10H4z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><circle cx="12" cy="13.2" r="3.3" fill="none" stroke="currentColor" stroke-width="2"/></svg><span data-i18n="s3.own">+ Dein Stoff</span></button>
-            <button type="button" class="swatch swatch--own" data-fabric="own" data-hands data-i18n-label="s3.ownName" aria-label="" hidden><img alt="" draggable="false"></button>
-            <input type="file" class="own-file" accept="image/*" hidden>
+        <span class="label board-label" data-i18n="s3.board">Dein Wendehut</span>
+        <div class="board-sides">
+          <div class="side">
+            <button type="button" class="cell" data-side="out" data-i18n-label="s3.outCell" aria-label=""><span class="cell-empty"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-cam"/></svg><span data-i18n="s3.photo">Foto</span></span><span class="cell-again" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#i-cam"/></svg></span></button>
+            <span class="side-name" data-i18n="s3.out">Außen</span>
           </div>
-        <div class="board-grid">
-          <button type="button" class="cell" data-i18n-label="s3.cell1" aria-label=""></button>
-          <button type="button" class="cell" data-i18n-label="s3.cell2" aria-label=""></button>
-          <button type="button" class="cell" data-i18n-label="s3.cell3" aria-label=""></button>
-          <button type="button" class="cell" data-i18n-label="s3.cell4" aria-label=""></button>
-          <svg class="board-stitch" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><polyline class="zig zig--v"/><polyline class="zig zig--h"/></svg>
+          <span class="side-turn" aria-hidden="true">&#8635;</span>
+          <div class="side">
+            <button type="button" class="cell" data-side="in" data-i18n-label="s3.inCell" aria-label=""><span class="cell-empty"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-cam"/></svg><span data-i18n="s3.photo">Foto</span></span><span class="cell-again" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#i-cam"/></svg></span></button>
+            <span class="side-name" data-i18n="s3.in">Innen</span>
+          </div>
+          <input type="file" class="own-file" accept="image/*" hidden>
         </div>
-        </div>
-        <p class="board-hint" aria-live="polite" data-i18n="s3.boardHint">Stoffe antippen oder hineinziehen</p>
+        <p class="board-hint" aria-live="polite" data-i18n="s3.boardHint">Tipp eine Seite an</p>
       </div>
       <ul class="rows">
-        <li><button type="button" class="swatch" data-fabric="denim" data-hands data-i18n-label="s3.a.h" aria-label=""><img src="/swatch/denim.webp" alt="" width="360" height="360" loading="lazy" decoding="async" draggable="false"><span class="yours-tag" data-i18n="s3.cutByYou">von dir geschnitten</span></button><h3 data-i18n="s3.a.h"></h3><p data-i18n="s3.a.p"></p></li>
-        <li><button type="button" class="swatch" data-fabric="scraps" data-hands data-i18n-label="s3.b.h" aria-label=""><img src="/swatch/scraps.webp" alt="" width="360" height="360" loading="lazy" decoding="async" draggable="false"><span class="yours-tag" data-i18n="s3.cutByYou">von dir geschnitten</span></button><h3 data-i18n="s3.b.h"></h3><p data-i18n="s3.b.p"></p></li>
-        <li><button type="button" class="swatch" data-fabric="rope" data-hands data-i18n-label="s3.c.h" aria-label=""><img src="/swatch/rope.webp" alt="" width="360" height="360" loading="lazy" decoding="async" draggable="false"><span class="yours-tag" data-i18n="s3.cutByYou">von dir geschnitten</span></button><h3 data-i18n="s3.c.h"></h3><p data-i18n="s3.c.p"></p></li>
-        <li><button type="button" class="swatch" data-fabric="knit" data-hands data-i18n-label="s3.d.h" aria-label=""><img src="/swatch/knit.webp" alt="" width="360" height="360" loading="lazy" decoding="async" draggable="false"><span class="yours-tag" data-i18n="s3.cutByYou">von dir geschnitten</span></button><h3 data-i18n="s3.d.h"></h3><p data-i18n="s3.d.p"></p></li>
+        <li><button type="button" class="swatch" data-fabric="denim" data-hands data-i18n-label="s3.a.h" aria-label=""><img fetchpriority="low" src="/swatch/denim.webp" alt="" width="360" height="360" loading="lazy" decoding="async" draggable="false"><span class="yours-tag" data-i18n="s3.cutByYou">von dir geschnitten</span></button><h3 data-i18n="s3.a.h"></h3><p data-i18n="s3.a.p"></p></li>
+        <li><button type="button" class="swatch" data-fabric="scraps" data-hands data-i18n-label="s3.b.h" aria-label=""><img fetchpriority="low" src="/swatch/scraps.webp" alt="" width="360" height="360" loading="lazy" decoding="async" draggable="false"><span class="yours-tag" data-i18n="s3.cutByYou">von dir geschnitten</span></button><h3 data-i18n="s3.b.h"></h3><p data-i18n="s3.b.p"></p></li>
+        <li><button type="button" class="swatch" data-fabric="rope" data-hands data-i18n-label="s3.c.h" aria-label=""><img fetchpriority="low" src="/swatch/rope.webp" alt="" width="360" height="360" loading="lazy" decoding="async" draggable="false"><span class="yours-tag" data-i18n="s3.cutByYou">von dir geschnitten</span></button><h3 data-i18n="s3.c.h"></h3><p data-i18n="s3.c.p"></p></li>
+        <li><button type="button" class="swatch" data-fabric="knit" data-hands data-i18n-label="s3.d.h" aria-label=""><img fetchpriority="low" src="/swatch/knit.webp" alt="" width="360" height="360" loading="lazy" decoding="async" draggable="false"><span class="yours-tag" data-i18n="s3.cutByYou">von dir geschnitten</span></button><h3 data-i18n="s3.d.h"></h3><p data-i18n="s3.d.p"></p></li>
       </ul>
     </section>
 
@@ -150,25 +177,26 @@
         <p class="sub" data-i18n="s4.sub"></p>
       </header>
       <ol class="stages">
-        <li><span class="n">1</span><h3 data-i18n="s4.a.h"></h3><p data-i18n="s4.a.p"></p></li>
-        <li><span class="n">2</span><h3 data-i18n="s4.b.h"></h3><p data-i18n="s4.b.p"></p></li>
-        <li><span class="n">3</span><h3 data-i18n="s4.c.h"></h3><p data-i18n="s4.c.p"></p></li>
-        <li><span class="n">4</span><h3 data-i18n="s4.d.h"></h3><p data-i18n="s4.d.p"></p></li>
+        <li><span class="n">1</span><svg class="step-art" viewBox="0 0 120 90" aria-hidden="true"><g stroke="#1E181A" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"><path d="M38 10h44v9H38z" fill="#4D718D"/><path d="M38 19 33 83h23l4-46 4 46h23l-5-64z" fill="#5B80A2"/><path d="M42 23q8 10 16 1M78 23q-8 10-16 1" fill="none" stroke="#FBF9F4" stroke-width="1.4" stroke-dasharray="3 2.5"/><circle class="art-glass" cx="86" cy="44" r="15" fill="rgba(251,249,244,0.45)" stroke-width="3.2"/><path class="art-glass" d="m97 55 12 13" stroke-width="5.5"/></g></svg><h3 data-i18n="s4.a.h"></h3><p data-i18n="s4.a.p"></p></li>
+        <li><span class="n">2</span><svg class="step-art" viewBox="0 0 120 90" aria-hidden="true"><g stroke="#1E181A" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"><path d="M12 24h47l-3 50H14z" fill="#F2C14E"/><path d="M65 24h44l-2 50H62z" fill="#5B80A2"/><path d="M60 47v25" stroke="#C4122F" stroke-width="2.6" stroke-dasharray="4 3.5"/><path d="M54 30q3 3 0 7M68 32q-3 3 1 6" fill="none" stroke="#C4122F" stroke-width="1.8"/><g class="art-ripper"><path d="M78 2 66 22" stroke-width="7" stroke="#C4122F"/><path d="m66 22-6 11"/><path d="m60 33-4 2m4-2 0.5 4.5" stroke-width="1.8"/></g></g></svg><h3 data-i18n="s4.b.h"></h3><p data-i18n="s4.b.p"></p></li>
+        <li><span class="n">3</span><svg class="step-art step-art--bulb" viewBox="0 0 120 90" aria-hidden="true"><g class="bulb-rays" stroke="#FFD36E" stroke-width="3" stroke-linecap="round"><path d="M60 4v6M30 16l5 4M90 16l-5 4M20 40h7M100 40h-7M30 62l5-4M90 62l-5-4"/></g><circle class="bulb-glow" cx="60" cy="38" r="26" fill="#FFE9A8"/><g stroke="#1E181A" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"><path class="bulb-glass" d="M48 58q-12-8-12-20a24 24 0 0 1 48 0q0 12-12 20v6H48z" fill="#FBF9F4"/><path class="bulb-wire" d="M53 58V46l-3-5q5-6 10 0 5-6 10 0l-3 5v12" fill="none" stroke-width="1.8"/><path d="M48 64h24v5H48zM49 69h22v5H49zM52 74h16l-3 6H55z" fill="#8A9097"/></g></svg><h3 data-i18n="s4.e.h"></h3><p data-i18n="s4.e.p"></p></li>
+        <li><span class="n">4</span><svg class="step-art" viewBox="0 0 120 90" aria-hidden="true"><g stroke="#1E181A" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"><path d="M8 18h104v62H8z" fill="#FBF9F4"/><path d="M24 70q-2-30 14-40 22-10 44 0 16 10 14 40z" fill="none" stroke-width="1.8" stroke-dasharray="4 3.5"/><g class="art-scissors" transform="translate(88 62) rotate(-35)"><g class="blade blade--a"><path d="M-2-1 30 4-2 3z" fill="#D9DEE3"/><circle cx="-12" cy="-7" r="7" fill="none" stroke="#C4122F" stroke-width="3.2"/><path d="M-6-4-2-1" stroke="#C4122F" stroke-width="3.2"/></g><g class="blade blade--b"><path d="M-2 1 30-4-2-3z" fill="#D9DEE3"/><circle cx="-12" cy="7" r="7" fill="none" stroke="#C4122F" stroke-width="3.2"/><path d="M-6 4-2 1" stroke="#C4122F" stroke-width="3.2"/></g><circle r="1.8" fill="#1E181A"/></g></g></svg><h3 data-i18n="s4.c.h"></h3><p data-i18n="s4.c.p"></p></li>
+        <li><span class="n">5</span><svg class="step-art step-art--machine" viewBox="0 0 120 90" aria-hidden="true"><g stroke="#1E181A" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"><path d="M14 72h98" stroke-width="1.6"/><path d="M18 64h90v9H18z" fill="#4D718D"/><path class="sm-stitch" d="M37 68.5h66" stroke="#C4122F" stroke-width="2.2" stroke-dasharray="4 3" fill="none"/><path d="M8 72h104v7H8z" fill="#FBF9F4"/><path d="M84 72V30q0-12-12-12H36q-10 0-10 10v18h16V32h34v40z" fill="#86DEC9"/><path d="M42 32h34" fill="none" stroke-width="1.4"/><g class="sm-wheel"><circle cx="89" cy="34" r="9.5" fill="#FBF9F4"/><path d="M89 26.5v15M81.5 34h15" stroke-width="1.6"/></g><path d="M60 18v-8" stroke-width="2"/><path d="M55 4h10v6H55z" fill="#C4122F" stroke-width="1.6"/><path d="M60 7q-14 0-26 21" fill="none" stroke="#C4122F" stroke-width="1.2"/><g class="sm-needle"><path d="M34 46v12" stroke-width="3.2"/><path d="M34 58v6" stroke="#8A9097" stroke-width="1.6"/></g><path d="M29 62h10" stroke-width="2.6"/><g transform="translate(48 22)"><path d="M0 0h13v10H0z" fill="#FBF9F4" stroke-width="1"/><g transform="translate(2.4 1.2) scale(0.082)" fill="none" stroke-width="12"><path d="M42 15v35M59 15v35"/><path d="M19 37v9a31 31 0 0 0 62 0v-9"/></g></g></g></svg><h3 data-i18n="s4.d.h"></h3><p data-i18n="s4.d.p"></p></li>
       </ol>
     </section>
 
     <!-- 5 · bottom right -->
     <section class="screen s5" id="pieces" data-i="5" data-next="up" aria-labelledby="h5">
       <header class="head patch">
-        <h2 id="h5" class="display" tabindex="-1" data-i18n="t5">Stücke</h2>
+        <h2 id="h5" class="display" tabindex="-1" data-i18n="t5">Einzelstücke</h2>
         <p class="sub" data-i18n="s5.sub"></p>
       </header>
       <div class="pieces">
         <!-- pattern pieces waiting for photos: drop an <img> into a figure and it fills the frame -->
-        <figure class="piece"><figcaption class="label" data-i18n="s5.vests">Westen</figcaption><span class="soon" data-i18n="s5.soon"></span><span class="tag" aria-hidden="true"><svg class="smile" viewBox="0 0 100 100"><use href="#i-smile"/></svg></span></figure>
-        <figure class="piece"><figcaption class="label" data-i18n="s5.bags">Taschen</figcaption><span class="soon" data-i18n="s5.soon"></span><span class="tag" aria-hidden="true"><svg class="smile" viewBox="0 0 100 100"><use href="#i-smile"/></svg></span></figure>
-        <figure class="piece piece--hat"><figcaption class="label" data-i18n="s5.hats">Hüte</figcaption><span class="soon" data-i18n="s5.soon"></span><canvas class="hat-canvas" width="800" height="600" aria-hidden="true"></canvas><span class="label yours-label" data-i18n="s5.yours">Dein Hut</span><span class="tag" aria-hidden="true"><svg class="smile" viewBox="0 0 100 100"><use href="#i-smile"/></svg></span></figure>
-        <figure class="piece"><figcaption class="label" data-i18n="s5.baskets">Körbe</figcaption><span class="soon" data-i18n="s5.soon"></span><span class="tag" aria-hidden="true"><svg class="smile" viewBox="0 0 100 100"><use href="#i-smile"/></svg></span></figure>
+        <figure class="piece piece--stack" data-show="0"><figcaption class="label" data-i18n="s5.vests">Westen</figcaption><img fetchpriority="low" class="piece-photo" src="/pieces/vest-flowers.webp" alt="" width="560" height="552" loading="lazy" decoding="async"><img fetchpriority="low" class="piece-photo" src="/pieces/vest-mushrooms.webp" alt="" width="560" height="558" loading="lazy" decoding="async"><span class="sr-only" data-i18n="s5.vestAlt"></span><span class="piece-note" data-i18n="s5.vestNote">Was näht man mit Kompass-Nadeln? Westen!</span><button type="button" class="piece-flip" data-hands data-i18n-label="s5.next" aria-label="Nächstes Stück"></button><span class="soon" data-i18n="s5.soon"></span><span class="tag" aria-hidden="true"><svg class="smile" viewBox="0 0 100 100"><use href="#i-smile"/></svg></span></figure>
+        <figure class="piece piece--stack" data-show="0"><figcaption class="label" data-i18n="s5.bags">Taschen</figcaption><img fetchpriority="low" class="piece-photo" src="/pieces/bag-belt.webp" alt="" width="640" height="464" loading="lazy" decoding="async"><img fetchpriority="low" class="piece-photo" src="/pieces/pouches.webp" alt="" width="680" height="434" loading="lazy" decoding="async"><span class="piece-note" data-i18n="s5.bagNote">Bauchtasche / Crossbag, in nicht langweilig</span><span class="piece-note" data-i18n="s5.pouchNote">Nötige Täschchen fürs Nötigste</span><button type="button" class="piece-flip" data-hands data-i18n-label="s5.next" aria-label="Nächstes Stück"></button><span class="soon" data-i18n="s5.soon"></span><span class="tag" aria-hidden="true"><svg class="smile" viewBox="0 0 100 100"><use href="#i-smile"/></svg></span></figure>
+        <figure class="piece piece--hat piece--stack" data-show="0"><figcaption class="label" data-i18n="s5.hats">Hüte</figcaption><span class="soon" data-i18n="s5.soon"></span><button type="button" class="hat-turn piece-photo" data-front="out" aria-pressed="false" data-i18n-label="s6.turn" aria-label="Hut wenden"><canvas class="hat-canvas" width="800" height="600" aria-hidden="true"></canvas></button><img fetchpriority="low" class="piece-photo piece-photo--toad" src="/pieces/hat-toadstool-cut.webp" alt="" width="640" height="517" loading="lazy" decoding="async"><span class="sr-only" data-i18n="s6.toadstool">Fliegenpilz-Hut</span><span class="piece-note"></span><span class="piece-note" data-i18n="s5.toadNote">Perfekt fürs nächste Waldbad</span><button type="button" class="piece-flip" data-hands data-i18n-label="s5.next" aria-label="Nächstes Stück"></button><span class="label yours-label" data-i18n="s5.yours">Dein Hut</span><span class="tag" aria-hidden="true"><svg class="smile" viewBox="0 0 100 100"><use href="#i-smile"/></svg></span></figure>
+        <figure class="piece"><figcaption class="label" data-i18n="s5.packs">Rucksäcke</figcaption><img fetchpriority="low" class="piece-photo piece-photo--pack" src="/pieces/backpack.webp" alt="" width="480" height="595" loading="lazy" decoding="async"><span class="piece-note" data-i18n="s5.packNote">Rückenwind inklusive</span><span class="soon" data-i18n="s5.soon"></span><span class="tag" aria-hidden="true"><svg class="smile" viewBox="0 0 100 100"><use href="#i-smile"/></svg></span></figure>
       </div>
       <a class="textlink patch" href="https://www.instagram.com/ribisl_design/" target="_blank" rel="me noopener" data-i18n="s5.cta">Alle Stücke auf Instagram</a>
     </section>
@@ -179,8 +207,8 @@
       <!-- a reversible bucket hat, both sides cut out and overlapping: tap and it turns -->
       <figure class="turn">
         <button type="button" class="hats" id="hat" aria-pressed="false" data-front="a" data-i18n-label="s6.turn" aria-label="Hut wenden">
-          <img class="hat-side hat-side--a" src="/pieces/hat-swirl-cut.webp" alt="" width="694" height="576" decoding="async">
-          <img class="hat-side hat-side--b" src="/pieces/hat-ink-cut.webp" alt="" width="662" height="558" decoding="async">
+          <img loading="lazy" fetchpriority="low" class="hat-side hat-side--a" src="/pieces/hat-swirl-cut.webp" alt="" width="694" height="576" decoding="async">
+          <img loading="lazy" fetchpriority="low" class="hat-side hat-side--b" src="/pieces/hat-ink-cut.webp" alt="" width="662" height="558" decoding="async">
           <span class="tag hat-tag" aria-hidden="true"><svg class="smile" viewBox="0 0 100 100"><use href="#i-smile"/></svg></span>
         </button>
         <figcaption>
@@ -274,12 +302,30 @@
           </div>
         </li>
       </ul>
+          <!-- references (no dates on purpose), as embroidered patches you'd collect at events, and a market stall
+           that invites you to ask Katrin to your own event -->
+      <aside class="refs" aria-labelledby="refs-h">
+        <h3 id="refs-h" class="label" data-i18n="s7.refs">Schon dabei gewesen</h3>
+        <ul class="patches">
+          <li class="patch-badge patch-badge--1"><svg viewBox="0 0 120 120" aria-hidden="true"><defs><path id="arc-top" d="M23 60a37 37 0 0 1 74 0"/><path id="arc-bot" d="M17 60a43 43 0 0 0 86 0"/></defs><circle cx="60" cy="60" r="55" fill="#FFC066"/><circle class="satin" cx="60" cy="60" r="54" fill="none"/><circle cx="60" cy="60" r="46" fill="none" stroke="#1E181A" stroke-opacity="0.45" stroke-width="1" stroke-dasharray="3 2.4"/><g fill="none" stroke="#1E181A" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M60 52a5 5 0 1 1 5-5"/><path d="M60 52v3L40 69h40L60 55"/></g><text class="arc" fill="#1E181A"><textPath href="#arc-top" startOffset="50%" data-i18n="s7.ref1">UpCon</textPath></text><text class="arc" fill="#1E181A"><textPath href="#arc-bot" startOffset="50%" data-i18n="s7.ref1p">REX Brixen</textPath></text></svg><span class="sr-only" data-i18n="s7.ref1sr"></span></li>
+          <li class="patch-badge patch-badge--2"><svg viewBox="0 0 120 120" aria-hidden="true"><circle cx="60" cy="60" r="55" fill="#C4122F"/><circle class="satin" cx="60" cy="60" r="54" fill="none"/><circle cx="60" cy="60" r="46" fill="none" stroke="#FBF9F4" stroke-opacity="0.45" stroke-width="1" stroke-dasharray="3 2.4"/><g fill="none" stroke="#FBF9F4" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M42 74V56h5v-6h5v6h5v-6h6v6h5v-6h5v6h5v18z"/><path d="M56 74v-7a4 4 0 0 1 8 0v7"/></g><text class="arc" fill="#FBF9F4"><textPath href="#arc-top" startOffset="50%" data-i18n="s7.ref2">Upcycling-Workshop</textPath></text><text class="arc" fill="#FBF9F4"><textPath href="#arc-bot" startOffset="50%" data-i18n="s7.ref2p">Schloss Runkelstein</textPath></text></svg><span class="sr-only" data-i18n="s7.ref2sr"></span></li>
+          <li class="patch-badge patch-badge--3"><svg viewBox="0 0 120 120" aria-hidden="true"><circle cx="60" cy="60" r="55" fill="#86DEC9"/><circle class="satin" cx="60" cy="60" r="54" fill="none"/><circle cx="60" cy="60" r="46" fill="none" stroke="#1E181A" stroke-opacity="0.45" stroke-width="1" stroke-dasharray="3 2.4"/><g fill="none" stroke="#1E181A" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M47 48h26M47 72h26" stroke-width="4"/><path d="M51 48v24M69 48v24"/><path d="M51 54h18M51 60h18M51 66h18" stroke-width="1.6"/><path d="M80 44 68 70" stroke-width="1.8"/></g><text class="arc" fill="#1E181A"><textPath href="#arc-top" startOffset="50%" data-i18n="s7.ref3">Creative Week</textPath></text><text class="arc" fill="#1E181A"><textPath href="#arc-bot" startOffset="50%" data-i18n="s7.ref3p">Jugenddienst Bozen</textPath></text></svg><span class="sr-only" data-i18n="s7.ref3sr"></span></li>
+          <li class="patch-badge patch-badge--4"><svg viewBox="0 0 120 120" aria-hidden="true"><circle cx="60" cy="60" r="55" fill="#FBF9F4"/><circle class="satin" cx="60" cy="60" r="54" fill="none"/><circle cx="60" cy="60" r="46" fill="none" stroke="#1E181A" stroke-opacity="0.45" stroke-width="1" stroke-dasharray="3 2.4"/><g fill="none" stroke="#1E181A" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M42 56l5-11h26l5 11z"/><path d="M53 45l-2 11M60 45v11M67 45l2 11"/><path d="M42 56q3 4 6 0 3 4 6 0 3 4 6 0 3 4 6 0 3 4 6 0 3 4 6 0"/><path d="M45 60v15M75 60v15M41 75h38"/></g><text class="arc" fill="#1E181A"><textPath href="#arc-top" startOffset="50%" data-i18n="s7.ref4">Viele lokale</textPath></text><text class="arc" fill="#1E181A"><textPath href="#arc-bot" startOffset="50%" data-i18n="s7.ref4p">Märkte &amp; Events</textPath></text></svg><span class="sr-only" data-i18n="s7.ref4sr"></span></li>
+        </ul>
+        <div class="stall">
+          <svg class="stall-bunting" viewBox="0 0 300 44" aria-hidden="true"><defs><pattern id="pb-dots" width="6" height="6" patternUnits="userSpaceOnUse"><rect width="6" height="6" fill="#C4122F"/><circle cx="3" cy="3" r="1.2" fill="#FBF9F4"/></pattern><pattern id="pb-dots2" width="5" height="5" patternUnits="userSpaceOnUse"><rect width="5" height="5" fill="#86DEC9"/><circle cx="2.5" cy="2.5" r="1" fill="#1E181A"/></pattern><pattern id="pb-check" width="6" height="6" patternUnits="userSpaceOnUse"><rect width="6" height="6" fill="#FBF9F4"/><rect width="3" height="6" fill="#C4122F" opacity="0.55"/><rect width="6" height="3" fill="#C4122F" opacity="0.55"/></pattern><pattern id="pb-check2" width="6" height="6" patternUnits="userSpaceOnUse"><rect width="6" height="6" fill="#FFF3D6"/><rect width="3" height="6" fill="#3D6A5A" opacity="0.6"/><rect width="6" height="3" fill="#3D6A5A" opacity="0.6"/></pattern><pattern id="pb-stripe" width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="5" height="5" fill="#F2C14E"/><rect width="2.2" height="5" fill="#E5770F"/></pattern><pattern id="pb-denim" width="3" height="3" patternUnits="userSpaceOnUse" patternTransform="rotate(30)"><rect width="3" height="3" fill="#5B80A2"/><rect width="1" height="3" fill="#4D718D"/></pattern></defs><path d="M0 5.0Q150 23.0 300 5.0" fill="none" stroke="#FBF9F4" stroke-width="1.4"/><g class="pennant" style="--i:0"><path d="M4.0 5.5L25.0 7.7L14.5 30.7z" fill="url(#pb-dots)"/><path d="M7.0 7.3L22.0 9.5L14.5 26.7z" fill="none" stroke="rgba(30,24,26,0.4)" stroke-width="0.6" stroke-dasharray="1.6 1.2"/></g><g class="pennant" style="--i:1"><path d="M28.6 8.1L49.6 10.0L39.1 33.1z" fill="#FFC066"/><path d="M31.6 9.9L46.6 11.8L39.1 29.1z" fill="none" stroke="rgba(30,24,26,0.4)" stroke-width="0.6" stroke-dasharray="1.6 1.2"/></g><g class="pennant" style="--i:2"><path d="M53.3 10.3L74.3 11.7L63.8 35.0z" fill="url(#pb-check)"/><path d="M56.3 12.1L71.3 13.5L63.8 31.0z" fill="none" stroke="rgba(30,24,26,0.4)" stroke-width="0.6" stroke-dasharray="1.6 1.2"/></g><g class="pennant" style="--i:3"><path d="M77.9 11.9L98.9 13.0L88.4 36.5z" fill="#86DEC9"/><path d="M80.9 13.7L95.9 14.8L88.4 32.5z" fill="none" stroke="rgba(30,24,26,0.4)" stroke-width="0.6" stroke-dasharray="1.6 1.2"/></g><g class="pennant" style="--i:4"><path d="M102.5 13.1L123.5 13.7L113.0 37.5z" fill="url(#pb-stripe)"/><path d="M105.5 14.9L120.5 15.5L113.0 33.5z" fill="none" stroke="rgba(30,24,26,0.4)" stroke-width="0.6" stroke-dasharray="1.6 1.2"/></g><g class="pennant" style="--i:5"><path d="M127.2 13.8L148.2 14.0L137.7 37.9z" fill="#C4122F"/><path d="M130.2 15.6L145.2 15.8L137.7 33.9z" fill="none" stroke="rgba(30,24,26,0.4)" stroke-width="0.6" stroke-dasharray="1.6 1.2"/></g><g class="pennant" style="--i:6"><path d="M151.8 14.0L172.8 13.8L162.3 37.9z" fill="url(#pb-denim)"/><path d="M154.8 15.8L169.8 15.6L162.3 33.9z" fill="none" stroke="rgba(30,24,26,0.4)" stroke-width="0.6" stroke-dasharray="1.6 1.2"/></g><g class="pennant" style="--i:7"><path d="M176.5 13.7L197.5 13.1L187.0 37.5z" fill="#F2C14E"/><path d="M179.5 15.5L194.5 14.9L187.0 33.5z" fill="none" stroke="rgba(30,24,26,0.4)" stroke-width="0.6" stroke-dasharray="1.6 1.2"/></g><g class="pennant" style="--i:8"><path d="M201.1 13.0L222.1 11.9L211.6 36.5z" fill="url(#pb-dots2)"/><path d="M204.1 14.8L219.1 13.7L211.6 32.5z" fill="none" stroke="rgba(30,24,26,0.4)" stroke-width="0.6" stroke-dasharray="1.6 1.2"/></g><g class="pennant" style="--i:9"><path d="M225.7 11.7L246.7 10.3L236.2 35.0z" fill="#FBF9F4"/><path d="M228.7 13.5L243.7 12.1L236.2 31.0z" fill="none" stroke="rgba(30,24,26,0.4)" stroke-width="0.6" stroke-dasharray="1.6 1.2"/></g><g class="pennant" style="--i:10"><path d="M250.4 10.0L271.4 8.1L260.9 33.1z" fill="url(#pb-check2)"/><path d="M253.4 11.8L268.4 9.9L260.9 29.1z" fill="none" stroke="rgba(30,24,26,0.4)" stroke-width="0.6" stroke-dasharray="1.6 1.2"/></g><g class="pennant" style="--i:11"><path d="M275.0 7.7L296.0 5.5L285.5 30.7z" fill="#5B80A2"/><path d="M278.0 9.5L293.0 7.3L285.5 26.7z" fill="none" stroke="rgba(30,24,26,0.4)" stroke-width="0.6" stroke-dasharray="1.6 1.2"/></g></svg>
+          <p class="stall-copy"><span data-i18n="s7.ask">Du planst ein Event? Frag an, ob Katrin einen Stand aufbaut.</span> <a class="textlink" href="https://www.instagram.com/ribisl_design/" target="_blank" rel="noopener"><span data-i18n="s7.askLink">Anfragen</span> <svg class="ico" aria-hidden="true"><use href="#i-out"/></svg></a></p>
+        </div>
+        <p class="refs-motto" data-i18n="s7.motto">Aus Alt mach Lieblingsstück.</p>
+      </aside>
+      <!-- a lost button, hiding in the terry -->
+      <button type="button" class="lost-button" id="lost-button" data-i18n-label="egg.label" aria-label=""><svg viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="17" fill="#E9B44C" stroke="#7A5418" stroke-width="2"/><circle cx="20" cy="20" r="12.5" fill="none" stroke="#B9822B" stroke-width="1.5"/><g fill="#7A5418"><circle cx="15.5" cy="15.5" r="2.4"/><circle cx="24.5" cy="15.5" r="2.4"/><circle cx="15.5" cy="24.5" r="2.4"/><circle cx="24.5" cy="24.5" r="2.4"/></g></svg></button>
     </section>
 
     <!-- 8 · top middle -->
     <section class="screen s8" id="thread" data-i="8" data-next="down" aria-labelledby="h8">
       <header class="head patch">
-        <h2 id="h8" class="display" tabindex="-1" data-i18n="t8">Alles an einem Faden</h2>
+        <h2 id="h8" class="display" tabindex="-1" data-i18n="t8">Alles wie am Schnürchen</h2>
         <p class="sub" data-i18n="s8.sub"></p>
       </header>
       <ul class="nodes">
@@ -288,10 +334,8 @@
         <li style="--x:34%;--y:60%"><span class="hand" data-i18n="s8.c"></span></li>
         <li style="--x:72%;--y:62%"><span class="hand" data-i18n="s8.d"></span></li>
         <li style="--x:16%;--y:78%"><span class="hand" data-i18n="s8.e"></span></li>
-        <li style="--x:52%;--y:82%"><span class="hand" data-i18n="s8.f"></span></li>
+        <li style="--x:52%;--y:82%"><span class="hand" data-i18n="s8.f"></span><div class="stone"><button type="button" class="stone-btn" data-hands data-i18n-label="s8.stoneTurn" aria-label="Schmunzelsteinchen drehen"><svg class="stone-art" viewBox="0 0 120 90" aria-hidden="true"><defs><radialGradient id="stone-g" cx="0.38" cy="0.32" r="0.8"><stop offset="0" stop-color="#E4DED3"/><stop offset="0.6" stop-color="#B9B1A4"/><stop offset="1" stop-color="#8F877B"/></radialGradient></defs><ellipse cx="60" cy="80" rx="40" ry="6" fill="rgba(30,24,26,0.25)"/><path d="M18 50q-2-26 26-34 26-7 48 4 16 9 12 30-4 22-34 26-46 4-52-26z" fill="url(#stone-g)" stroke="#1E181A" stroke-width="1.6"/><g class="stone-face" transform="translate(60 47) rotate(-7) scale(0.42) translate(-50 -40)" fill="none" stroke="#1E181A" stroke-width="9" stroke-linecap="round"><path class="stone-eye" d="M42 15v30"/><path class="stone-eye stone-eye--r" d="M59 15v30"/><path class="stone-mouth" d="M19 37v6a31 31 0 0 0 62 0v-9"/></g></svg></button><span class="stone-note" data-i18n="s8.stone"></span></div></li>
       </ul>
-      <!-- a lost button, hiding in the plaid -->
-      <button type="button" class="lost-button" id="lost-button" data-i18n-label="egg.label" aria-label=""><svg viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="17" fill="#E9B44C" stroke="#7A5418" stroke-width="2"/><circle cx="20" cy="20" r="12.5" fill="none" stroke="#B9822B" stroke-width="1.5"/><g fill="#7A5418"><circle cx="15.5" cy="15.5" r="2.4"/><circle cx="24.5" cy="15.5" r="2.4"/><circle cx="15.5" cy="24.5" r="2.4"/><circle cx="24.5" cy="24.5" r="2.4"/></g></svg></button>
     </section>
 
     <!-- 9 · center: the thread ends here, sewing on the label -->
@@ -333,12 +377,12 @@
       <ol class="menu-list" id="menu-list" hidden>
         <li><a href="#start" data-go="1"><span class="n">1</span><span data-i18n="t1">Start</span></a></li>
         <li><a href="#about" data-go="2"><span class="n">2</span><span data-i18n="t2">Wer ist Ribisl?</span></a></li>
-        <li><a href="#materials" data-go="3"><span class="n">3</span><span data-i18n="t3">Aus Altem</span></a></li>
+        <li><a href="#materials" data-go="3"><span class="n">3</span><span data-i18n="t3">Alter Stoff. Neuer Hut.</span></a></li>
         <li><a href="#process" data-go="4"><span class="n">4</span><span data-i18n="t4">So entsteht ein Stück</span></a></li>
-        <li><a href="#pieces" data-go="5"><span class="n">5</span><span data-i18n="t5">Stücke</span></a></li>
+        <li><a href="#pieces" data-go="5"><span class="n">5</span><span data-i18n="t5">Einzelstücke</span></a></li>
         <li><a href="#markets" data-go="6"><span class="n">6</span><span data-i18n="t6">Auf dem Markt</span></a></li>
         <li><a href="#courses" data-go="7"><span class="n">7</span><span data-i18n="t7">Kurse</span></a></li>
-        <li><a href="#thread" data-go="8"><span class="n">8</span><span data-i18n="t8">Alles an einem Faden</span></a></li>
+        <li><a href="#thread" data-go="8"><span class="n">8</span><span data-i18n="t8">Alles wie am Schnürchen</span></a></li>
         <li><a href="#contact" data-go="9"><span class="n">9</span><span data-i18n="t9">Kontakt</span></a></li>
       </ol>
     </nav>
