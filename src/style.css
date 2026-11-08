@@ -2250,7 +2250,6 @@ button.swatch:active { cursor: grabbing; }
     flex-direction: column;
     justify-content: center;
     gap: clamp(1.25rem, 3vh, 2.5rem);
-    padding-bottom: calc(var(--pad-bottom) + 54px);
   }
   .s7 .head { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr); align-items: end; gap: 3rem; max-width: none; }
   .s7 .display { max-width: none; font-size: clamp(3rem, 5.1vw, 7rem); }
@@ -2268,7 +2267,8 @@ button.swatch:active { cursor: grabbing; }
   .s7 .refs .stall { grid-column: 2; grid-row: 1; width: 100%; max-width: none; margin: 0; }
   .s7 .stall-copy { padding: 1rem 1.2rem; font-size: 1rem; }
   .s7 .refs-motto { grid-column: 2; grid-row: 2; font-size: clamp(1.8rem, 2.5vw, 2.8rem); }
-  .s7 .stall-bunting { position: absolute; left: 0; bottom: var(--pad-bottom); width: var(--W); height: 44px; margin: 0; }
+  /* the bunting hangs over the stall it belongs to, a little wider than the counter */
+  .s7 .stall-bunting { position: relative; width: calc(100% + 1.6rem); height: 44px; margin: 0 -0.8rem -0.7rem; }
   .s7 .lost-button { left: auto; right: 4%; top: auto; bottom: calc(var(--pad-bottom) + 10px); z-index: 1; }
 }
 
