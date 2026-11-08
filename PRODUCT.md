@@ -10,7 +10,7 @@ The same nine-screen 3x3 spiral as the ziofungo site (top-left, down, along the 
 Scrolling (wheel, trackpad, or dragging up and down on touch) moves the needle along the thread through the current screen. Sewing to a screen's edge flies the camera to the next screen, and scrolling back unpicks. The next button, minimap, menu and keys still jump straight to a screen, and the thread sews or unpicks its way there. Screen 2 has a pair of scissors that cut a ribisl label out of the cloth each time you arrive.
 
 ## Fabrics
-The nine screens are real fabric scans from Poly Haven (CC0, no attribution required): yellow bi-stretch, mint crepe georgette, denim, orange caban (brightened), red picnic gingham (saturation boosted), lime poplin, cobalt terry, teal curly-teddy tartan (saturation boosted), and blue linen. They are compressed WebP files in `public/fabric/`, about 1.2 MB in total. Cream text sits on the denim and cobalt; on the gingham and plaid, text sits on sewn-on cotton patches.
+The nine screens are real fabric scans from Poly Haven (CC0, no attribution required): yellow bi-stretch, mint crepe georgette, denim, orange caban (brightened), teal curly-teddy tartan (saturation boosted), lime poplin, cobalt terry, red picnic gingham (saturation boosted), and blue linen. They are compressed WebP files in `public/fabric/`, about 1.2 MB in total. Cream text sits on the denim and cobalt; on the gingham and plaid, text sits on sewn-on cotton patches. In system dark mode, the mint and lime screens have a dark overlay with cream text for contrast.
 
 ## The workbench (visitors make something)
 - **Screen 1:** cut a square out of the jeans patch behind "ribisl"; the smiley label shows through the hole.

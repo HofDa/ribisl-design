@@ -19,10 +19,10 @@ const PATCHES = [
   { fabric: 'mint', base: '#86DEC9', scale: 0.8 },
   { fabric: 'denim', base: '#4D718D', scale: 0.9 },
   { fabric: 'orange', base: '#E5770F', scale: 0.8 },
-  { fabric: 'gingham', base: '#C85047', scale: 0.75 },
+  { fabric: 'plaid', base: '#8EA390', scale: 0.55 },
   { fabric: 'lime', base: '#B6D363', scale: 0.8 },
   { fabric: 'cobalt', base: '#054896', scale: 0.8 },
-  { fabric: 'plaid', base: '#8EA390', scale: 0.55 },
+  { fabric: 'gingham', base: '#C85047', scale: 0.75 },
   { fabric: 'linen', base: '#91ABCD', scale: 0.8 },
 ];
 const MAT = '#3D6A5A'; // the cutting mat beyond the cloth, seen in dips and the overview

@@ -2116,3 +2116,16 @@ button.swatch:active { cursor: grabbing; }
   .s7 .patch-cap span { font-size: 0.66rem; }
 }
 @media (max-width: 900px) { .s7 .refs { width: auto; } }
+
+/* Keep the mint and lime cloth readable with a dark system appearance. */
+@media (prefers-color-scheme: dark) {
+  .s2, .s6 {
+    background: rgba(30, 24, 26, 0.82);
+    color: var(--tag);
+    --line: var(--tag);
+  }
+  .s2 .display { color: #FFC066; }
+  .s2 .smile--dt { color: inherit; }
+  .s2 .cutout { color: var(--tag); }
+  .s2 .cut-guide, .s2 .cut-done { stroke: var(--tag); }
+}
