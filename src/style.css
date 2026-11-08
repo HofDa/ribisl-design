@@ -2020,3 +2020,15 @@ button.swatch:active { cursor: grabbing; }
 /* phones: Katrin sits a little lower beside the heading (moved visually, so the text below keeps its place) */
 @media (max-width: 900px) { .katrin { translate: 0 0.9rem; } }
 @media (max-width: 900px) and (max-height: 720px) { .katrin { translate: 0 0.45rem; } }
+
+/* phones: Katrin a little bigger again, her name label smaller so it stays a small sewn-on tag */
+@media (max-width: 900px) {
+  .katrin { --kh: clamp(150px, 22.5vh, 215px); }
+  .katrin .katrin-name { font-size: 0.46rem; padding: 0.35em 0.6em; outline-offset: -3px; left: 2%; bottom: 9%; }
+  .s2-body { gap: 1rem; }
+}
+@media (max-width: 900px) and (max-height: 720px) { .katrin { --kh: 120px; } .katrin .katrin-name { font-size: 0.42rem; } }
+@media (max-width: 900px) and (min-height: 721px) and (max-height: 860px) {
+  .s2 { row-gap: 0.9rem; }
+  .s2 .cutout { margin-top: -2.2rem; }
+}
