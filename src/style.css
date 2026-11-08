@@ -1959,3 +1959,14 @@ button.swatch:active { cursor: grabbing; }
   .katrin { --kh: clamp(150px, calc(100vh - 592px), 330px); height: var(--kh); width: calc(var(--kh) * 395 / 510); aspect-ratio: auto; max-width: none; }
 }
 @media (min-width: 901px) and (max-height: 710px) { .katrin { --kh: 104px; } }
+
+/* phones: Katrin comes after the text, bottom left, beside the ribisl label */
+@media (max-width: 900px) {
+  .s2 { grid-template-columns: minmax(0, 1fr) auto; }
+  .s2 .display { grid-column: 1 / -1; grid-row: 1; }
+  .s2-body { grid-column: 1 / -1; grid-row: 2; }
+  .katrin { --kh: clamp(120px, 22vh, 200px); grid-column: 1; grid-row: 3; justify-self: start; align-self: end; margin: 0.4rem 0 0 0.2rem; rotate: -3deg; }
+  .s2 .cutout { grid-column: 2; grid-row: 3; align-self: end; }
+  .katrin .katrin-name { display: block; }
+}
+@media (max-width: 900px) and (max-height: 720px) { .katrin { --kh: 104px; } }
