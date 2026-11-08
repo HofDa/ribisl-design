@@ -571,7 +571,7 @@ button.swatch:active { cursor: grabbing; }
 .s2-body { grid-column: 2; grid-row: 1 / 3; }
 .cutout {
   --cut: 1.7s;
-  --wait: 0.45s;
+  --wait: 1.6s; /* after Katrin's sunglasses have landed */
   grid-column: 1;
   grid-row: 2;
   align-self: end;
