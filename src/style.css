@@ -2076,3 +2076,10 @@ button.swatch:active { cursor: grabbing; }
 /* Katrin's name label is sewn on so it sticks out a little past the left edge of the photo */
 .katrin .katrin-name { left: -9%; }
 @media (max-width: 900px) { .katrin .katrin-name { left: -12%; } }
+
+/* screen 7: the pennant chain hangs right across the screen, edge to edge, behind the envelopes */
+.stall-bunting { width: var(--W); max-width: none; height: 44px; margin-left: calc(-1 * var(--pad)); position: relative; z-index: 0; }
+.s7 .refs { z-index: auto; }
+.s7 .envelopes { z-index: 2; }
+.s7 .stall-copy { position: relative; z-index: 1; }
+@media (max-width: 600px) { .stall-bunting { height: 38px; } }

@@ -82,6 +82,30 @@ function fitArcs() {
 }
 document.fonts?.ready.then(fitArcs);
 
+// Screen 7: the pennant chain runs across the whole screen. It is rebuilt for the screen's width,
+// so the pennants keep their shape and just get more (or fewer) along the line.
+const PENNANTS = ['url(#pb-dots)', '#FFC066', 'url(#pb-check)', '#86DEC9', 'url(#pb-stripe)', '#C4122F',
+  'url(#pb-denim)', '#F2C14E', 'url(#pb-dots2)', '#FBF9F4', 'url(#pb-check2)', '#5B80A2'];
+function buildBunting() {
+  const svg = document.querySelector('.stall-bunting');
+  if (!svg) return;
+  const W = Math.max(200, Math.round(svg.getBoundingClientRect().width)), H = 44;
+  svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+  const sag = Math.min(16, 6 + W / 120);
+  const y = (x) => 5 + sag * (1 - ((x - W / 2) / (W / 2)) ** 2);
+  const pw = 21, n = Math.max(6, Math.floor((W - 8) / (pw + 4)));
+  const gap = (W - 8 - n * pw) / (n - 1);
+  let out = `<path d="M0 ${y(0).toFixed(1)}Q${W / 2} ${(5 + 2 * sag).toFixed(1)} ${W} ${y(W).toFixed(1)}" fill="none" stroke="#FBF9F4" stroke-width="1.4"/>`;
+  for (let i = 0; i < n; i++) {
+    const x0 = 4 + i * (pw + gap), x1 = x0 + pw, xm = (x0 + x1) / 2;
+    out += `<g class="pennant" style="--i:${i % 24}"><path d="M${x0.toFixed(1)} ${y(x0).toFixed(1)}L${x1.toFixed(1)} ${y(x1).toFixed(1)}L${xm.toFixed(1)} ${(y(xm) + 24).toFixed(1)}z" fill="${PENNANTS[i % PENNANTS.length]}"/>`
+      + `<path d="M${(x0 + 3).toFixed(1)} ${(y(x0) + 1.8).toFixed(1)}L${(x1 - 3).toFixed(1)} ${(y(x1) + 1.8).toFixed(1)}L${xm.toFixed(1)} ${(y(xm) + 20).toFixed(1)}z" fill="none" stroke="rgba(30,24,26,0.4)" stroke-width="0.6" stroke-dasharray="1.6 1.2"/></g>`;
+  }
+  svg.querySelector('.bunting-line').innerHTML = out;
+}
+buildBunting();
+addEventListener('resize', buildBunting);
+
 /* ---------- spiral map ---------- */
 
 function buildMap() {
