@@ -19,7 +19,8 @@
   --W: 100vw;
   --H: 100vh;
 
-  color-scheme: light;
+  /* Keep HTML text and SVG colors matched to the canvas fabrics in browser dark mode. */
+  color-scheme: only light;
 }
 
 @media (min-resolution: 2dppx) {
