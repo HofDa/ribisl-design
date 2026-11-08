@@ -9,6 +9,11 @@ import { drawHat, madeSides, fabricSrc } from './workbench.js';
 const BASE = import.meta.env.BASE_URL;
 const SIDES = { swirl: `${BASE}pieces/fabric-swirl.webp`, ink: `${BASE}pieces/fabric-ink.webp` };
 
+// the front camera, as the try-on wants it
+export function getCamera() {
+  return navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user', width: { ideal: 1280 }, height: { ideal: 720 } }, audio: false });
+}
+
 let detectorPromise = null;
 function getDetector() {
   detectorPromise ??= FilesetResolver.forVisionTasks(`${BASE}mediapipe/wasm`).then((files) =>
@@ -20,7 +25,7 @@ function getDetector() {
   return detectorPromise;
 }
 
-export async function openTryOn({ tr, reduced }) {
+export async function openTryOn({ tr, reduced, firstStream = null }) {
   const root = document.documentElement;
   const ui = document.createElement('div');
   ui.className = 'tryon';
@@ -89,7 +94,10 @@ export async function openTryOn({ tr, reduced }) {
   let stream = null;
   async function startCamera() {
     try {
-      stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user', width: { ideal: 1280 }, height: { ideal: 720 } }, audio: false });
+      // the first time, the camera was already asked for on the tap itself (some phone browsers only allow it then)
+      const pending = firstStream;
+      firstStream = null;
+      stream = await (pending || getCamera());
       video.srcObject = stream;
       await video.play();
       return true;

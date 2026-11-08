@@ -884,8 +884,17 @@ if (navigator.mediaDevices?.getUserMedia) {
   tryBtn.hidden = false;
   tryBtn.addEventListener('click', () => {
     tryBtn.classList.add('is-loading');
+    // ask for the camera right on the tap: some phone browsers refuse it once the tap is a few seconds old
+    const firstStream = navigator.mediaDevices
+      .getUserMedia({ video: { facingMode: 'user', width: { ideal: 1280 }, height: { ideal: 720 } }, audio: false });
+    firstStream.catch(() => {}); // a refusal is handled (and shown) inside the try-on
     import('./tryon.js')
-      .then((m) => m.openTryOn({ tr: (k) => t(lang, k), reduced: () => reducedQuery.matches }))
+      .then((m) => m.openTryOn({ tr: (k) => t(lang, k), reduced: () => reducedQuery.matches, firstStream }))
+      .catch(() => {
+        // the try-on code changed with a newer version of the site since this page was opened: load the new one
+        firstStream.then((st) => st.getTracks().forEach((tr) => tr.stop()), () => {});
+        location.reload();
+      })
       .finally(() => tryBtn.classList.remove('is-loading'));
   });
 }
