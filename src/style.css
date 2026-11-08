@@ -1975,3 +1975,7 @@ button.swatch:active { cursor: grabbing; }
   .s2-body { gap: 0.8rem; }
   .s2 .cutout { margin-top: -2.8rem; }
 }
+
+/* "Dein Hut" belongs to your own hat only: it steps aside while the toadstool hat is on top */
+.piece--hat .yours-label { transition: opacity 0.3s; }
+.piece--hat:not(:has(.hat-turn.is-top)) .yours-label { opacity: 0; }
