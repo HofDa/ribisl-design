@@ -5,6 +5,7 @@
 // Nothing is stored: every visit starts with an uncut pair of jeans and an empty hat.
 
 import { sound } from './sound.js';
+import { bindImageExport } from './image-export.js';
 
 const FABRICS = ['denim', 'scraps', 'rope', 'knit'];
 // a side the visitor hasn't filled yet is sewn from Katrin's default
@@ -259,6 +260,13 @@ export function initWorkbench({ tr, reduced }) {
   const madeBox = document.querySelector('.made');
   const thumb = madeBox.querySelector('canvas');
   const saveBtn = document.getElementById('save-hat');
+  const setExportFile = bindImageExport({
+    downloadButton: saveBtn,
+    shareButton: document.getElementById('share-hat'),
+    status: document.getElementById('hat-export-status'),
+    tr,
+  });
+  let exportVersion = 0;
 
   const sideImgs = () => {
     const { out, in: inside } = madeSides();
@@ -266,13 +274,23 @@ export function initWorkbench({ tr, reduced }) {
   };
 
   function refreshHat() {
+    const version = ++exportVersion;
+    setExportFile(null);
     const mine = !!(state.out && state.in);
     ready.then(() => {
       drawReversible(hatCanvas, ...sideImgs(), hatTurn.dataset.front);
       hatFrame.classList.add('has-hat');
       hatFrame.classList.toggle('is-yours', mine);
       madeBox.hidden = !mine;
-      if (mine) drawReversible(thumb, ...sideImgs());
+      if (mine) {
+        drawReversible(thumb, ...sideImgs());
+        const c = document.createElement('canvas');
+        c.width = 1200; c.height = 900;
+        drawReversible(c, ...sideImgs(), 'out', true);
+        c.toBlob((blob) => {
+          if (blob && version === exportVersion) setExportFile(new File([blob], 'ribisl-hat.png', { type: 'image/png' }));
+        }, 'image/png');
+      }
     });
   }
 
@@ -285,20 +303,6 @@ export function initWorkbench({ tr, reduced }) {
     if (!reduced()) await hatCanvas.animate([{ transform: 'none' }, { transform: 'scaleX(0) rotate(-6deg)' }], { duration: 170, easing: 'ease-in' }).finished;
     drawReversible(hatCanvas, ...sideImgs(), front);
     if (!reduced()) hatCanvas.animate([{ transform: 'scaleX(0) rotate(6deg)' }, { transform: 'none' }], { duration: 320, easing: 'cubic-bezier(0.34, 1.56, 0.64, 1)' });
-  });
-
-  saveBtn.addEventListener('click', () => {
-    const c = document.createElement('canvas');
-    c.width = 1200; c.height = 900;
-    drawReversible(c, ...sideImgs(), 'out', true);
-    c.toBlob((blob) => {
-      if (!blob) return;
-      const a = document.createElement('a');
-      a.href = URL.createObjectURL(blob);
-      a.download = 'ribisl-hat.png';
-      a.click();
-      setTimeout(() => URL.revokeObjectURL(a.href), 2000);
-    }, 'image/png');
   });
 
   markCutSwatch();

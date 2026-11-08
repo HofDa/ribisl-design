@@ -362,7 +362,12 @@
             <canvas class="hat-thumb" width="400" height="300" aria-hidden="true"></canvas>
             <div class="made-copy">
               <p data-i18n="s9.made">Du hast einen Hut entworfen.</p>
-              <button type="button" class="btn btn--light" id="save-hat"><span data-i18n="s9.save">Hut speichern</span><svg class="ico" aria-hidden="true"><use href="#i-arrow"/></svg></button>
+              <div class="image-actions">
+                <button type="button" class="btn btn--light" id="share-hat" hidden data-i18n="image.share">Speichern oder teilen …</button>
+                <button type="button" class="btn btn--light" id="save-hat" disabled><span data-i18n="s9.save">Hut herunterladen</span><svg class="ico" aria-hidden="true"><use href="#i-arrow"/></svg></button>
+              </div>
+              <p class="image-help" data-i18n="image.hint">Heruntergeladene Bilder findest du im Browser unter „Downloads“ oder in Dateien → Downloads.</p>
+              <p class="image-status" id="hat-export-status" role="status"></p>
             </div>
           </div>
         </div>

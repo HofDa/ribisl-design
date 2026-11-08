@@ -3,6 +3,7 @@
 // are served with the site, and the picture is only saved or shared if you take one.
 import { FaceDetector, FilesetResolver } from '@mediapipe/tasks-vision';
 import { drawHat, madeSides, fabricSrc } from './workbench.js';
+import { bindImageExport, canShareImage, downloadImage } from './image-export.js';
 
 // Seen from the front: the real fabric of each side of the reversible hat, sewn onto a frontal hat shape,
 // so it sits straight on a face looking into the camera.
@@ -224,28 +225,30 @@ export async function openTryOn({ tr, reduced, firstStream = null }) {
       <button type="button" class="tryon-close btn tryon-preview-close" aria-label="${tr('tryon.back')}">×</button>
       <div class="tryon-preview-bar">
         <button type="button" class="btn tryon-ig"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="3.5" width="17" height="17" rx="5" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="17.2" cy="6.8" r="1.2" fill="currentColor"/></svg><span>${tr('tryon.shareIg')}</span></button>
+        <button type="button" class="btn tryon-share" hidden>${tr('image.share')}</button>
         <button type="button" class="btn tryon-save">${tr('tryon.save')}</button>
         <button type="button" class="btn tryon-again">${tr('tryon.again')}</button>
+        <p class="tryon-preview-help">${tr('image.hint')}</p>
         <p class="tryon-preview-note" aria-live="polite"></p>
       </div>`;
     ui.append(sheet);
     // the phone's back button (or gesture) returns from the photo to the camera
     history.pushState({ ribisl: 'preview' }, '');
-    preview = { sheet, url };
+    const bar = sheet.querySelector('.tryon-preview-bar');
+    const resizeObserver = new ResizeObserver(() => sheet.style.setProperty('--bar-h', `${bar.offsetHeight}px`));
+    resizeObserver.observe(bar);
+    preview = { sheet, url, resizeObserver };
     const note = sheet.querySelector('.tryon-preview-note');
-    const save = () => {
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = file.name;
-      a.click();
-    };
+    const setExportFile = bindImageExport({ downloadButton: sheet.querySelector('.tryon-save'), shareButton: sheet.querySelector('.tryon-share'), status: note, tr });
+    setExportFile(file);
     sheet.querySelector('.tryon-ig').addEventListener('click', async () => {
       const caption = tr('tryon.caption');
       // Instagram often drops shared text, so the caption also goes on the clipboard to paste
-      try { await navigator.clipboard.writeText(caption); } catch {}
-      if (navigator.canShare?.({ files: [file] })) {
+      navigator.clipboard?.writeText(caption).catch(() => {});
+      if (canShareImage(file)) {
         try {
           await navigator.share({ files: [file], text: caption });
+          note.dataset.i18n = 'tryon.copied';
           note.textContent = tr('tryon.copied');
           return;
         } catch (e) {
@@ -253,11 +256,11 @@ export async function openTryOn({ tr, reduced, firstStream = null }) {
         }
       }
       // no share sheet here (most computers): save the photo and open Katrin's Instagram
-      save();
+      downloadImage(file);
+      note.dataset.i18n = 'tryon.saved';
       note.textContent = tr('tryon.saved');
       window.open('https://www.instagram.com/ribisl_design/', '_blank', 'noopener');
     });
-    sheet.querySelector('.tryon-save').addEventListener('click', () => { save(); note.textContent = tr('tryon.savedOnly'); });
     sheet.querySelector('.tryon-again').addEventListener('click', () => history.back());
     sheet.querySelector('.tryon-preview-close').addEventListener('click', () => history.back());
     sheet.querySelector('.tryon-ig').focus();
@@ -271,6 +274,7 @@ export async function openTryOn({ tr, reduced, firstStream = null }) {
   history.pushState({ ribisl: 'tryon' }, '');
   function closePreview() {
     if (!preview) return;
+    preview.resizeObserver.disconnect();
     preview.sheet.remove();
     URL.revokeObjectURL(preview.url);
     preview = null;
@@ -280,7 +284,7 @@ export async function openTryOn({ tr, reduced, firstStream = null }) {
   function close() {
     cancelAnimationFrame(raf);
     stopCamera();
-    if (preview) { URL.revokeObjectURL(preview.url); preview = null; }
+    if (preview) { preview.resizeObserver.disconnect(); URL.revokeObjectURL(preview.url); preview = null; }
     removeEventListener('keydown', onKey, true);
     removeEventListener('popstate', onPop);
     document.removeEventListener('visibilitychange', onVisibility);
