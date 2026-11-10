@@ -600,7 +600,7 @@ function setEnvelope(env, open) {
   };
   if (reducedQuery.matches) return turn();
   env.classList.add('is-tearing');
-  sound.snip();
+  sound.tear();
   setTimeout(turn, 300);
 }
 for (const env of envelopes) {
@@ -619,7 +619,7 @@ lostBtn.addEventListener('click', () => {
   if (lostBtn.classList.contains('is-found')) return;
   lostBtn.classList.add('is-found');
   endTag.querySelector('.tag-button').hidden = false;
-  sound.pop();
+  sound.found();
   announce.textContent = t(lang, 'egg.found');
   const note = document.createElement('span');
   note.className = 'label found-note';
@@ -634,6 +634,7 @@ hat.addEventListener('click', () => {
   const front = hat.dataset.front === 'a' ? 'b' : 'a';
   hat.dataset.front = front;
   hat.setAttribute('aria-pressed', String(front === 'b'));
+  sound.spring();
   if (reducedQuery.matches) return;
   hat.querySelector(`.hat-side--${front}`).animate(
     [{ scale: '1 1', translate: '0 0' }, { scale: '0.2 1.05', translate: '0 -34px', offset: 0.35 }, { scale: '1.08 0.94', translate: '0 0', offset: 0.75 }, { scale: '1 1', translate: '0 0' }],
