@@ -323,9 +323,9 @@ async function frontalHat(fabric) {
   const crop = document.createElement('canvas');
   crop.width = 552; crop.height = 316;
   crop.getContext('2d').drawImage(c, 124, 188, 552, 316, 0, 0, 552, 316);
-  // a touch bigger than the face box, so the crown goes round the head, and set lower, so the brim's
-  // front edge comes down onto the forehead just above the eyebrows
-  return { src: crop.toDataURL('image/png'), bottom: 0.84, fit: 1.05 };
+  // sized so the crown is just a little wider than the face (the crown is 70% of the picture, the brim
+  // the rest), and set low, so the brim's front edge comes down onto the forehead above the eyebrows
+  return { src: crop.toDataURL('image/png'), bottom: 0.84, fit: 0.86 };
 }
 
 // The toadstool hat's cloth, as on the real one: red cotton with pale blue and cream felt dots sewn on,
