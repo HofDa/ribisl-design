@@ -534,7 +534,7 @@ button.swatch:active { cursor: grabbing; }
 .hat-thumb { width: clamp(110px, 12vw, 170px); height: auto; flex: none; }
 .made-copy { display: grid; gap: 0.7rem; justify-items: start; max-width: 26rem; font-weight: 520; }
 .image-actions { display: flex; flex-wrap: wrap; gap: 0.5rem; }
-.image-actions [hidden], .tryon-preview-bar [hidden] { display: none; }
+.image-actions [hidden], .tryon-preview-bar [hidden], .made-copy .image-help[hidden] { display: none; }
 .made-copy .image-help, .made-copy .image-status { display: block; font-size: 0.8rem; line-height: 1.4; }
 .image-status:empty { display: none; }
 
@@ -931,7 +931,30 @@ button.swatch:active { cursor: grabbing; }
 .hat-tag { position: absolute; right: 4%; top: 2%; width: 2.8rem; rotate: 8deg; z-index: 3; }
 .turn figcaption { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 0.5rem 1rem; }
 .turn-hint { font: 600 1.45rem/1 var(--hand); rotate: -3deg; }
-.turn-hint::before { content: '\21BB'; margin-right: 0.25em; font: 700 1rem/1 var(--font); }
+.turn-hint .pen-arrow { display: none; }
+
+/* Desktop: under the hats only the label and the try-on button, side by side as one line;
+   the note in pen sits on the cloth beside the hats, its arrow pointing at them. */
+@media (min-width: 901px) {
+  .turn figcaption { flex-wrap: nowrap; gap: 1rem; }
+  .turn figcaption .label { rotate: -1.5deg; white-space: nowrap; }
+  .turn .tryon-btn { margin: 0; rotate: 1deg; }
+  .turn-hint {
+    position: absolute;
+    right: calc(100% - 3%);
+    top: 30%;
+    display: grid;
+    justify-items: end;
+    gap: 0.15rem;
+    width: max-content;
+    max-width: 9.5rem;
+    font-size: clamp(1.45rem, 1.9vw, 1.9rem);
+    line-height: 0.95;
+    text-align: right;
+    rotate: -6deg;
+  }
+  .turn-hint .pen-arrow { display: block; width: 48px; height: auto; margin-right: -1.6rem; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+}
 /* every few seconds the hats shuffle, to show they turn */
 @keyframes hat-hint {
   0%, 72%, 100% { transform: none; }
@@ -1246,8 +1269,10 @@ button.swatch:active { cursor: grabbing; }
   align-content: center;
   gap: 0.6rem;
 }
-.tryon-ig { background: var(--red); border-color: var(--red); }
-.tryon-save, .tryon-share, .tryon-again { background: transparent; border-color: rgba(251, 249, 244, 0.7); }
+/* the way out of the photo (share on phones, download elsewhere) is the red one */
+.tryon-share, .tryon-save { background: var(--red); border-color: var(--red); }
+.tryon-share .ico { margin: 0 0.4em 0 0; }
+.tryon-again { background: transparent; border-color: rgba(251, 249, 244, 0.7); }
 .tryon-preview-help { flex-basis: 100%; text-align: center; color: var(--tag); font-size: 0.8rem; line-height: 1.4; }
 .tryon-preview-note { flex-basis: 100%; text-align: center; color: var(--tag); font-size: 0.85rem; min-height: 1.2em; }
 .tryon.is-flash::after { content: ''; position: absolute; inset: 0; background: #fff; animation: flash 0.4s ease-out forwards; pointer-events: none; }

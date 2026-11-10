@@ -15,7 +15,10 @@ export function downloadImage(file) {
 }
 
 // Prepare the file before a tap so the device's share menu opens within user activation.
-export function bindImageExport({ downloadButton, shareButton, status, tr }) {
+// Where the device has a share menu (phones), it's the only way out: it already offers "Save Image" and
+// Instagram, and a download would only bring up the browser's own "download from …" prompt. Elsewhere
+// (most computers) the picture is downloaded. `help` is the line explaining where downloads end up.
+export function bindImageExport({ downloadButton, shareButton, status, help, tr }) {
   let file = null;
   const message = (key) => {
     status.dataset.i18n = key;
@@ -47,8 +50,11 @@ export function bindImageExport({ downloadButton, shareButton, status, tr }) {
   });
   return (nextFile) => {
     file = nextFile;
+    const share = canShareImage(file);
     downloadButton.disabled = !file;
-    shareButton.hidden = !canShareImage(file);
+    shareButton.hidden = !share;
+    downloadButton.hidden = share;
+    if (help) help.hidden = share;
     status.textContent = '';
     delete status.dataset.i18n;
   };

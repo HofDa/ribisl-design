@@ -224,11 +224,10 @@ export async function openTryOn({ tr, reduced, firstStream = null }) {
       <img alt="" src="${url}">
       <button type="button" class="tryon-close btn tryon-preview-close" aria-label="${tr('tryon.back')}">×</button>
       <div class="tryon-preview-bar">
-        <button type="button" class="btn tryon-ig"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="3.5" width="17" height="17" rx="5" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="17.2" cy="6.8" r="1.2" fill="currentColor"/></svg><span>${tr('tryon.shareIg')}</span></button>
-        <button type="button" class="btn tryon-share" hidden>${tr('image.share')}</button>
+        <button type="button" class="btn tryon-share" hidden><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15V3.5M7.5 8 12 3.5 16.5 8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M8 11H5.5v9.5h13V11H16" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg><span>${tr('image.share')}</span></button>
         <button type="button" class="btn tryon-save">${tr('tryon.save')}</button>
         <button type="button" class="btn tryon-again">${tr('tryon.again')}</button>
-        <p class="tryon-preview-help">${tr('image.hint')}</p>
+        <p class="tryon-preview-help">${tr(canShareImage(file) ? 'tryon.shareHint' : 'tryon.saveHint')}</p>
         <p class="tryon-preview-note" aria-live="polite"></p>
       </div>`;
     ui.append(sheet);
@@ -239,31 +238,15 @@ export async function openTryOn({ tr, reduced, firstStream = null }) {
     resizeObserver.observe(bar);
     preview = { sheet, url, resizeObserver };
     const note = sheet.querySelector('.tryon-preview-note');
+    // the caption goes on the clipboard, ready to paste under the post
+    const copyCaption = () => navigator.clipboard?.writeText(tr('tryon.caption')).catch(() => {});
+    sheet.querySelector('.tryon-share').addEventListener('click', copyCaption, true);
+    sheet.querySelector('.tryon-save').addEventListener('click', copyCaption, true);
     const setExportFile = bindImageExport({ downloadButton: sheet.querySelector('.tryon-save'), shareButton: sheet.querySelector('.tryon-share'), status: note, tr });
     setExportFile(file);
-    sheet.querySelector('.tryon-ig').addEventListener('click', async () => {
-      const caption = tr('tryon.caption');
-      // Instagram often drops shared text, so the caption also goes on the clipboard to paste
-      navigator.clipboard?.writeText(caption).catch(() => {});
-      if (canShareImage(file)) {
-        try {
-          await navigator.share({ files: [file], text: caption });
-          note.dataset.i18n = 'tryon.copied';
-          note.textContent = tr('tryon.copied');
-          return;
-        } catch (e) {
-          if (e?.name === 'AbortError') return;
-        }
-      }
-      // no share sheet here (most computers): save the photo and open Katrin's Instagram
-      downloadImage(file);
-      note.dataset.i18n = 'tryon.saved';
-      note.textContent = tr('tryon.saved');
-      window.open('https://www.instagram.com/ribisl_design/', '_blank', 'noopener');
-    });
     sheet.querySelector('.tryon-again').addEventListener('click', () => history.back());
     sheet.querySelector('.tryon-preview-close').addEventListener('click', () => history.back());
-    sheet.querySelector('.tryon-ig').focus();
+    sheet.querySelector(canShareImage(file) ? '.tryon-share' : '.tryon-save').focus();
   }
 
   /* ---------- closing ---------- */

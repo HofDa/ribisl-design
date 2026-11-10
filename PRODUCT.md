@@ -19,7 +19,7 @@ The nine screens are real fabric scans from Poly Haven (CC0, no attribution requ
 - **Screen 5:** the Hats frame shows your reversible hat, both sides; tap it to turn it inside out.
 - **Screen 6:** "Try it on!" opens the front camera with MediaPipe face detection (self-hosted, loaded only on tap) and puts a hat on your head: either side of the market hat, or either side of yours. You can take a photo.
 - **Screen 7:** the courses are sewing-pattern envelopes you tear open to read the back and "Reserve a spot". Below them, references (no dates on purpose): UpCon Brixen, a workshop at Schloss Runkelstein, the Creative Week of Jugenddienst Bozen, "many local markets and events", and an invitation to ask Katrin for a stall at your event. Closing line: "Aus Alt mach Lieblingsstück."
-- **Screen 9:** download your hat as a picture, with directions to the browser’s Downloads or Files → Downloads. Where file sharing is supported, “Save or share…” opens the device’s sharing menu. The try-on photo offers the same choices. Download confirmations report that the download started; they do not claim the file was saved successfully.
+- **Screen 9:** keep your hat as a picture. Where the device has a share menu (phones), “Share” is the only button: the menu already offers saving the image and posting it to Instagram, and a download would only bring up the browser’s own “download from …” prompt. Elsewhere (most computers) the picture is downloaded, with directions to the Downloads folder. The try-on photo works the same way, and its caption is copied to the clipboard, ready to paste under the post.
 - **Nothing is stored:** every visit starts fresh. Photos never leave the device.
 
 ## Small fun

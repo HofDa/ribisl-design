@@ -264,6 +264,7 @@ export function initWorkbench({ tr, reduced }) {
     downloadButton: saveBtn,
     shareButton: document.getElementById('share-hat'),
     status: document.getElementById('hat-export-status'),
+    help: madeBox.querySelector('.image-help'),
     tr,
   });
   let exportVersion = 0;
