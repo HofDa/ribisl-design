@@ -13,17 +13,18 @@ const ORDER = [[0, 0], [0, 1], [0, 2], [1, 2], [2, 2], [2, 1], [2, 0], [1, 0], [
 const DIRS = { down: [0, 1], up: [0, -1], left: [-1, 0], right: [1, 0] };
 
 // Nine offcuts sewn into one cloth, indexed by spiral position: real fabric scans (CC0, polyhaven.com).
-// base is each fabric's average colour, painted until its scan has loaded.
+// base is each fabric's average colour, painted until its scan has loaded. The busier scans are kept at
+// 768 px and drawn larger (scale), so every weave shows at the same size as at 1024 px.
 const PATCHES = [
   { fabric: 'yellow', base: '#F7AB28', scale: 0.8 },
-  { fabric: 'pink', base: '#EE6EA4', scale: 0.8 },
-  { fabric: 'denim', base: '#4D718D', scale: 0.9 },
+  { fabric: 'pink', base: '#EE6EA4', scale: 1.07 },
+  { fabric: 'denim', base: '#4D718D', scale: 1.2 },
   { fabric: 'orange', base: '#E5770F', scale: 0.8 },
-  { fabric: 'plaid', base: '#8EA390', scale: 0.55 },
+  { fabric: 'plaid', base: '#8EA390', scale: 0.73 },
   { fabric: 'lime', base: '#B6D363', scale: 0.8 },
-  { fabric: 'cobalt', base: '#054896', scale: 0.8 },
+  { fabric: 'cobalt', base: '#054896', scale: 1.07 },
   { fabric: 'scuba', base: '#056F81', scale: 0.8 },
-  { fabric: 'linen', base: '#91ABCD', scale: 0.8 },
+  { fabric: 'linen', base: '#91ABCD', scale: 1.07 },
 ];
 const MAT = '#3D6A5A'; // the cutting mat beyond the cloth, seen in dips and the overview
 

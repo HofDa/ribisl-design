@@ -58,7 +58,7 @@ function jsonLd(lang) {
   return JSON.stringify(data).replace(/</g, '\\u003c');
 }
 
-function head(lang, font) {
+function head(lang, fonts = []) {
   const title = esc(t(lang, 'meta.title'));
   const desc = esc(t(lang, 'meta.desc'));
   return [
@@ -66,7 +66,8 @@ function head(lang, font) {
     `<link rel="canonical" href="${url(lang)}" />`,
     ...Object.keys(PATHS).map((l) => `<link rel="alternate" hreflang="${l}" href="${url(l)}" />`),
     `<link rel="alternate" hreflang="x-default" href="${url('de')}" />`,
-    font ? `<link rel="preload" href="${font}" as="font" type="font/woff2" crossorigin />` : '',
+    // the fonts the first screen needs (text and the wordmark), fetched alongside the CSS instead of after it
+    ...fonts.map((f) => `<link rel="preload" href="${f}" as="font" type="font/woff2" crossorigin />`),
     '<meta property="og:type" content="website" />',
     '<meta property="og:site_name" content="ribisl design" />',
     `<meta property="og:title" content="${title}" />`,
@@ -83,13 +84,13 @@ function head(lang, font) {
 }
 
 // Write one language into the page: copy, labels, metadata. Idempotent, so any language can be made from any other.
-function localize(html, lang, font) {
+function localize(html, lang, fonts) {
   return html
     .replace(/<html lang="[^"]*">/, `<html lang="${lang}">`)
     .replace(/<title>[^<]*<\/title>/, `<title>${esc(t(lang, 'meta.title'))}</title>`)
     .replace(/<meta name="description" content="[^"]*" \/>/, `<meta name="description" content="${esc(t(lang, 'meta.desc'))}" />`)
     .replace(/\s*<!--seo-->[\s\S]*?<!--\/seo-->/, '')
-    .replace('</head>', `  ${head(lang, font)}\n</head>`)
+    .replace('</head>', `  ${head(lang, fonts)}\n</head>`)
     .replace(/<(\w+)(\s[^>]*?\bdata-i18n="([^"]+)"[^>]*)>[^<]*<\/\1>/g, (_, tag, attrs, key) => `<${tag}${attrs}>${esc(t(lang, key))}</${tag}>`)
     .replace(/<[^>]*\bdata-i18n-label="([^"]+)"[^>]*>/g, (tag, key) => tag.replace(/aria-label="[^"]*"/, `aria-label="${esc(t(lang, key))}"`))
     .replace(/(<button[^>]*data-lang="(\w+)"[^>]*?)(?: aria-pressed="\w+")?>/g, (_, open, l) => `${open} aria-pressed="${l === lang}">`)
@@ -159,12 +160,14 @@ function seo() {
     // the dev server shows the same finished German page the build ships at /
     transformIndexHtml: { order: 'post', handler: (html) => localize(html, 'de') },
     writeBundle({ dir }) {
-      const font = readdirSync(join(dir, 'assets')).find((f) => /^gabarito-latin-wght-normal-.*\.woff2$/.test(f));
+      const assets = readdirSync(join(dir, 'assets'));
+      const fonts = [/^gabarito-latin-wght-normal-.*\.woff2$/, /^outfit-latin-wght-normal-.*\.woff2$/]
+        .map((re) => assets.find((f) => re.test(f))).filter(Boolean).map((f) => `${BASE}assets/${f}`);
       const base = readFileSync(join(dir, 'index.html'), 'utf8');
       for (const lang of Object.keys(PATHS)) {
         const out = join(dir, PATHS[lang]);
         mkdirSync(out, { recursive: true });
-        writeFileSync(join(out, 'index.html'), localize(base, lang, font && `${BASE}assets/${font}`));
+        writeFileSync(join(out, 'index.html'), localize(base, lang, fonts));
       }
       writeFileSync(join(dir, 'robots.txt'), robots());
       writeFileSync(join(dir, 'sitemap.xml'), sitemap());
