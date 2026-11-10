@@ -16,13 +16,13 @@ const DIRS = { down: [0, 1], up: [0, -1], left: [-1, 0], right: [1, 0] };
 // base is each fabric's average colour, painted until its scan has loaded.
 const PATCHES = [
   { fabric: 'yellow', base: '#F7AB28', scale: 0.8 },
-  { fabric: 'mint', base: '#86DEC9', scale: 0.8 },
+  { fabric: 'pink', base: '#EE6EA4', scale: 0.8 },
   { fabric: 'denim', base: '#4D718D', scale: 0.9 },
   { fabric: 'orange', base: '#E5770F', scale: 0.8 },
-  { fabric: 'gingham', base: '#C85047', scale: 0.75 },
+  { fabric: 'plaid', base: '#8EA390', scale: 0.55 },
   { fabric: 'lime', base: '#B6D363', scale: 0.8 },
   { fabric: 'cobalt', base: '#054896', scale: 0.8 },
-  { fabric: 'plaid', base: '#8EA390', scale: 0.55 },
+  { fabric: 'scuba', base: '#056F81', scale: 0.8 },
   { fabric: 'linen', base: '#91ABCD', scale: 0.8 },
 ];
 const MAT = '#3D6A5A'; // the cutting mat beyond the cloth, seen in dips and the overview
@@ -39,10 +39,6 @@ const menuList = document.getElementById('menu-list');
 const announce = document.getElementById('announce');
 const endTag = document.getElementById('end-tag');
 const reducedQuery = matchMedia('(prefers-reduced-motion: reduce)');
-const darkQuery = matchMedia('(prefers-color-scheme: dark)');
-// Keep the original daylight cloth; exchange screens 5 and 8 only in dark mode.
-const fabricIndex = (i) => darkQuery.matches ? (i === 4 ? 7 : i === 7 ? 4 : i) : i;
-darkQuery.addEventListener('change', () => kick());
 
 let lang = detectLang();
 let W = innerWidth, H = innerHeight;
@@ -392,8 +388,8 @@ stoneBtn?.addEventListener('click', () => {
 });
 stoneBtn?.addEventListener('animationend', (e) => { if (e.animationName === 'stone-turn') stoneBtn.classList.remove('is-turning'); });
 
-// Screen 4: the numbered steps come out one by one as the needle sews along beneath them.
-const STEPS_AT = 3; // spiral index of the process screen
+// Screen 3: the numbered steps come out one by one as the needle sews along beneath them.
+const STEPS_AT = 2; // spiral index of the process screen
 const steps = [...document.querySelectorAll('.stages li')];
 const STEP_AT = (k) => LEAD + k * (0.8 / steps.length); // progress at which step k appears, spread over the screen
 const stepsShown = () => steps.filter((li) => li.classList.contains('is-shown')).length;
@@ -698,8 +694,8 @@ function loadFabrics(first) {
     img.src = `${import.meta.env.BASE_URL}fabric/${p.fabric}.webp`;
   });
   const idle = window.requestIdleCallback || ((f) => setTimeout(f, 300));
-  load(fabricIndex(first))
-    .then(() => Promise.all([load(fabricIndex(first - 1)), load(fabricIndex(first + 1)), shown]))
+  load(first)
+    .then(() => Promise.all([load(first - 1), load(first + 1), shown]))
     .then(() => idle(() => PATCHES.forEach((_, i) => load(i))));
 }
 
@@ -719,7 +715,7 @@ function relayout(instant = true) {
   if (!anim) Object.assign(cam, overview ? overviewCam() : target(current));
   applyCamera();
   const tag = worldRect(endTag);
-  const end = { x: tag.x - 3, y: tag.y + tag.h * 0.5 };
+  const end = { x: tag.x + 4, y: tag.y + tag.h * 0.5 }; // just under the label's edge, where the stitching starts
   thread.layout(W, H, seamInset(), end, instant);
   thread.setProgress(current, progress);
   if (instant) thread.fastForward();
@@ -795,7 +791,7 @@ function drawFray(view) {
   // loose threads in the colour of the patch they come out of, pulled toward the pointer
   const col = Math.floor((fray.x + (fray.vertical ? fray.side : 0)) / W), row = Math.floor((fray.y + (fray.vertical ? 0 : fray.side)) / H);
   const k = ORDER.findIndex(([c, r]) => c === col && r === row);
-  const base = PATCHES[fabricIndex(k)]?.base || '#888';
+  const base = PATCHES[k]?.base || '#888';
   ctx.lineCap = 'round';
   for (let i = 0; i < 7; i++) {
     const along = (i - 3) * 4.5;
@@ -838,13 +834,12 @@ function drawCloth(view) {
   ORDER.forEach(([c, r], i) => {
     const x = c * W, y = r * H;
     if (x > view.x + view.w || x + W < view.x || y > view.y + view.h || y + H < view.y) return;
-    const index = fabricIndex(i);
-    const p = PATCHES[index];
+    const p = PATCHES[i];
     ctx.fillStyle = p.base;
     ctx.fillRect(x, y, W, H);
     const cx0 = Math.max(x, view.x), cy0 = Math.max(y, view.y);
     const cw = Math.min(x + W, view.x + view.w) - cx0, ch = Math.min(y + H, view.y + view.h) - cy0;
-    if (fabrics[index]) { ctx.fillStyle = fabrics[index]; ctx.fillRect(cx0, cy0, cw, ch); }
+    if (fabrics[i]) { ctx.fillStyle = fabrics[i]; ctx.fillRect(cx0, cy0, cw, ch); }
     ctx.fillStyle = grain;
     ctx.fillRect(cx0, cy0, cw, ch);
   });
@@ -900,9 +895,16 @@ const start = Math.max(0, screens.findIndex((s) => '#' + s.id === location.hash)
 current = start;
 thread = new Thread(ORDER);
 // the last stitch sews the label on, and the smiley gets its red
+// the label is sewn on round its edge (1.6s, as in the CSS), the machine rattling along, then the pop
+let sewTimers = [];
 thread.onDone = (done) => {
   endTag.classList.toggle('is-sewn', done);
-  if (done) sound.pop();
+  sewTimers.forEach(clearTimeout);
+  sewTimers = [];
+  if (!done) return;
+  if (reducedQuery.matches) { sound.pop(); return; }
+  for (let ms = 0; ms < 1600; ms += 130) sewTimers.push(setTimeout(() => sound.stitch(), ms));
+  sewTimers.push(setTimeout(() => sound.pop(), 1600));
 };
 applyLang(lang);
 initWorkbench({ tr: (k) => t(lang, k), reduced: () => reducedQuery.matches });

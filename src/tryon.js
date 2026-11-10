@@ -62,7 +62,7 @@ export async function openTryOn({ tr, reduced, firstStream = null }) {
   for (const [key, src] of Object.entries(SIDES)) hats[key] = await frontalHat(await loadImg(src));
   // the toadstool hat is photographed, not drawn: it goes on as it is
   hats.toadstool = { src: `${BASE}pieces/hat-toadstool-cut.webp`, bottom: 0.95 };
-  // the reversible hat from screen 3, both its sides; it's "yours" once you've chosen a fabric there
+  // the reversible hat from screen 4, both its sides; it's "yours" once you've chosen a fabric there
   const made = madeSides();
   const { mine } = made;
   for (const side of ['out', 'in']) hats[side] = await frontalHat(await loadImg(fabricSrc(made[side])));

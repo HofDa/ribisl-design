@@ -290,7 +290,7 @@ p { text-wrap: pretty; }
 .s3, .s7 { color: var(--tag); --line: var(--tag); }
 .s3 > *, .s7 > * { text-shadow: 0 1px 2px rgba(10, 20, 40, 0.35); }
 
-/* on loud prints (gingham, plaid) copy sits on a cotton patch sewn onto the cloth */
+/* on the tartan fleece and the deep teal suede, copy sits on a cotton patch sewn onto the cloth */
 .patch {
   background: var(--tag);
   padding: clamp(0.9rem, 1.6vw, 1.4rem) clamp(1rem, 2vw, 1.6rem);
@@ -395,7 +395,7 @@ p { text-wrap: pretty; }
 .bench.is-cut .cut-btn { display: none; }
 .bench.is-cut .cut-done-note { display: block; animation: drop-in 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both; }
 
-/* ---------- the workbench, part 2: patchwork (screen 3) ---------- */
+/* ---------- the workbench, part 2: patchwork (screen 4) ---------- */
 
 .board {
   position: absolute;
@@ -455,7 +455,7 @@ p { text-wrap: pretty; }
 .cell-again svg { width: 0.95rem; height: 0.95rem; }
 .cell.is-filled .cell-again { display: grid; }
 .cell.is-target { background-color: rgba(245, 205, 211, 0.55); outline: 2px solid var(--red-soft); }
-.board-hint { font-size: 0.85rem; font-weight: 600; max-width: 16rem; }
+.board-hint { font: 600 1.3rem/1.05 var(--hand); max-width: 15rem; rotate: -1.5deg; }
 .board.is-sewn .board-hint { animation: drop-in 0.5s cubic-bezier(0.34, 1.56, 0.64, 1); }
 
 /* the cutter: a full-screen table with your photo and a square to cut */
@@ -567,7 +567,6 @@ button.swatch:active { cursor: grabbing; }
   line-height: 1.2;
 }
 .etym dd { font-weight: 500; align-self: center; }
-.smile--dt { width: 1.6rem; height: 1.6rem; }
 .aside { font-weight: 500; max-width: 38ch; }
 
 /* the scissors: they arrive with the visitor, cut once round the label, and it lifts off */
@@ -581,7 +580,7 @@ button.swatch:active { cursor: grabbing; }
   grid-row: 2;
   align-self: end;
   position: relative;
-  width: 240px;
+  width: 170px;
   height: 150px;
   transform-origin: 0 100%;
   scale: clamp(1, 0.08vw + 0.55, 1.4);
@@ -590,21 +589,17 @@ button.swatch:active { cursor: grabbing; }
   position: absolute;
   left: 20px;
   top: 20px;
-  width: 200px;
+  width: 130px;
   height: 110px;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 14px;
   background: var(--tag);
   outline: 1px dashed rgba(30, 24, 26, 0.4);
   outline-offset: -7px;
-  font-size: 2.3rem;
-  font-weight: 800;
-  letter-spacing: -0.04em;
   color: var(--ink);
 }
-.cut-label .smile { width: 46px; height: 46px; }
+.cut-label .smile { width: 60px; height: 60px; }
 .cut-lines { position: absolute; inset: 0; overflow: visible; fill: none; pointer-events: none; }
 .cut-guide { stroke: var(--ink); stroke-width: 1.4; stroke-dasharray: 6 5; opacity: 0.7; }
 .cut-done { stroke: var(--ink); stroke-width: 1.6; stroke-dasharray: 100; stroke-dashoffset: 100; }
@@ -614,7 +609,7 @@ button.swatch:active { cursor: grabbing; }
   top: 0;
   width: 108px;
   height: 54px;
-  offset-path: path('M20 20H220V130H20Z');
+  offset-path: path('M20 20H150V130H20Z');
   offset-anchor: 63.5px 27px; /* where the blades cross sits on the line */
   offset-rotate: auto;
   offset-distance: 0%;
@@ -636,6 +631,31 @@ button.swatch:active { cursor: grabbing; }
 .cutout:hover .cut-label { rotate: 3deg; transition: rotate 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
 .s2.is-here .cutout .cut-lines { animation: fade-out 0.3s calc(var(--wait) + var(--cut) + 0.35s) both; }
 
+/* the note in pen, written once the label has lifted off: what it is, and an arrow to it */
+.cut-note {
+  position: absolute;
+  right: calc(100% - 0.6rem);
+  bottom: 62%;
+  display: flex;
+  align-items: flex-end;
+  gap: 0.1rem;
+  width: max-content;
+  max-width: 11rem;
+  font: 600 1.45rem/0.95 var(--hand);
+  color: var(--ink);
+  text-align: right;
+  rotate: -8deg;
+  pointer-events: none;
+  opacity: 0;
+}
+.cut-arrow { flex: none; width: 54px; height: auto; margin-bottom: -1.6rem; overflow: visible; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+.cut-arrow path { stroke-dasharray: 100; stroke-dashoffset: 100; }
+.s2.is-here .cutout .cut-note { --after: calc(var(--wait) + var(--cut) + 0.8s); animation: fade-in 0.01s var(--after) both; }
+.s2.is-here .cutout .cut-note > span { animation: write 0.6s var(--after) cubic-bezier(0.45, 0.1, 0.55, 0.9) both; }
+.s2.is-here .cutout .cut-arrow path:first-child { animation: cut-line 0.35s calc(var(--after) + 0.55s) ease-out both; }
+.s2.is-here .cutout .cut-arrow path:last-child { animation: cut-line 0.2s calc(var(--after) + 0.9s) ease-out both; }
+@keyframes fade-in { to { opacity: 1; } }
+
 @keyframes scissors-in { from { opacity: 0; } to { opacity: 1; } }
 @keyframes scissors-cut { from { offset-distance: 0%; } to { offset-distance: 100%; } }
 @keyframes scissors-out { 30% { opacity: 1; } to { opacity: 0; translate: 90px -70px; rotate: 160deg; } }
@@ -656,9 +676,11 @@ button.swatch:active { cursor: grabbing; }
 @media (prefers-reduced-motion: reduce) {
   .cut-lines, .scissors { display: none; }
   .cut-label { translate: -6px -12px; rotate: -4deg; box-shadow: 0 16px 30px rgba(30, 24, 26, 0.22); }
+  .cut-note { opacity: 1; }
+  .cut-arrow path { stroke-dashoffset: 0; }
 }
 
-/* ---------- 3 · materials, 4 · process, 7 · courses ---------- */
+/* ---------- 3 · process, 4 · materials, 7 · courses ---------- */
 
 .head { max-width: 46rem; }
 
@@ -718,8 +740,8 @@ button.swatch:active { cursor: grabbing; }
 .rows li:nth-child(3) .swatch { rotate: -1.5deg; }
 .rows li:nth-child(4) .swatch { rotate: 4deg; }
 .rows li:hover .swatch { rotate: -8deg; translate: 0 -8px; scale: 1.08; }
-.s3 .rows li { border-top: 0; padding-top: 0; }
-.s3 .rows h3 { border-top: var(--hair) solid currentColor; padding-top: 0.8rem; }
+.s4 .rows li { border-top: 0; padding-top: 0; }
+.s4 .rows h3 { border-top: var(--hair) solid currentColor; padding-top: 0.8rem; }
 
 /* courses: a two-by-two on the right, the title holding the left */
 .rows--two {
@@ -908,8 +930,8 @@ button.swatch:active { cursor: grabbing; }
 .hats:hover .hat-side + .hat-side { translate: 0 -10px; }
 .hat-tag { position: absolute; right: 4%; top: 2%; width: 2.8rem; rotate: 8deg; z-index: 3; }
 .turn figcaption { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 0.5rem 1rem; }
-.turn-hint { font-size: 0.9rem; font-weight: 600; }
-.turn-hint::before { content: '\21BB'; margin-right: 0.35em; font-weight: 700; }
+.turn-hint { font: 600 1.45rem/1 var(--hand); rotate: -3deg; }
+.turn-hint::before { content: '\21BB'; margin-right: 0.25em; font: 700 1rem/1 var(--font); }
 /* every few seconds the hats shuffle, to show they turn */
 @keyframes hat-hint {
   0%, 72%, 100% { transform: none; }
@@ -1053,7 +1075,27 @@ button.swatch:active { cursor: grabbing; }
 }
 .tag--big.is-sewn .smile-red { opacity: 1; transform: translate(5px, 4px); }
 
+/* sewing the label on: the red thread runs once round the label in running stitch, then the smiley
+   gets its red, the label settles with a little bounce and the winking starts */
+/* the svg sits exactly on the label's dashed seam (its outline, 4px in) */
+.tag-stitch { position: absolute; inset: 4px; width: calc(100% - 8px); height: calc(100% - 8px); overflow: visible; pointer-events: none; }
+.stitch-line { fill: none; stroke: var(--red); stroke-width: 1.6; stroke-linecap: round; stroke-dasharray: 2.6 1.9; filter: drop-shadow(0.3px 0.6px 0 rgba(80, 10, 22, 0.35)); }
+/* the grey seam gives way to the red one as it's sewn */
+.tag--big { transition: rotate 0.6s cubic-bezier(0.16, 1, 0.3, 1), outline-color 0.35s; }
+.tag--big.is-sewn { outline-color: transparent; transition: rotate 0.6s cubic-bezier(0.16, 1, 0.3, 1), outline-color 0.4s var(--sew, 1.6s); }
+.stitch-mask { fill: none; stroke: #fff; stroke-width: 12; stroke-dasharray: 100 101; stroke-dashoffset: 100; transition: stroke-dashoffset 0.35s ease-in; }
+.tag--big.is-sewn .stitch-mask { stroke-dashoffset: 0; transition: stroke-dashoffset var(--sew, 1.6s) linear; }
+.tag--big.is-sewn { animation-delay: var(--sew, 1.6s); }
+.tag--big.is-sewn .smile-red { transition-delay: var(--sew, 1.6s); }
+.tag--big.is-sewn .eye-r, .tag--big.is-sewn .mouth { animation-delay: calc(var(--sew, 1.6s) + 0.35s); }
+@media (prefers-reduced-motion: reduce) { .tag--big { --sew: 0s; } }
+
 .reach { display: flex; flex-wrap: wrap; align-items: center; gap: 1rem 1.6rem; margin-top: 0.4rem; }
+
+/* here and there a note in pen, as if Katrin had scribbled on the cloth */
+.pen { width: fit-content; font: 600 1.6rem/1 var(--hand); letter-spacing: 0; rotate: -4deg; }
+.pen--dare { display: flex; align-items: center; gap: 0.3rem; margin-left: -0.8rem; color: #8A0C24; font-size: clamp(1.5rem, 1.9vw, 2rem); }
+.pen-arrow { width: 40px; height: auto; flex: none; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; translate: 0 -0.3rem; }
 .handle {
   font-size: clamp(1.5rem, 3.4vw, 3rem);
   font-weight: 740;
@@ -1431,9 +1473,9 @@ button.swatch:active { cursor: grabbing; }
   .env-back p { font-size: 0.82rem; line-height: 1.3; }
   .env-back .textlink { font-size: 0.82rem; }
   /* the swatch sits beside its text */
-  .s3 .rows li { grid-template-columns: 52px 1fr; column-gap: 0.9rem; row-gap: 0.15rem; align-items: start; }
-  .s3 .swatch { grid-row: 1 / 3; width: 52px; margin: 0.15rem 0 0; }
-  .s3 .rows h3 { border-top: 0; padding-top: 0; }
+  .s4 .rows li { grid-template-columns: 52px 1fr; column-gap: 0.9rem; row-gap: 0.15rem; align-items: start; }
+  .s4 .swatch { grid-row: 1 / 3; width: 52px; margin: 0.15rem 0 0; }
+  .s4 .rows h3 { border-top: 0; padding-top: 0; }
   .rows li { gap: 0.3rem; padding-top: 0.7rem; }
   .rows p, .stages p { font-size: 0.9375rem; line-height: 1.42; }
   .rows h3, .stages h3 { font-size: 1.15rem; }
@@ -1451,36 +1493,62 @@ button.swatch:active { cursor: grabbing; }
   .s8 .hand { font-size: 1.15em; }
   /* screen 2: the scissors fit into the space under the text on every phone */
   .s2-body { gap: 1.1rem; }
-  .s2 .cutout { scale: 0.72; margin-top: -1.6rem; }
+  .s2 .cutout { scale: 0.72; margin-top: 0.6rem; }
+  .cut-note { font-size: 1.9rem; max-width: 9.5rem; bottom: 14%; }
+  .cut-arrow { scale: 1 -1; margin-bottom: 0.9rem; }
   .s6 { gap: 0.9rem; }
   .turn { gap: 0.6rem; }
-  .tag--big { width: 80px; }
+  /* screen 9 on phones: a centred finale. The label the thread sews on sits big in the middle,
+     the invitation and the way to write to Katrin stack under it. */
+  .s9 { display: flex; flex-direction: column; }
+  .s9-body { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 1.8rem; width: 100%; padding-bottom: 1rem; }
+  .tag--big { width: min(38vw, 150px); rotate: -4deg; }
+  .s9-copy { justify-items: center; text-align: center; gap: 1.1rem; }
+  .s9 .display--xl { font-size: min(11vw, 2.9rem); max-width: 11ch; }
+  .s9 .lede { max-width: 30ch; }
+  .s9 .reach { flex-direction: column; gap: 0.9rem; margin-top: 0.2rem; }
+  .pen--dare { margin: -0.3rem 0 0 4.5rem; }
+  .pen--dare .pen-arrow { rotate: 40deg; }
+  .s9 .made { width: 100%; text-align: left; }
+  .s9 .colophon { position: static; align-self: flex-start; margin-top: 1rem; }
+  /* once you've designed a hat, its picture and buttons join in, so everything above makes room */
+  .s9:has(.made:not([hidden])) .s9-body { justify-content: flex-start; gap: 1rem; padding-bottom: 0; }
+  .s9:has(.made:not([hidden])) .tag--big { width: 84px; }
+  .s9:has(.made:not([hidden])) .display--xl { font-size: 2.1rem; max-width: none; }
+  .s9:has(.made:not([hidden])) .s9-copy { gap: 0.8rem; }
+  .s9:has(.made:not([hidden])) .lede { font-size: 0.92rem; }
+  .s9:has(.made:not([hidden])) .reach { flex-direction: row; justify-content: center; gap: 0.6rem 1rem; }
   .colophon { left: var(--pad); translate: none; bottom: max(26px, env(safe-area-inset-bottom)); }
   .readout { left: auto; right: max(18px, env(safe-area-inset-right)); bottom: calc(max(18px, env(safe-area-inset-bottom)) + 38px); }
   .readout > span { padding: 0.45rem; }
   #r-title { display: none; }
   .hint { display: none; }
-  .wordmark { font-size: 18.5vw; }
-  .jeans { height: min(42vw, 190px); margin-bottom: 0.3rem; }
-  .mark-row { column-gap: 0.5rem; }
-  /* on phones the patch sits beside the name and the hint wraps underneath */
+  /* screen 1 on phones: one column down the cloth. The name runs big across the top, the jeans
+     patch hangs just under its tail on the right with the cutting note beside it, the copy closes. */
+  .s1 { display: flex; flex-direction: column; }
+  .label--intro { position: static; align-self: flex-start; }
+  .s1-body { position: static; flex: 1; display: flex; flex-direction: column; justify-content: space-evenly; gap: 1.2rem; margin-top: 0.8rem; }
+  .mark-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 0 0.9rem; }
+  .wordmark { grid-column: 1 / -1; position: relative; z-index: 1; font-size: min(31vw, 9.5rem); }
   .bench--jeans { display: contents; }
-  .bench-note { flex-basis: 100%; max-width: none; display: flex; flex-wrap: wrap; align-items: center; gap: 0.4rem 0.7rem; }
-  .bench-note .label { font-size: 0.66rem; }
-  .cut-btn { font-size: 0.8rem; }
-  .board { right: var(--pad); width: 136px; gap: 0.35rem; }
-  .board-sides { gap: 0.25rem; }
+  .jeans { grid-column: 2; grid-row: 2; height: min(47vw, 220px); margin: -0.9rem 0 0; rotate: 4deg; }
+  .bench-note { grid-column: 1; grid-row: 2; max-width: none; margin: 0.6rem 0 0; gap: 0.6rem; }
+  .bench-note .label { font-size: 0.7rem; line-height: 1.3; rotate: -1.5deg; }
+  .cut-btn { font-size: 0.85rem; }
+  .s1-copy { margin-top: 0; }
+  /* on phones the hat board sits under the fabric samples instead of squeezing beside the heading */
+  .s4 { display: flex; flex-direction: column; }
+  .s4 .board { position: static; order: 1; align-self: center; justify-items: center; width: min(100%, 220px); margin-top: 1rem; gap: 0.4rem; }
+  .board-hint { display: none; }
+  .board-sides { gap: 0.45rem; }
   .side { gap: 0.35rem; }
-  .side-name { font-size: 0.55rem; }
+  .side-name { font-size: 0.72rem; }
   .side-turn { font-size: 0.95rem; margin-top: -0.9rem; }
-  .cell-empty { font-size: 0.5rem; gap: 0.15rem; }
-  .cell-empty svg { width: 1.15rem; height: 1.15rem; }
+  .s4 .cell-empty { font-size: 0.7rem; line-height: 1.15; gap: 0.3rem; padding: 0 0.3rem; text-align: center; letter-spacing: 0; }
+  .s4 .cell-empty svg { width: 1.5rem; height: 1.5rem; }
   .cell-again { width: 1.25rem; height: 1.25rem; right: -0.35rem; bottom: -0.35rem; }
   .cell-again svg { width: 0.75rem; height: 0.75rem; }
-  .s3 .head { min-height: 100px; }
-  .board-label { font-size: 0.58rem; padding: 0.35em 0.5em; }
-  .board-hint { display: none; }
-  .s3 .head { max-width: calc(100% - 150px); }
+  .board-label { font-size: 0.68rem; padding: 0.35em 0.5em; }
   .hat-thumb { width: 96px; }
   .made { gap: 0.8rem; padding-top: 0.7rem; }
   .made-copy { font-size: 0.85rem; gap: 0.5rem; }
@@ -1500,17 +1568,24 @@ button.swatch:active { cursor: grabbing; }
   :root { --pad-top: 64px; --pad-bottom: 92px; }
   .display, .s2 .display, .s6 .display { font-size: 2rem; }
   .rows { margin-top: 0.5rem; gap: 0.6rem; }
+  .s4 .board { width: min(100%, 190px); margin-top: 0.6rem; }
+  .wordmark { font-size: min(25vw, 9.5rem); }
+  .jeans { height: min(36vw, 170px); }
+  .s1-body { gap: 0.8rem; margin-top: 0.4rem; }
   .sub { margin-top: 0.3rem; }
   .rows li { padding-top: 0.55rem; gap: 0.2rem; }
   .rows p, .stages p, .s2 .lede, .s6 .lede { font-size: 0.875rem; line-height: 1.38; }
   .rows h3, .stages h3 { font-size: 1.05rem; }
   .s2-body { gap: 1.1rem; }
   .etym dt, .etym dd { padding-block: 0.45rem; }
-  .s2 .cutout { scale: 0.6; margin-top: -2.4rem; }
+  .s2 .cutout { scale: 0.6; margin-top: -0.6rem; }
   .s2 .aside { font-size: 0.875rem; }
   .made-copy > p:first-child { display: none; }
   .s9 .lede { font-size: 0.92rem; }
-  .s9-body { gap: 1rem; }
+  .s9-body { gap: 1.1rem; }
+  .tag--big { width: min(28vw, 110px); }
+  .s9 .display--xl { font-size: 2.2rem; }
+  .s9-copy { gap: 0.8rem; }
   .turn { width: min(88%, 30vh); }
   .turn-hint { display: none; }
   .s6 .facts li { padding: 0.5rem 0; font-size: 0.9rem; }
@@ -1523,12 +1598,12 @@ button.swatch:active { cursor: grabbing; }
 /* ---------- colour and life: every screen as fresh as the market hats ---------- */
 
 /* big headings take a deep shade of the colour opposite their cloth (6 keeps its ink: lime already sings) */
-.s2 .display { color: #6E1650; }              /* plum on mint */
-.s3 .display { color: #FFD36E; }              /* butter on denim */
-.s4 .display, .s4 .stages .n { color: #16246B; } /* navy on orange */
-.s5 .display { color: #17603A; }              /* green on the red check */
+.s2 .display { color: #6E1650; }              /* plum on raspberry */
+.s3 .display, .s3 .stages .n { color: #FFD36E; } /* butter on denim */
+.s4 .display { color: #16246B; }              /* navy on orange */
+.s5 .display { color: #17603A; }              /* green on its cotton patch */
 .s7 .display { color: #FFC066; }              /* apricot on cobalt */
-.s8 .display { color: #A80F2B; }              /* thread red on the teal tartan */
+.s8 .display { color: #A80F2B; }              /* thread red on its cotton patch */
 .s9 .display { color: #8A0C24; }              /* the finale in redcurrant */
 
 /* the hat's two-layer shadow: a tight contact shadow and a soft one far below */
@@ -1550,11 +1625,11 @@ button.swatch:active { cursor: grabbing; }
 :is(.rows, .stages, .pieces, .nodes) > :nth-child(5) { --k: 4; }
 :is(.rows, .stages, .pieces, .nodes) > :nth-child(6) { --k: 5; }
 
-.s3.is-here .rows .swatch { animation: idle-wiggle 6s calc(1.4s + var(--k, 0) * 1.5s) ease-in-out infinite; }
+.s4.is-here .rows .swatch { animation: idle-wiggle 6s calc(1.4s + var(--k, 0) * 1.5s) ease-in-out infinite; }
 .s5.is-here .piece { animation: idle-sway 6s calc(1.2s + var(--k, 0) * 1.5s) ease-in-out infinite; }
 .s8.is-here .nodes li { animation: idle-wiggle 7.2s calc(3.6s + var(--k, 0) * 1.2s) ease-in-out infinite; }
 .s7.is-here .env:not(.is-tearing):not(.is-open) .env-flap { animation: flap-twitch 6s calc(1.4s + var(--k, 0) * 1.5s) ease-in-out infinite; }
-.is-ready .s4.is-here .stages li.is-shown .n {
+.is-ready .s3.is-here .stages li.is-shown .n {
   animation: number-pop 0.5s cubic-bezier(0.34, 1.9, 0.6, 1), idle-hop 6s calc(2s + var(--k, 0) * 1.5s) ease-in-out infinite;
 }
 .envelopes > :nth-child(2) { --k: 1; }
@@ -1584,10 +1659,10 @@ button.swatch:active { cursor: grabbing; }
   7% { transform: rotateX(-6deg); }
   9% { transform: rotateX(-14deg); }
 }
-/* the red check would show through a see-through frame as pink */
+/* the cloth would show through a see-through frame */
 .s5 .piece { background: var(--tag); }
 
-/* ---------- 4 · the steps, drawn; and to finish, a Schmunzelsteinchen ---------- */
+/* ---------- 3 · the steps, drawn; and to finish, a Schmunzelsteinchen ---------- */
 
 .step-art { display: block; width: clamp(76px, min(11vw, 17vh), 190px); height: auto; overflow: visible; filter: drop-shadow(0 3px 2px rgba(60, 20, 0, 0.22)) drop-shadow(0 12px 14px rgba(60, 20, 0, 0.18)); }
 .stages li { position: relative; }
@@ -1606,8 +1681,8 @@ button.swatch:active { cursor: grabbing; }
 @keyframes art-snip-b { from { rotate: 14deg; } to { rotate: 0deg; } }
 
 /* the steps flow under the heading (so they never run into it) and sit at the bottom when there's room */
-.s4 { display: flex; flex-direction: column; }
-.s4 .stages {
+.s3 { display: flex; flex-direction: column; }
+.s3 .stages {
   position: static;
   margin-top: auto;
   padding-top: clamp(1rem, 4vh, 3rem);
@@ -1618,16 +1693,16 @@ button.swatch:active { cursor: grabbing; }
 
 /* phones */
 @media (max-width: 900px) {
-  .s4 .stages { grid-template-columns: repeat(2, minmax(0, 1fr)); margin-top: 1.4rem; padding-top: 0; }
+  .s3 .stages { grid-template-columns: repeat(2, minmax(0, 1fr)); margin-top: 1.4rem; padding-top: 0; }
   .step-art { width: clamp(56px, 9vh, 84px); margin: -0.1rem 0 0.1rem; }
 }
 
 /* short laptop windows: no stagger, smaller numbers and drawings, so all five fit without scrolling */
 @media (min-width: 901px) and (max-height: 780px) {
-  .s4 .stages li:nth-child(even) { margin-top: 0; }
-  .s4 .stages .n { font-size: clamp(2.4rem, 7vh, 4rem); }
-  .s4 .step-art { width: clamp(70px, 13vh, 120px); }
-  .s4 .stages { padding-top: 1rem; }
+  .s3 .stages li:nth-child(even) { margin-top: 0; }
+  .s3 .stages .n { font-size: clamp(2.4rem, 7vh, 4rem); }
+  .s3 .step-art { width: clamp(70px, 13vh, 120px); }
+  .s3 .stages { padding-top: 1rem; }
 }
 
 
@@ -1729,19 +1804,19 @@ button.swatch:active { cursor: grabbing; }
 
 /* phones: five steps as one list, drawing on the left, number, title and text beside it */
 @media (max-width: 900px) {
-  .s4 .stages { grid-template-columns: 1fr; gap: 0.55rem; margin-top: 1rem; }
-  .s4 .stages li:not(.stone) { grid-template-columns: clamp(48px, 15vw, 64px) 1fr; column-gap: 0.75rem; row-gap: 0.05rem; align-items: start; padding-top: 0.5rem; }
-  .s4 .stages li:not(.stone) .step-art { grid-column: 1; grid-row: 1 / span 2; width: 100%; margin: 0.15rem 0 0; }
-  .s4 .stages li:not(.stone) .n { grid-column: 2; grid-row: 1; justify-self: start; align-self: center; font-size: 1.35rem; line-height: 1; }
-  .s4 .stages li:not(.stone) h3 { grid-column: 2; grid-row: 1; padding-left: 1.5rem; }
-  .s4 .stages li:not(.stone) p { grid-column: 2; grid-row: 2; max-width: none; }
+  .s3 .stages { grid-template-columns: 1fr; gap: 0.55rem; margin-top: 1rem; }
+  .s3 .stages li:not(.stone) { grid-template-columns: clamp(48px, 15vw, 64px) 1fr; column-gap: 0.75rem; row-gap: 0.05rem; align-items: start; padding-top: 0.5rem; }
+  .s3 .stages li:not(.stone) .step-art { grid-column: 1; grid-row: 1 / span 2; width: 100%; margin: 0.15rem 0 0; }
+  .s3 .stages li:not(.stone) .n { grid-column: 2; grid-row: 1; justify-self: start; align-self: center; font-size: 1.35rem; line-height: 1; }
+  .s3 .stages li:not(.stone) h3 { grid-column: 2; grid-row: 1; padding-left: 1.5rem; }
+  .s3 .stages li:not(.stone) p { grid-column: 2; grid-row: 2; max-width: none; }
 }
 @media (max-width: 900px) and (max-height: 720px) {
-  .s4 .stages { gap: 0.3rem; margin-top: 0.6rem; }
-  .s4 .stages li:not(.stone) { padding-top: 0.35rem; grid-template-columns: 46px 1fr; }
-  .s4 .stages li:not(.stone) p { font-size: 0.8rem; line-height: 1.3; }
-  .s4 .stages li:not(.stone) h3 { font-size: 0.98rem; }
-  .s4 .sub { font-size: 0.85rem; }
+  .s3 .stages { gap: 0.3rem; margin-top: 0.6rem; }
+  .s3 .stages li:not(.stone) { padding-top: 0.35rem; grid-template-columns: 46px 1fr; }
+  .s3 .stages li:not(.stone) p { font-size: 0.8rem; line-height: 1.3; }
+  .s3 .stages li:not(.stone) h3 { font-size: 0.98rem; }
+  .s3 .sub { font-size: 0.85rem; }
 }
 
 /* ---------- 8 · the Schmunzelsteinchen, sitting right beside the "Mit Schmunzeln" label ---------- */
@@ -1798,9 +1873,9 @@ button.swatch:active { cursor: grabbing; }
 /* step 5: the sewing machine runs while you're on the screen: needle up and down, wheel turning, stitches running through */
 .sm-needle, .sm-wheel { transform-box: fill-box; }
 .sm-wheel { transform-origin: 50% 50%; }
-.s4.is-here .stages li.is-shown .sm-needle { animation: sm-needle 0.22s ease-in-out infinite alternate; }
-.s4.is-here .stages li.is-shown .sm-wheel { animation: sm-wheel 0.9s linear infinite; }
-.s4.is-here .stages li.is-shown .sm-stitch { animation: sm-stitch 0.44s linear infinite; }
+.s3.is-here .stages li.is-shown .sm-needle { animation: sm-needle 0.22s ease-in-out infinite alternate; }
+.s3.is-here .stages li.is-shown .sm-wheel { animation: sm-wheel 0.9s linear infinite; }
+.s3.is-here .stages li.is-shown .sm-stitch { animation: sm-stitch 0.44s linear infinite; }
 @keyframes sm-needle { from { translate: 0 -5px; } to { translate: 0 1px; } }
 @keyframes sm-wheel { to { rotate: -360deg; } }
 @keyframes sm-stitch { to { stroke-dashoffset: -7; } }
@@ -1865,7 +1940,7 @@ button.swatch:active { cursor: grabbing; }
 
 /* phones: the small swatches can't carry a long one-line tag, so it wraps and stays inside the screen */
 @media (max-width: 900px) {
-  .s3 .yours-tag { white-space: normal; width: 4.6rem; text-align: center; font-size: 0.5rem; line-height: 1.15; padding: 0.25em 0.3em; bottom: -0.7rem; }
+  .s4 .yours-tag { white-space: normal; width: 4.6rem; text-align: center; font-size: 0.5rem; line-height: 1.15; padding: 0.25em 0.3em; bottom: -0.7rem; }
 }
 
 /* phones: screen 7 gets room to breathe. An open envelope grows so its back is readable,
@@ -2122,18 +2197,6 @@ button.swatch:active { cursor: grabbing; }
 }
 @media (max-width: 900px) { .s7 .refs { width: auto; } }
 
-/* Keep the mint and lime cloth readable with a dark system appearance. */
-@media (prefers-color-scheme: dark) {
-  .s2, .s6 {
-    background: rgba(30, 24, 26, 0.82);
-    color: var(--tag);
-    --line: var(--tag);
-  }
-  .s2 .display { color: #FFC066; }
-  .s2 .smile--dt { color: inherit; }
-  .s2 .cutout { color: var(--tag); }
-  .s2 .cut-guide, .s2 .cut-done { stroke: var(--tag); }
-}
 
 /* Desktop: let the objects and copy share the centre of each fabric. */
 @media (min-width: 901px) {
@@ -2184,11 +2247,9 @@ button.swatch:active { cursor: grabbing; }
     box-shadow: 0 2px 0 rgba(30, 24, 26, 0.1), 0 10px 18px -10px rgba(30, 24, 26, 0.45);
     rotate: -1.5deg;
   }
-  .s2 .etym > div:nth-child(2) { rotate: 1.8deg; translate: 0 0.35rem; }
   .s2 .etym dt, .s2 .etym dd { padding: 0; border: 0; }
   .s2 .etym dt { font-size: 1.5rem; line-height: 1; display: flex; align-items: center; min-height: 1.75rem; }
   .s2 .etym dd { font-size: 0.95rem; }
-  .s2 .etym .smile--dt { width: 1.75rem; height: 1.75rem; color: var(--ink); }
   .s2 .aside { font-size: 1.05rem; max-width: 36ch; }
   .s2 .katrin {
     --kh: clamp(300px, min(72vh, 46vw), 760px);
@@ -2211,14 +2272,17 @@ button.swatch:active { cursor: grabbing; }
     justify-self: end;
     align-self: end;
     position: relative;
-    margin: 0 -1.5rem -1rem 0;
+    margin: 0 -0.5rem -2.6rem 0;
     scale: clamp(0.75, 0.05vw + 0.35, 1);
     transform-origin: 100% 100%;
     rotate: 6deg;
     z-index: 2;
   }
+  /* on her the note would vanish in the dark hair: it sits on the cloth below, pointing up to the label */
+  .s2 .cut-note { bottom: auto; top: calc(100% - 0.2rem); right: calc(100% - 4.2rem); max-width: 16rem; font-size: 1.6rem; rotate: -9deg; align-items: flex-start; }
+  .s2 .cut-arrow { scale: 1 -1; margin: -2.4rem 0 0 0.1rem; width: 52px; }
 
-  .s3 {
+  .s4 {
     display: grid;
     grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
     grid-template-rows: auto auto;
@@ -2226,13 +2290,13 @@ button.swatch:active { cursor: grabbing; }
     row-gap: clamp(1.5rem, 4vh, 3rem);
     align-content: center;
   }
-  .s3 .head { grid-column: 1; grid-row: 1; }
-  .s3 .display { font-size: clamp(3.3rem, 6vw, 6.5rem); max-width: none; }
-  .s3 .board { position: static; grid-column: 1; grid-row: 2; width: min(100%, 30rem); align-self: start; gap: 0.8rem; }
-  .s3 .board-hint { max-width: 42ch; font-size: 0.95rem; }
-  .s3 .cell-empty { font-size: 0.8rem; gap: 0.5rem; }
-  .s3 .cell-empty svg { width: 2.2rem; height: 2.2rem; }
-  .s3 .rows {
+  .s4 .head { grid-column: 1; grid-row: 1; }
+  .s4 .display { font-size: clamp(3.3rem, 6vw, 6.5rem); max-width: none; }
+  .s4 .board { position: static; grid-column: 1; grid-row: 2; width: min(100%, 30rem); align-self: start; gap: 0.8rem; }
+  .s4 .board-hint { max-width: 22rem; font-size: 1.55rem; }
+  .s4 .cell-empty { font-size: 0.8rem; gap: 0.5rem; }
+  .s4 .cell-empty svg { width: 2.2rem; height: 2.2rem; }
+  .s4 .rows {
     position: static;
     grid-column: 2;
     grid-row: 1 / 3;
@@ -2241,35 +2305,48 @@ button.swatch:active { cursor: grabbing; }
     gap: clamp(1.4rem, 3.5vh, 3rem) clamp(1.5rem, 3vw, 3rem);
     margin: 0;
   }
-  .s3 .swatch { width: clamp(100px, min(12vw, 20vh), 220px); }
-  .s3 .rows p { font-size: clamp(0.95rem, 1.14vw, 1.1rem); line-height: 1.45; }
-  .s3 .rows li { gap: 0.45rem; }
+  .s4 .swatch { width: clamp(100px, min(12vw, 20vh), 220px); }
+  .s4 .rows p { font-size: clamp(0.95rem, 1.14vw, 1.1rem); line-height: 1.45; }
+  .s4 .rows li { gap: 0.45rem; }
 
+  /* screen 7 on desktop: two halves, as in its name. Courses on the left: the heading, its line and the
+     four pattern envelopes in a block. Markets on the right: one stall under bunting, with the patches
+     from past events pinned to it, the invitation for your own event, and the motto hung below. */
   .s7 {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    gap: clamp(1.25rem, 3vh, 2.5rem);
+    display: grid;
+    grid-template-columns: minmax(0, 1.12fr) minmax(0, 0.88fr);
+    grid-template-rows: auto auto;
+    align-content: center;
+    column-gap: clamp(2.5rem, 5.5vw, 7rem);
+    row-gap: clamp(1.2rem, 3.2vh, 2.6rem);
   }
-  .s7 .head { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr); align-items: end; gap: 3rem; max-width: none; }
-  .s7 .display { max-width: none; font-size: clamp(3rem, 5.1vw, 7rem); }
-  .s7 .sub { margin: 0; max-width: 42ch; }
-  .s7 .envelopes { position: static; width: auto; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: clamp(1rem, 2vw, 2.5rem); margin: 0; flex: none; }
-  .s7 .envelopes li.env { height: clamp(190px, 28vh, 310px); }
+  .s7 .head { grid-column: 1; grid-row: 1; display: block; max-width: none; }
+  .s7 .display { max-width: none; font-size: clamp(3rem, min(5.4vw, 10vh), 7rem); }
+  .s7 .sub { margin: clamp(0.6rem, 1.4vh, 1rem) 0 0; max-width: 40ch; }
+  .s7 .envelopes { grid-column: 1; grid-row: 2; position: static; width: auto; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: clamp(1rem, 2.2vh, 1.8rem) clamp(1rem, 1.8vw, 2rem); margin: 0; align-self: start; }
+  .s7 .envelopes li.env { height: clamp(150px, 22vh, 250px); }
   .s7 .env-front { padding-inline: clamp(0.9rem, 1.4vw, 1.5rem); }
-  .s7 .env-title { font-size: clamp(1.1rem, 1.6vw, 1.7rem); }
-  .s7 .env-art { width: clamp(36px, 3.5vw, 64px); }
-  .s7 .refs { position: static; width: auto; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 0.8rem clamp(2rem, 6vw, 7rem); align-items: center; margin: 0; }
-  .s7 .refs h3 { grid-column: 1; grid-row: 1; align-self: end; }
-  .s7 .patches { grid-column: 1; grid-row: 2; max-width: 38rem; gap: 0.7rem; padding: 0; }
-  .s7 .patch-badge { width: auto; max-width: 118px; margin: 0; }
-  .s7 .patch-badge--2 { scale: 1; }
-  .s7 .refs .stall { grid-column: 2; grid-row: 1; width: 100%; max-width: none; margin: 0; }
-  .s7 .stall-copy { padding: 1rem 1.2rem; font-size: 1rem; }
-  .s7 .refs-motto { grid-column: 2; grid-row: 2; font-size: clamp(1.8rem, 2.5vw, 2.8rem); }
-  /* the bunting hangs over the stall it belongs to, a little wider than the counter */
-  .s7 .stall-bunting { position: relative; width: calc(100% + 1.6rem); height: 44px; margin: 0 -0.8rem -0.7rem; }
-  .s7 .lost-button { left: auto; right: 4%; top: auto; bottom: calc(var(--pad-bottom) + 10px); z-index: 1; }
+  .s7 .env-title { font-size: clamp(1.1rem, 1.5vw, 1.6rem); }
+  .s7 .env-art { width: clamp(36px, 3.2vw, 58px); }
+
+  .s7 .refs {
+    grid-column: 2; grid-row: 2; align-self: stretch; justify-content: space-between;
+    position: static; width: 100%; margin: 0;
+    display: flex; flex-direction: column; align-items: stretch; gap: clamp(0.9rem, 2vh, 1.4rem);
+    padding: 0 clamp(1.1rem, 1.8vw, 1.8rem) clamp(1.1rem, 2.4vh, 1.8rem);
+    background: rgba(251, 249, 244, 0.1);
+    outline: 1.5px dashed rgba(251, 249, 244, 0.55);
+    outline-offset: -6px;
+  }
+  .s7 .refs .stall { display: contents; }
+  .s7 .stall-bunting { order: -1; position: relative; width: calc(100% + 2 * clamp(1.1rem, 1.8vw, 1.8rem) + 1.6rem); max-width: none; height: 48px; margin: 0 calc(-1 * clamp(1.1rem, 1.8vw, 1.8rem) - 0.8rem) -0.2rem; }
+  .s7 .refs h3 { align-self: flex-start; }
+  .s7 .patches { display: flex; justify-content: space-between; width: 100%; max-width: none; gap: 0; padding: 0.2rem 0.3rem 0.4rem; }
+  .s7 .patch-badge { flex: 0 1 auto; width: 25%; max-width: 132px; margin: 0; }
+  .s7 .patch-badge--2 { scale: 1.06; }
+  .s7 .stall-copy { padding: clamp(0.8rem, 1.6vh, 1.1rem) 0 0; border-top: 1.5px dashed rgba(251, 249, 244, 0.45); font-size: clamp(0.95rem, 1.05vw, 1.1rem); line-height: 1.45; }
+  .s7 .refs-motto { align-self: flex-end; margin: 0 -0.4rem -0.2rem 0; font-size: clamp(1.7rem, 2.3vw, 2.6rem); }
+  .s7 .lost-button { left: auto; right: 2.2%; top: auto; bottom: calc(var(--pad-bottom) - 0.6rem); z-index: 1; }
 }
 
 @media (min-width: 901px) and (max-height: 780px) {
@@ -2280,13 +2357,14 @@ button.swatch:active { cursor: grabbing; }
   .s2 .lede { font-size: 1.1rem; }
   .s2 .etym > div { padding-block: 0.6rem 0.65rem; }
   .s2 .cutout { scale: 0.72; }
-  .s3 .swatch { width: min(11vw, 17vh); }
-  .s3 .rows { row-gap: 1rem; }
-  .s3 .rows h3 { padding-top: 0.5rem; }
-  .s3 .board { width: min(100%, 25rem); }
-  .s3 .display { font-size: clamp(3rem, 7.5vh, 4.5rem); }
+  .s4 .swatch { width: min(11vw, 17vh); }
+  .s4 .rows { row-gap: 1rem; }
+  .s4 .rows h3 { padding-top: 0.5rem; }
+  .s4 .board { width: min(100%, 25rem); }
+  .s4 .display { font-size: clamp(3rem, 7.5vh, 4.5rem); }
   .s7 { gap: 1.1rem; }
   .s7 .envelopes li.env { height: 25vh; min-height: 180px; }
-  .s7 .patch-badge { max-width: 98px; }
+  .s7 .patch-badge { max-width: 104px; }
   .s7 .sub { font-size: 1rem; }
+  .s7 .envelopes li.env { height: clamp(140px, 21vh, 250px); min-height: 0; }
 }

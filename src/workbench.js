@@ -1,5 +1,5 @@
 // The workbench: the visitor makes something on the way through the spiral.
-// Screen 1: cut a piece out of a jeans leg. Screen 3: a reversible hat, one old fabric outside and
+// Screen 1: cut a piece out of a jeans leg. Screen 4: a reversible hat, one old fabric outside and
 // another inside, each photographed from a garment of yours (or a sample). Screen 5: the hat, tap to turn it.
 // Screen 9: save the hat as a picture to send to Katrin.
 // Nothing is stored: every visit starts with an uncut pair of jeans and an empty hat.
@@ -135,7 +135,7 @@ export function initWorkbench({ tr, reduced }) {
 
   placeScissors();
 
-  /* ---------- 3 · the reversible hat: outside and inside ---------- */
+  /* ---------- 4 · the reversible hat: outside and inside ---------- */
 
   const board = document.querySelector('.board');
   const cells = [...board.querySelectorAll('.cell')];
