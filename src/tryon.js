@@ -5,7 +5,7 @@ import { FaceDetector, FilesetResolver } from '@mediapipe/tasks-vision';
 import { drawHat, madeSides, fabricSrc } from './workbench.js';
 import { bindImageExport, canShareImage, downloadImage } from './image-export.js';
 
-// Seen from the front: the real fabric of each side of the reversible hat, sewn onto a frontal hat shape,
+// Seen from the front: the real fabric of each side of the reversible hat, sewn onto a selfie-height hat shape,
 // so it sits straight on a face looking into the camera.
 const BASE = import.meta.env.BASE_URL;
 const SIDES = { swirl: `${BASE}pieces/fabric-swirl.webp`, ink: `${BASE}pieces/fabric-ink.webp` };
@@ -60,8 +60,8 @@ export async function openTryOn({ tr, reduced, firstStream = null }) {
 
   const hats = {};
   for (const [key, src] of Object.entries(SIDES)) hats[key] = await frontalHat(await loadImg(src));
-  // the toadstool hat is photographed, not drawn: it goes on as it is
-  hats.toadstool = { src: `${BASE}pieces/hat-toadstool-cut.webp`, bottom: 0.95 };
+  // the toadstool hat: red cotton with felt dots sewn on, on the same selfie hat shape
+  hats.toadstool = await frontalHat(await toadstoolFabric());
   // the reversible hat from screen 4, both its sides; it's "yours" once you've chosen a fabric there
   const made = madeSides();
   const { mine } = made;
@@ -139,7 +139,7 @@ export async function openTryOn({ tr, reduced, firstStream = null }) {
 
   function render() {
     const h = hats[current];
-    hatBox.style.width = `${pose.w}px`;
+    hatBox.style.width = `${pose.w * (h.fit || 1)}px`;
     hatBox.style.transform = `translate(${pose.x}px, ${pose.y}px) rotate(${pose.r}rad) translate(-50%, -${(h.bottom - 0.08) * 100}%)`;
   }
 
@@ -202,7 +202,7 @@ export async function openTryOn({ tr, reduced, firstStream = null }) {
     g.restore();
     if (hatBox.classList.contains('is-on') || manual) {
       await hatImg.decode().catch(() => {});
-      const w = pose.w, h = (w * hatImg.naturalHeight) / hatImg.naturalWidth;
+      const w = pose.w * (hats[current].fit || 1), h = (w * hatImg.naturalHeight) / hatImg.naturalWidth;
       g.save();
       g.translate(pose.x, pose.y);
       g.rotate(pose.r);
@@ -318,12 +318,73 @@ function loadImg(src) {
 async function frontalHat(fabric) {
   const c = document.createElement('canvas');
   c.width = 800; c.height = 600;
-  drawHat(c, fabric);
+  drawHat(c, fabric, { shadow: false });
   // crop to the hat itself, so it sits like the photographed ones
   const crop = document.createElement('canvas');
-  crop.width = 704; crop.height = 470;
-  crop.getContext('2d').drawImage(c, 48, 118, 704, 470, 0, 0, 704, 470);
-  return { src: crop.toDataURL('image/png'), bottom: 0.93 };
+  crop.width = 552; crop.height = 316;
+  crop.getContext('2d').drawImage(c, 124, 188, 552, 316, 0, 0, 552, 316);
+  // a touch bigger than the face box, so the crown goes round the head, and set lower, so the brim's
+  // front edge comes down onto the forehead just above the eyebrows
+  return { src: crop.toDataURL('image/png'), bottom: 0.84, fit: 1.05 };
+}
+
+// The toadstool hat's cloth, as on the real one: red cotton with pale blue and cream felt dots sewn on,
+// each with a stitched, slightly frayed edge. Laid out for the selfie hat (the fabric covers the hat's
+// 360 × 250 area round its middle, at twice the size), so the dots land on crown, band and brim.
+const TOAD_DOTS = [
+  // [x, y, r] in the hat's 400 × 300 box
+  [146, 132, 25], [236, 116, 21], [291, 152, 13], [108, 106, 10], [196, 162, 12],
+  [112, 222, 19], [196, 230, 23], [281, 217, 19], [326, 241, 8], [72, 238, 7],
+];
+function toadstoolFabric() {
+  const c = document.createElement('canvas');
+  c.width = 720; c.height = 500;
+  const g = c.getContext('2d');
+  g.fillStyle = '#D9231B';
+  g.fillRect(0, 0, 720, 500);
+  // the weave: fine speckles of lighter and darker red
+  for (let i = 0; i < 9000; i++) {
+    g.fillStyle = Math.random() < 0.5 ? 'rgba(255, 90, 70, 0.10)' : 'rgba(90, 0, 0, 0.12)';
+    g.fillRect(Math.random() * 720, Math.random() * 500, 1.6, 1.6);
+  }
+  TOAD_DOTS.forEach(([bx, by, br], n) => {
+    const x = (bx - 20) * 2, y = (by - 47) * 2, r = br * 2;
+    const felt = n === 1 || n === 6 ? '#EFE9DF' : '#CFE0EE';
+    // frayed edge: short fibres sticking out all round
+    g.strokeStyle = felt;
+    g.lineWidth = 1;
+    for (let a = 0; a < Math.PI * 2; a += 0.09) {
+      const l = 2 + Math.random() * 3.5;
+      g.globalAlpha = 0.5 + Math.random() * 0.4;
+      g.beginPath();
+      g.moveTo(x + Math.cos(a) * (r - 1), y + Math.sin(a) * (r - 1));
+      g.lineTo(x + Math.cos(a + 0.05) * (r + l), y + Math.sin(a + 0.05) * (r + l));
+      g.stroke();
+    }
+    g.globalAlpha = 1;
+    // the felt, a little uneven, lighter in the middle
+    g.beginPath();
+    g.ellipse(x, y, r, r * (0.94 + Math.random() * 0.1), Math.random() * Math.PI, 0, Math.PI * 2);
+    const grad = g.createRadialGradient(x - r * 0.3, y - r * 0.3, r * 0.1, x, y, r);
+    grad.addColorStop(0, felt);
+    grad.addColorStop(1, n === 1 || n === 6 ? '#DDD5C8' : '#B9CDDF');
+    g.fillStyle = grad;
+    g.fill();
+    for (let i = 0; i < r * 4; i++) {
+      const a = Math.random() * Math.PI * 2, d = Math.random() * r * 0.9;
+      g.fillStyle = 'rgba(255, 255, 255, 0.25)';
+      g.fillRect(x + Math.cos(a) * d, y + Math.sin(a) * d, 1.4, 1.4);
+    }
+    // sewn on round its edge
+    g.setLineDash([3, 2.4]);
+    g.strokeStyle = 'rgba(255, 255, 255, 0.85)';
+    g.lineWidth = 1.3;
+    g.beginPath();
+    g.arc(x, y, r - 2.5, 0, Math.PI * 2);
+    g.stroke();
+    g.setLineDash([]);
+  });
+  return loadImg(c.toDataURL('image/png'));
 }
 
 // The ribisl label in the corner of every photo: white cotton, stitched edge, the smiley and the name.

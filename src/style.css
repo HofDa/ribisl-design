@@ -1094,7 +1094,7 @@ button.swatch:active { cursor: grabbing; }
 
 /* here and there a note in pen, as if Katrin had scribbled on the cloth */
 .pen { width: fit-content; font: 600 1.6rem/1 var(--hand); letter-spacing: 0; rotate: -4deg; }
-.pen--dare { display: flex; align-items: center; gap: 0.3rem; margin-left: -0.8rem; color: #8A0C24; font-size: clamp(1.5rem, 1.9vw, 2rem); }
+.pen--dare { display: flex; align-items: center; gap: 0.3rem; margin-left: -0.8rem; translate: 0 0.7rem; color: #8A0C24; font-size: clamp(1.5rem, 1.9vw, 2rem); }
 .pen-arrow { width: 40px; height: auto; flex: none; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; translate: 0 -0.3rem; }
 .handle {
   font-size: clamp(1.5rem, 3.4vw, 3rem);
@@ -1494,8 +1494,8 @@ button.swatch:active { cursor: grabbing; }
   /* screen 2: the scissors fit into the space under the text on every phone */
   .s2-body { gap: 1.1rem; }
   .s2 .cutout { scale: 0.72; margin-top: 0.6rem; }
-  .cut-note { font-size: 1.9rem; max-width: 9.5rem; bottom: 14%; }
-  .cut-arrow { scale: 1 -1; margin-bottom: 0.9rem; }
+  .cut-note { font-size: 1.9rem; max-width: 9.5rem; bottom: 4%; right: calc(100% - 1.5rem); }
+  .cut-arrow { scale: 1 -1; margin-bottom: 1.6rem; }
   .s6 { gap: 0.9rem; }
   .turn { gap: 0.6rem; }
   /* screen 9 on phones: a centred finale. The label the thread sews on sits big in the middle,
@@ -1507,7 +1507,7 @@ button.swatch:active { cursor: grabbing; }
   .s9 .display--xl { font-size: min(11vw, 2.9rem); max-width: 11ch; }
   .s9 .lede { max-width: 30ch; }
   .s9 .reach { flex-direction: column; gap: 0.9rem; margin-top: 0.2rem; }
-  .pen--dare { margin: -0.3rem 0 0 4.5rem; }
+  .pen--dare { margin: -0.3rem 0 0 4.5rem; translate: none; }
   .pen--dare .pen-arrow { rotate: 40deg; }
   .s9 .made { width: 100%; text-align: left; }
   .s9 .colophon { position: static; align-self: flex-start; margin-top: 1rem; }

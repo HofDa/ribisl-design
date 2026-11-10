@@ -315,12 +315,16 @@ export function initWorkbench({ tr, reduced }) {
 
 /* ---------- drawing the hat ---------- */
 
-const CROWN = new Path2D('M106 104 Q107 80 140 75 Q200 68 260 75 Q293 80 294 104 L303 168 Q200 184 97 168 Z');
-const BAND = new Path2D('M100 168 Q200 184 300 168 L305 193 Q200 210 95 193 Z');
-const BRIM = new Path2D('M95 193 Q200 210 305 193 Q356 206 374 234 Q378 264 300 276 Q200 292 100 276 Q22 264 26 234 Q44 206 95 193 Z');
 const SMILE = [new Path2D('M42 15v35M59 15v35'), new Path2D('M19 37v9a31 31 0 0 0 62 0v-9')];
 
-// A bucket hat seen from the front, sewn from one fabric all over, in a 400 × 300 box.
+// A bucket hat seen straight on, at eye height, as the camera sees it in a selfie: a compact crown with
+// nearly upright sides and a broad flat top, and a short brim angled down towards you, its front edge
+// curving gently round the face. In a 400 × 300 box.
+const CROWN = new Path2D('M104 166 L108 120 Q110 106 128 104 Q200 98 272 104 Q290 106 292 120 L296 166 Q200 178 104 166 Z');
+const BAND = new Path2D('M101 166 Q200 178 299 166 L301 182 Q200 194 99 182 Z');
+const BRIM = new Path2D('M99 182 Q200 194 301 182 Q320 202 332 222 Q335 232 322 235 Q200 252 78 235 Q65 232 68 222 Q80 202 99 182 Z');
+
+// The hat sewn from one fabric all over; `shadow` adds its shadow on the table (not in a selfie).
 export function drawHat(canvas, fabric, { shadow = true } = {}) {
   const ctx = canvas.getContext('2d');
   const k = canvas.width / 400;
@@ -328,13 +332,12 @@ export function drawHat(canvas, fabric, { shadow = true } = {}) {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   ctx.setTransform(k, 0, 0, k, 0, (canvas.height / k - 300) / 2 * k);
 
-  // shadow on the table
   if (shadow) {
     ctx.save();
     ctx.filter = `blur(${7 * k}px)`;
     ctx.fillStyle = 'rgba(30, 24, 26, 0.28)';
     ctx.beginPath();
-    ctx.ellipse(200, 284, 168, 14, 0, 0, Math.PI * 2);
+    ctx.ellipse(200, 253, 132, 8, 0, 0, Math.PI * 2);
     ctx.fill();
     ctx.restore();
   }
@@ -365,11 +368,12 @@ export function drawHat(canvas, fabric, { shadow = true } = {}) {
   g.addColorStop(0, 'rgba(255, 255, 255, 0.18)'); g.addColorStop(1, 'rgba(255, 255, 255, 0)');
   shade(CROWN, g);
   shade(BAND, 'rgba(20, 12, 16, 0.22)');
-  g = ctx.createRadialGradient(200, 200, 60, 200, 230, 210);
-  g.addColorStop(0, 'rgba(20, 12, 16, 0.05)'); g.addColorStop(1, 'rgba(20, 12, 16, 0.42)');
+  // the brim slopes away from the light under the crown, and catches it towards its edge
+  g = ctx.createLinearGradient(0, 182, 0, 248);
+  g.addColorStop(0, 'rgba(20, 12, 16, 0.42)'); g.addColorStop(1, 'rgba(20, 12, 16, 0.06)');
   shade(BRIM, g);
 
-  // outlines and the rows of topstitching round the brim
+  // outlines, and rows of topstitching following the brim's front edge
   ctx.lineJoin = 'round';
   ctx.strokeStyle = 'rgba(30, 24, 26, 0.6)';
   ctx.lineWidth = 1.6;
@@ -379,16 +383,17 @@ export function drawHat(canvas, fabric, { shadow = true } = {}) {
   ctx.setLineDash([4, 3]);
   ctx.strokeStyle = 'rgba(255, 246, 230, 0.7)';
   ctx.lineWidth = 1;
-  for (const d of [12, 24, 36]) {
+  for (const d of [8, 16, 24]) {
     ctx.beginPath();
-    ctx.ellipse(200, 236, 176 - d, 45 - d * 0.55, 0, 0.05 * Math.PI, 0.95 * Math.PI);
+    ctx.moveTo(78 + d * 0.7, 234 - d);
+    ctx.quadraticCurveTo(200, 251 - d * 1.05, 322 - d * 0.7, 234 - d);
     ctx.stroke();
   }
   ctx.restore();
 
   // the smiley label, sewn on the band
   ctx.save();
-  ctx.translate(244, 170);
+  ctx.translate(246, 160);
   ctx.rotate(0.04);
   ctx.fillStyle = '#FBF9F4';
   ctx.fillRect(0, 0, 24, 21);
@@ -434,8 +439,9 @@ export function drawReversible(canvas, outside, inside, front = 'out', withBackg
     ctx.restore();
   };
   // behind: smaller, raised and turned the other way; in front: big and a little cocky
-  put(side(second), 262, 112, 0.62, 9, true);
-  put(side(first), 168, 168, 0.8, -4, false);
+  // (the hat is drawn front on, as in the try-on, and fills less of its box, so both come up a size)
+  put(side(second), 262, 110, 0.76, 9, true);
+  put(side(first), 172, 158, 0.98, -4, false);
 
   if (withBackground) {
     ctx.fillStyle = '#1E181A';
