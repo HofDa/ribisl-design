@@ -607,7 +607,8 @@ function setEnvelope(env, open) {
 for (const env of envelopes) {
   env.querySelector('.env-back').inert = true;
   env.querySelector('.env-front').addEventListener('click', () => setEnvelope(env, true));
-  env.querySelector('.env-close').addEventListener('click', () => {
+  env.querySelector('.env-back').addEventListener('click', (event) => {
+    if (event.target.closest('a')) return;
     setEnvelope(env, false);
     env.querySelector('.env-front').focus({ preventScroll: true });
   });
