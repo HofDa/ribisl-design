@@ -32,6 +32,8 @@ Two upright bar eyes inside a deep U, black, as on Katrin's white sewn-in labels
 Plain HTML/CSS/vanilla JS with Vite, canvas for the cloth and thread. DE (at `/`), IT (`/it/`) and EN (`/en/`) are each prerendered at build time, with JSON-LD, sitemap, robots.txt and llms.txt.
 
 ## Open decisions / to confirm with Katrin
+
+Legal details confirmed by the site owner: Katrin Unterhofer, Bozen / Bolzano, Italy. This is a hobby page; publish the city only, with Instagram as the contact channel. No street address or email was supplied. The Impressum credits “Konzept, Design, Umsetzung und Optimierung: Ziofungo (David Hofer).” Static legal pages in German, Italian and English are generated from `src/legal-pages.js`; menu and contact-footer links follow the selected language. The privacy notice documents GitHub Pages hosting, the local language preference and the optional browser-local photo/camera features.
 - **Domain**: `SITE` in `src/site.js` is a placeholder (`https://ribisl.design`).
 - **Photos**: screen 5 shows cut-outs of real pieces (two vests, a belt bag, pouches, the toadstool hat, a backpack), made from photos sent during development. Confirm with Katrin they may be used. The frames for vests, bags and hats are stacks that swap every few seconds.
 - **Draft copy**: materials (denim, scraps, rope, knits) and the process steps were inferred from her Instagram grid. The course contents (s7) and "replies in German, Italian or English" are unconfirmed. "ribisl = South Tyrolean for redcurrant" should be checked against how she'd put it.

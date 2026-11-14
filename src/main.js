@@ -6,7 +6,7 @@ import { t, detectLang } from './i18n.js';
 import { Thread } from './thread.js';
 import { initWorkbench } from './workbench.js';
 import { sound } from './sound.js';
-import { PATHS } from './site.js';
+import { PATHS, LEGAL_PATHS } from './site.js';
 
 // Counter-clockwise inward spiral: down the left, along the bottom, up the right, back along the top, into the center.
 const ORDER = [[0, 0], [0, 1], [0, 2], [1, 2], [2, 2], [2, 1], [2, 0], [1, 0], [1, 1]];
@@ -35,6 +35,9 @@ const ctx = canvas.getContext('2d');
 const screens = [...document.querySelectorAll('.screen')];
 const nextBtn = document.getElementById('next');
 const plateBtn = document.getElementById('plate-btn');
+const mapToggle = document.getElementById('map-toggle');
+const mapPanel = document.getElementById('map-panel');
+const mobileMapQuery = matchMedia('(max-width: 600px)');
 const menuBtn = document.getElementById('menu-btn');
 const menuList = document.getElementById('menu-list');
 const announce = document.getElementById('announce');
@@ -63,9 +66,11 @@ function applyLang(l) {
   document.querySelector('meta[name="description"]').content = t(l, 'meta.desc');
   for (const el of document.querySelectorAll('[data-i18n]')) el.textContent = t(l, el.dataset.i18n);
   for (const el of document.querySelectorAll('[data-i18n-label]')) el.setAttribute('aria-label', t(l, el.dataset.i18nLabel));
+  for (const link of document.querySelectorAll('[data-legal]')) link.href = import.meta.env.BASE_URL + LEGAL_PATHS[l][link.dataset.legal];
   for (const b of document.querySelectorAll('[data-lang]')) b.setAttribute('aria-pressed', String(b.dataset.lang === l));
   if (thread) thread.phew = t(l, 'thread.phew');
-  fitArcs();
+  marketNeedsLayout = true;
+  layoutMarket();
   buildMap();
   updateHud();
   updateNext();
@@ -73,15 +78,18 @@ function applyLang(l) {
 
 // the names sewn round the patches on screen 7: shrink any that would run past their half of the circle
 function fitArcs() {
-  for (const text of document.querySelectorAll('.patch-badge text.arc')) {
-    text.style.fontSize = '';
+  if (!document.querySelector('.s7.is-rendered')) return;
+  const texts = [...document.querySelectorAll('.patch-badge text.arc')];
+  texts.forEach((text) => { text.style.fontSize = ''; });
+  const sizes = texts.map((text) => {
     const path = document.querySelector(text.firstElementChild.getAttribute('href'));
     const room = path.getTotalLength() * 0.93;
     const len = text.getComputedTextLength();
-    if (len > room) text.style.fontSize = `${(10 * room) / len}px`;
-  }
+    return len > room ? `${(10 * room) / len}px` : '';
+  });
+  texts.forEach((text, i) => { text.style.fontSize = sizes[i]; });
 }
-document.fonts?.ready.then(fitArcs);
+document.fonts?.ready.then(() => { marketNeedsLayout = true; layoutMarket(); });
 
 // Screen 7: the pennant chain runs across the whole screen. It is rebuilt for the screen's width,
 // so the pennants keep their shape and just get more (or fewer) along the line.
@@ -104,15 +112,22 @@ function buildBunting() {
   }
   svg.querySelector('.bunting-line').innerHTML = out;
 }
-buildBunting();
-addEventListener('resize', buildBunting);
+let marketNeedsLayout = true;
+function layoutMarket() {
+  if (!marketNeedsLayout || !document.querySelector('.s7.is-rendered')) return;
+  marketNeedsLayout = false;
+  buildBunting();
+  fitArcs();
+}
+addEventListener('resize', () => { marketNeedsLayout = true; layoutMarket(); });
 
 /* ---------- spiral map ---------- */
 
 function buildMap() {
   const map = document.getElementById('map');
-  const pts = ORDER.map(([c, r]) => `${c * 20 + 9},${r * 20 + 9}`).join(' ');
-  map.innerHTML = `<svg class="map-path" viewBox="0 0 58 58" aria-hidden="true"><polyline points="${pts}"/></svg>`;
+  const pts = ORDER.map(([c, r]) => `${c * 30 + 14},${r * 30 + 14}`).join(' ');
+  map.innerHTML = `<svg class="map-path" viewBox="0 0 88 88" aria-hidden="true"><polyline points="${pts}"/></svg>`;
+  mapToggle.innerHTML = `<svg viewBox="0 0 88 88" aria-hidden="true">${ORDER.map(([c, r], i) => `<rect data-map-preview="${i}" x="${c * 30}" y="${r * 30}" width="28" height="28"/>`).join('')}<polyline points="${pts}"/></svg>`;
   const here = document.createElement('span');
   here.className = 'map-here';
   map.append(here);
@@ -126,9 +141,30 @@ function buildMap() {
     b.addEventListener('click', () => go(i));
     map.append(b);
   });
+  setMapOpen(mapToggle.getAttribute('aria-expanded') === 'true');
 }
 
+function setMapOpen(open) {
+  mapToggle.setAttribute('aria-expanded', String(open));
+  mapToggle.setAttribute('aria-label', t(lang, open ? 'hud.mapClose' : 'hud.mapOpen'));
+  mapPanel.inert = mobileMapQuery.matches && !open;
+}
+mapToggle.addEventListener('click', () => setMapOpen(mapToggle.getAttribute('aria-expanded') !== 'true'));
+mobileMapQuery.addEventListener('change', () => setMapOpen(false));
+document.addEventListener('pointerdown', (e) => {
+  if (!e.target.closest('.map')) setMapOpen(false);
+});
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && mapToggle.getAttribute('aria-expanded') === 'true') {
+    setMapOpen(false);
+    mapToggle.focus();
+  }
+});
+
 function updateHud() {
+  mapToggle.querySelectorAll('[data-map-preview]').forEach((cell, i) => {
+    cell.classList.toggle('is-current', i === current && !overview);
+  });
   document.querySelectorAll('.map-cell').forEach((b, i) => {
     b.classList.toggle('is-here', i === current && !overview);
     b.classList.toggle('is-sewn', !!thread?.sewn.has(i));
@@ -141,9 +177,10 @@ function updateHud() {
   });
   const [c, r] = ORDER[current];
   const here = document.querySelector('.map-here');
-  here.style.transform = `translate(${c * 20}px, ${r * 20}px)`;
+  here.style.transform = `translate(${c * 30}px, ${r * 30}px)`;
   here.classList.toggle('is-off', overview);
   plateBtn.setAttribute('aria-pressed', String(overview));
+  plateBtn.setAttribute('aria-label', t(lang, overview ? 'hud.plateExit' : 'hud.plate'));
   plateBtn.querySelector('span').textContent = t(lang, overview ? 'hud.plateExit' : 'hud.plate');
   document.getElementById('r-n').textContent = current + 1;
   document.getElementById('r-title').textContent = t(lang, 't' + (current + 1));
@@ -221,6 +258,18 @@ function applyCamera() {
   plate.style.transform = cam.r
     ? `translate(${W / 2}px, ${H / 2}px) rotate(${cam.r}rad) translate(${-W / 2}px, ${-H / 2}px) translate3d(${tx}px, ${ty}px, 0) scale(${cam.s})`
     : `translate3d(${tx}px, ${ty}px, 0) scale(${cam.s})`;
+  // Skip layout and paint for panels outside the camera, including their SVG animations.
+  // Keep every panel crossed during a flight, and all nine in the overview.
+  const margin = cam.r ? Math.max(W, H) * 0.15 / cam.s : 0;
+  const left = -tx / cam.s - margin, top = -ty / cam.s - margin;
+  const right = left + W / cam.s + margin * 2, bottom = top + H / cam.s + margin * 2;
+  screens.forEach((screen, i) => {
+    const [c, r] = ORDER[i];
+    const visible = (c + 1) * W > left + 0.5 && c * W < right - 0.5
+      && (r + 1) * H > top + 0.5 && r * H < bottom - 0.5;
+    screen.classList.toggle('is-rendered', visible);
+  });
+  layoutMarket();
 }
 
 // a small wind-up before it goes and a small overshoot when it lands: quick, and a bit cheeky
@@ -273,6 +322,7 @@ const LEAD = 0.14; // on arrival the needle has just come in, so you can see whe
 
 function go(i, { instant = false, focus = true, prog } = {}) {
   i = Math.max(0, Math.min(8, i));
+  setMapOpen(false);
   if (!menuList.hidden) toggleMenu(false, false);
   const wasOverview = overview;
   overview = false;
@@ -400,6 +450,7 @@ function updateSteps() {
 }
 
 function toggleOverview(on = !overview) {
+  setMapOpen(false);
   overview = on;
   root.classList.toggle('is-overview', on);
   setInert();
@@ -650,7 +701,12 @@ let thread = null;
 
 function worldRect(el) {
   // invert the camera to get layout boxes in plate coordinates
+  // The thread ends on the contact panel, which may currently be skipped.
+  const screen = el.closest('.screen');
+  const skipped = screen && !screen.classList.contains('is-rendered');
+  if (skipped) screen.classList.add('is-measuring');
   const r = el.getBoundingClientRect();
+  if (skipped) screen.classList.remove('is-measuring');
   const ox = W / 2 - cam.s * cam.cx * W, oy = H / 2 - cam.s * cam.cy * H;
   return { x: (r.left - ox) / cam.s, y: (r.top - oy) / cam.s, w: r.width / cam.s, h: r.height / cam.s };
 }

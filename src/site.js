@@ -7,3 +7,9 @@ export const HANDLE = '@ribisl_design';
 // Every language has its own address, so search engines can index and link each one.
 // Relative to where the site is served from (its base path: "/" locally, "/ribisl-design/" on GitHub Pages).
 export const PATHS = { de: '', it: 'it/', en: 'en/' };
+
+export const LEGAL_PATHS = {
+  de: { imprint: 'impressum/', privacy: 'datenschutz/' },
+  it: { imprint: 'it/note-legali/', privacy: 'it/privacy/' },
+  en: { imprint: 'en/legal-notice/', privacy: 'en/privacy/' },
+};

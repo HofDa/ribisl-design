@@ -113,6 +113,12 @@ a { color: inherit; }
 }
 .is-ready .screen { opacity: 1; }
 
+/* Each panel has a fixed outer size; only its contents need to be rendered on demand. */
+.screen { content-visibility: hidden; }
+.screen.is-rendered, .screen.is-measuring { content-visibility: visible; }
+.screen:not(.is-rendered) *, .screen:not(.is-rendered) *::before,
+.screen:not(.is-rendered) *::after { animation-play-state: paused !important; }
+
 /* focus pull: only the screen under the lens is sharp; the destination resolves as the camera lands */
 .screen > * { transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
 .screen.is-away > * { opacity: 0.32; }
@@ -640,14 +646,15 @@ button.swatch:active { cursor: grabbing; }
   align-items: flex-end;
   gap: 0.1rem;
   width: max-content;
-  max-width: 11rem;
-  font: 600 1.45rem/0.95 var(--hand);
-  color: var(--ink);
+  max-width: 14rem;
+  font: 600 1.55rem/1.05 var(--hand);
+  color: #0D080A;
   text-align: right;
   rotate: -8deg;
   pointer-events: none;
   opacity: 0;
 }
+.cut-note > span { text-shadow: 0 0 2px rgba(251, 249, 244, 0.6); }
 .cut-arrow { flex: none; width: 54px; height: auto; margin-bottom: -1.6rem; overflow: visible; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
 .cut-arrow path { stroke-dasharray: 100; stroke-dashoffset: 100; }
 .s2.is-here .cutout .cut-note { --after: calc(var(--wait) + var(--cut) + 0.8s); animation: fade-in 0.01s var(--after) both; }
@@ -1140,8 +1147,15 @@ button.swatch:active { cursor: grabbing; }
   translate: -50% 0;
   font-size: 0.85rem;
   font-weight: 550;
-  white-space: nowrap;
+  display: grid;
+  justify-items: center;
+  gap: 0.3rem;
+  width: max-content;
+  max-width: calc(100% - 2 * var(--pad));
+  text-align: center;
 }
+.colophon nav { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.2rem 1rem; }
+.colophon a { text-underline-offset: 0.2em; }
 
 /* ---------- try the hat on ---------- */
 
@@ -1332,17 +1346,19 @@ button.swatch:active { cursor: grabbing; }
 .map-grid {
   position: relative;
   display: grid;
-  grid-template: repeat(3, 18px) / repeat(3, 18px);
+  grid-template: repeat(3, 28px) / repeat(3, 28px);
   gap: 2px;
   padding: 3px;
   border: var(--hair) solid var(--ink);
   background: rgba(251, 249, 244, 0.92);
 }
+.map-panel { display: flex; align-items: flex-end; gap: 0.6rem; }
+.map-toggle { display: none; }
 .map-path {
   position: absolute;
   inset: 3px;
-  width: 58px;
-  height: 58px;
+  width: 88px;
+  height: 88px;
   pointer-events: none;
   z-index: 1;
 }
@@ -1365,8 +1381,8 @@ button.swatch:active { cursor: grabbing; }
   position: absolute;
   top: 3px;
   left: 3px;
-  width: 18px;
-  height: 18px;
+  width: 28px;
+  height: 28px;
   background: var(--ink);
   transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.2s;
 }
@@ -1392,6 +1408,8 @@ button.swatch:active { cursor: grabbing; }
   top: calc(100% + 8px);
   left: 0;
   width: min(300px, calc(100vw - 36px));
+  max-height: calc(100dvh - 110px);
+  overflow-y: auto;
   padding: 0.4rem 0;
   background: var(--tag);
   border: var(--hair) solid var(--ink);
@@ -1412,6 +1430,8 @@ button.swatch:active { cursor: grabbing; }
 .menu-list a:hover, .menu-list a:focus-visible { background: var(--red-soft); outline: none; }
 .menu-list a[aria-current] { font-weight: 760; }
 .menu-list .n { width: 1.2em; font: 650 0.8rem/1 var(--font); font-variant-numeric: tabular-nums; }
+.menu-list .menu-legal { display: flex; flex-wrap: wrap; border-top: var(--hair) dashed var(--ink); }
+.menu-list .menu-legal a { font-size: 0.875rem; }
 
 /* the one button that always points along the spiral */
 .next { font-size: 1rem; white-space: nowrap; }
@@ -1480,6 +1500,23 @@ button.swatch:active { cursor: grabbing; }
 }
 
 @media (max-width: 600px) {
+  .map-toggle {
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    padding: 6px;
+    border: var(--hair) solid var(--ink);
+    background: var(--tag);
+    color: var(--ink);
+    cursor: pointer;
+  }
+  .map-toggle svg { width: 30px; height: 30px; overflow: visible; }
+  .map-toggle rect { fill: var(--tag); stroke: currentColor; stroke-width: 2; }
+  .map-toggle rect.is-current { fill: var(--ink); }
+  .map-toggle polyline { fill: none; stroke: var(--red); stroke-width: 3; stroke-dasharray: 5 4; }
+  .map-panel { display: none; position: absolute; right: 0; bottom: calc(100% + 52px); padding: 8px; border: var(--hair) solid var(--ink); background: var(--tag); box-shadow: 0 4px 12px rgba(30, 24, 26, 0.16); }
+  .map-toggle[aria-expanded='true'] + .map-panel { display: flex; }
   :root { --pad-top: 68px; --pad-bottom: 96px; }
   .display { font-size: 2.25rem; }
   .s2 .display, .s6 .display { font-size: 2.6rem; }
@@ -1535,7 +1572,7 @@ button.swatch:active { cursor: grabbing; }
   /* screen 2: the scissors fit into the space under the text on every phone */
   .s2-body { gap: 1.1rem; }
   .s2 .cutout { scale: 0.72; margin-top: 0.6rem; }
-  .cut-note { font-size: 1.9rem; max-width: 9.5rem; bottom: 4%; right: calc(100% - 1.5rem); }
+  .cut-note { font-size: 1.9rem; max-width: 13rem; bottom: 4%; right: calc(100% - 1.5rem); }
   .cut-arrow { scale: 1 -1; margin-bottom: 1.6rem; }
   .s6 { gap: 0.9rem; }
   .turn { gap: 0.6rem; }
@@ -1560,7 +1597,7 @@ button.swatch:active { cursor: grabbing; }
   .s9:has(.made:not([hidden])) .lede { font-size: 0.92rem; }
   .s9:has(.made:not([hidden])) .reach { flex-direction: row; justify-content: center; gap: 0.6rem 1rem; }
   .colophon { left: var(--pad); translate: none; bottom: max(26px, env(safe-area-inset-bottom)); }
-  .readout { left: auto; right: max(18px, env(safe-area-inset-right)); bottom: calc(max(18px, env(safe-area-inset-bottom)) + 38px); }
+  .readout { left: auto; right: max(18px, env(safe-area-inset-right)); bottom: calc(max(18px, env(safe-area-inset-bottom)) + 52px); }
   .readout > span { padding: 0.45rem; }
   #r-title { display: none; }
   .hint { display: none; }

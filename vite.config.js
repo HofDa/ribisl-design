@@ -2,7 +2,8 @@ import { defineConfig } from 'vite';
 import { readFileSync, writeFileSync, mkdirSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { strings, t } from './src/i18n.js';
-import { SITE, INSTAGRAM, PATHS } from './src/site.js';
+import { SITE, INSTAGRAM, PATHS, LEGAL_PATHS } from './src/site.js';
+import { renderLegalPage } from './src/legal-pages.js';
 
 // The page fills its copy in with JavaScript, which many crawlers and AI answer engines never run.
 // So the build writes every language out as finished HTML at its own address, with the metadata,
@@ -78,7 +79,7 @@ function head(lang, fonts = []) {
     '<meta name="twitter:card" content="summary" />',
     `<script type="application/ld+json">${jsonLd(lang)}</script>`,
     // without JavaScript the nine screens simply stack, readable top to bottom
-    '<noscript><style>html,body{height:auto;overflow:auto}body{background:#F3EDE2;touch-action:auto}#cloth,.hud{display:none}#plate{position:static;width:auto;height:auto;transform:none}.screen{position:relative;left:auto;top:auto;width:auto;height:auto;min-height:100vh;opacity:1;overflow:visible}.tag--big .smile-red{opacity:1}</style></noscript>',
+    '<noscript><style>html,body{height:auto;overflow:auto}body{background:#F3EDE2;touch-action:auto}#cloth,.hud{display:none}#plate{position:static;width:auto;height:auto;transform:none}.screen{position:relative;left:auto;top:auto;width:auto;height:auto;min-height:100vh;opacity:1;overflow:visible;content-visibility:visible}.tag--big .smile-red{opacity:1}</style></noscript>',
     '<!--/seo-->',
   ].filter(Boolean).join('\n  ');
 }
@@ -93,10 +94,11 @@ function localize(html, lang, fonts) {
     .replace('</head>', `  ${head(lang, fonts)}\n</head>`)
     .replace(/<(\w+)(\s[^>]*?\bdata-i18n="([^"]+)"[^>]*)>[^<]*<\/\1>/g, (_, tag, attrs, key) => `<${tag}${attrs}>${esc(t(lang, key))}</${tag}>`)
     .replace(/<[^>]*\bdata-i18n-label="([^"]+)"[^>]*>/g, (tag, key) => tag.replace(/aria-label="[^"]*"/, `aria-label="${esc(t(lang, key))}"`))
+    .replace(/<a\b[^>]*\bdata-legal="(imprint|privacy)"[^>]*>/g, (tag, kind) => tag.replace(/href="[^"]*"/, `href="${BASE}${LEGAL_PATHS[lang][kind]}"`))
     .replace(/(<button[^>]*data-lang="(\w+)"[^>]*?)(?: aria-pressed="\w+")?>/g, (_, open, l) => `${open} aria-pressed="${l === lang}">`)
     .replace(/<span id="year">[^<]*<\/span>/, `<span id="year">${new Date().getFullYear()}</span>`)
     // files from public/ are addressed from the root; on a sub-path (GitHub Pages) they need the base in front
-    .replace(/(["'(])\/(fabric|swatch|pieces|mediapipe|favicon\.svg)/g, `$1${BASE}$2`);
+    .replace(/([\s"'(])\/(fabric|swatch|pieces|katrin|mediapipe|favicon\.svg)/g, `$1${BASE}$2`);
 }
 
 function robots() {
@@ -157,6 +159,23 @@ function llms() {
 function seo() {
   return {
     name: 'ribisl-seo',
+    configureServer(server) {
+      server.middlewares.use((req, res, next) => {
+        const path = (req.url || '').split('?')[0];
+        for (const [lang, paths] of Object.entries(LEGAL_PATHS)) {
+          for (const [kind, route] of Object.entries(paths)) {
+            if (![`${BASE}${route}`, `${BASE}${route}index.html`, `${BASE}${route.slice(0, -1)}`].includes(path)) continue;
+            res.setHeader('Content-Type', 'text/html; charset=utf-8');
+            res.end(renderLegalPage(lang, kind, {
+              base: BASE,
+              fontUrl: `${BASE}node_modules/@fontsource-variable/gabarito/files/gabarito-latin-wght-normal.woff2`,
+            }));
+            return;
+          }
+        }
+        next();
+      });
+    },
     // the dev server shows the same finished German page the build ships at /
     transformIndexHtml: { order: 'post', handler: (html) => localize(html, 'de') },
     writeBundle({ dir }) {
@@ -168,6 +187,11 @@ function seo() {
         const out = join(dir, PATHS[lang]);
         mkdirSync(out, { recursive: true });
         writeFileSync(join(out, 'index.html'), localize(base, lang, fonts));
+        for (const [kind, route] of Object.entries(LEGAL_PATHS[lang])) {
+          const legalOut = join(dir, route);
+          mkdirSync(legalOut, { recursive: true });
+          writeFileSync(join(legalOut, 'index.html'), renderLegalPage(lang, kind, { base: BASE, fontUrl: fonts[0] }));
+        }
       }
       writeFileSync(join(dir, 'robots.txt'), robots());
       writeFileSync(join(dir, 'sitemap.xml'), sitemap());
