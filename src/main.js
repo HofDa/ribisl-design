@@ -1,8 +1,6 @@
-import '@fontsource-variable/gabarito/wght.css';
-import '@fontsource-variable/caveat/wght.css';
-import '@fontsource-variable/outfit/wght.css';
+import './fonts.css';
 import './style.css';
-import { t, detectLang } from './i18n.js';
+import { t, detectLang, loadLang } from './i18n.js';
 import { Thread } from './thread.js';
 import { initWorkbench } from './workbench.js';
 import { sound } from './sound.js';
@@ -61,19 +59,24 @@ let workbench = null;
 
 /* ---------- copy ---------- */
 
+let domLang = root.dataset.prepaintLang ? 'de' : (root.lang || '');
 function applyLang(l) {
   lang = l;
   try { localStorage.setItem('ribisl-lang', l); } catch {}
-  root.lang = l;
-  // keep the address on the language's own page, so a shared or reloaded link opens in it
-  const here = import.meta.env.BASE_URL + PATHS[l];
-  if (location.pathname !== here) history.replaceState(null, '', here + location.hash);
-  document.title = t(l, 'meta.title');
-  document.querySelector('meta[name="description"]').content = t(l, 'meta.desc');
-  for (const el of document.querySelectorAll('[data-i18n]')) el.textContent = t(l, el.dataset.i18n);
-  for (const el of document.querySelectorAll('[data-i18n-label]')) el.setAttribute('aria-label', t(l, el.dataset.i18nLabel));
-  for (const link of document.querySelectorAll('[data-legal]')) link.href = import.meta.env.BASE_URL + LEGAL_PATHS[l][link.dataset.legal];
-  for (const b of document.querySelectorAll('[data-lang]')) b.setAttribute('aria-pressed', String(b.dataset.lang === l));
+  if (l !== domLang) {
+    domLang = l;
+    delete root.dataset.prepaintLang;
+    root.lang = l;
+    // keep the address on the language's own page, so a shared or reloaded link opens in it
+    const here = import.meta.env.BASE_URL + PATHS[l];
+    if (location.pathname !== here) history.replaceState(null, '', here + location.hash);
+    document.title = t(l, 'meta.title');
+    document.querySelector('meta[name="description"]').content = t(l, 'meta.desc');
+    for (const el of document.querySelectorAll('[data-i18n]')) el.textContent = t(l, el.dataset.i18n);
+    for (const el of document.querySelectorAll('[data-i18n-label]')) el.setAttribute('aria-label', t(l, el.dataset.i18nLabel));
+    for (const link of document.querySelectorAll('[data-legal]')) link.href = import.meta.env.BASE_URL + LEGAL_PATHS[l][link.dataset.legal];
+    for (const b of document.querySelectorAll('[data-lang]')) b.setAttribute('aria-pressed', String(b.dataset.lang === l));
+  }
   if (thread) thread.phew = t(l, 'thread.phew');
   workbench?.relabel();
   marketNeedsLayout = true;
@@ -96,7 +99,6 @@ function fitArcs() {
   });
   texts.forEach((text, i) => { text.style.fontSize = sizes[i]; });
 }
-document.fonts?.ready.then(() => { marketNeedsLayout = true; layoutMarket(); });
 
 // Screen 7: the pennant chain runs across the whole screen. It is rebuilt for the screen's width,
 // so the pennants keep their shape and just get more (or fewer) along the line.
@@ -594,10 +596,16 @@ function toggleMenu(open = menuList.hidden, refocus = true) {
 menuBtn.addEventListener('click', () => toggleMenu());
 
 for (const b of document.querySelectorAll('[data-lang]')) {
-  b.addEventListener('click', () => { applyLang(b.dataset.lang); relayout(); });
+  b.addEventListener('click', async () => {
+    await loadLang(b.dataset.lang);
+    applyLang(b.dataset.lang);
+    relayout();
+  });
 }
 
-document.getElementById('year').textContent = new Date().getFullYear();
+const yearEl = document.getElementById('year');
+const yearStr = String(new Date().getFullYear());
+if (yearEl && yearEl.textContent !== yearStr) yearEl.textContent = yearStr;
 
 /* ---------- workshop sounds ---------- */
 
@@ -779,6 +787,7 @@ function loadFabric(i, priority = 'low') {
 
 function prefetchFabrics(first) {
   loadFabric(first, 'high');
+  if (navigator.connection?.saveData) return;
   const idle = window.requestIdleCallback || ((f) => setTimeout(f, 300));
   const afterLoad = (fn) => (document.readyState === 'complete' ? fn() : addEventListener('load', fn, { once: true }));
   afterLoad(() => idle(async () => {
@@ -797,6 +806,7 @@ function seamInset() {
   return Math.round(Math.min(34, Math.max(10, pad * 0.42)));
 }
 
+let measuredEnd = null, measuredEndSize = '';
 function relayout(instant = true) {
   W = innerWidth; H = innerHeight;
   root.style.setProperty('--W', W + 'px');
@@ -809,8 +819,13 @@ function relayout(instant = true) {
   backgroundKey = null;
   if (!anim) Object.assign(cam, overview ? overviewCam() : target(current));
   applyCamera();
-  const tag = worldRect(endTag);
-  const end = { x: tag.x + 4, y: tag.y + tag.h * 0.5 }; // just under the label's edge, where the stitching starts
+  const sizeKey = `${W}x${H}`;
+  if (endTag.closest('.screen')?.classList.contains('is-rendered')) {
+    const tag = worldRect(endTag);
+    measuredEnd = { x: tag.x + 4, y: tag.y + tag.h * 0.5 }; // just under the label's edge, where the stitching starts
+    measuredEndSize = sizeKey;
+  }
+  const end = (measuredEnd && measuredEndSize === sizeKey) ? measuredEnd : { x: W * 1.4, y: H * 1.55 };
   thread.layout(W, H, seamInset(), end, instant);
   thread.setProgress(current, progress);
   if (instant) thread.fastForward();
@@ -822,6 +837,14 @@ function kick() { if (!raf) raf = requestAnimationFrame(frame); }
 
 function frame(now) {
   raf = 0;
+  if (measuredEndSize !== `${W}x${H}` && endTag.closest('.screen')?.classList.contains('is-rendered')) {
+    const tag = worldRect(endTag);
+    measuredEnd = { x: tag.x + 4, y: tag.y + tag.h * 0.5 };
+    measuredEndSize = `${W}x${H}`;
+    thread.layout(W, H, seamInset(), measuredEnd, true);
+    thread.setProgress(current, progress);
+    thread.fastForward();
+  }
   const moving = stepCamera(now);
   const growing = reducedQuery.matches ? (thread.fastForward(), false) : thread.tick(pace(now));
 
@@ -993,6 +1016,31 @@ addEventListener('resize', () => {
 
 /* ---------- boot ---------- */
 
+function whenCssReady() {
+  const link = document.querySelector('link[data-async-css]');
+  if (!link || link.sheet) { root.classList.add('is-css-ready'); return Promise.resolve(); }
+  return new Promise((resolve) => {
+    let done = false;
+    const finish = () => {
+      if (done) return;
+      done = true;
+      root.classList.add('is-css-ready');
+      resolve();
+    };
+    const checkSheet = () => {
+      if (link.sheet) finish();
+      else if (!done && link.rel === 'stylesheet') requestAnimationFrame(checkSheet);
+    };
+    link.addEventListener('load', () => {
+      if (link.rel !== 'stylesheet') link.rel = 'stylesheet';
+      checkSheet();
+    });
+    link.addEventListener('error', finish, { once: true });
+    if (link.rel === 'stylesheet') checkSheet();
+    setTimeout(finish, 4000);
+  });
+}
+
 const start = Math.max(0, screens.findIndex((s) => '#' + s.id === location.hash));
 current = start;
 thread = new Thread(ORDER);
@@ -1008,6 +1056,10 @@ thread.onDone = (done) => {
   for (let ms = 0; ms < 1600; ms += 130) sewTimers.push(setTimeout(() => sound.stitch(), ms));
   sewTimers.push(setTimeout(() => sound.pop(), 1600));
 };
+grain = makeGrain();
+prefetchFabrics(start);
+const cssReady = whenCssReady();
+await Promise.all([loadLang(lang), start !== 0 ? cssReady : Promise.resolve()]);
 applyLang(lang);
 workbench = initWorkbench({ tr: (k) => t(lang, k), reduced: () => reducedQuery.matches });
 
@@ -1031,16 +1083,16 @@ if (navigator.mediaDevices?.getUserMedia) {
       .finally(() => tryBtn.classList.remove('is-loading'));
   });
 }
-grain = makeGrain();
-prefetchFabrics(start);
 Object.assign(cam, target(start));
 setInert();
 // Paint the landing screen right away with fallback fonts, then re-measure once the webfonts swap in.
 relayout(false);
 go(start, { instant: true, focus: false });
+if (raf) cancelAnimationFrame(raf);
+frame(performance.now());
 root.classList.add('is-ready');
 document.fonts?.ready.then(() => {
-  relayout(false);
+  if (document.querySelector('.s9.is-rendered')) relayout(false);
   marketNeedsLayout = true;
   layoutMarket();
 });

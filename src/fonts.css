@@ -1,0 +1,23 @@
+@font-face {
+  font-family: 'Gabarito Variable';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 400 900;
+  src: url('./assets/fonts/gabarito-latin.woff2') format('woff2-variations');
+}
+
+@font-face {
+  font-family: 'Caveat Variable';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 400 700;
+  src: url('./assets/fonts/caveat-latin.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Outfit Variable';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 100 900;
+  src: url('./assets/fonts/outfit-wordmark.woff2') format('woff2');
+}

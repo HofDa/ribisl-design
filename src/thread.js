@@ -249,7 +249,7 @@ export class Thread {
     if (k > 0.55) {
       const f = (k - 0.55) / 0.45;
       ctx.globalAlpha = Math.min(1, (1 - f) * 2.2);
-      ctx.font = "700 17px 'Caveat Variable', Caveat, cursive";
+      ctx.font = "600 17px 'Caveat Variable', Caveat, cursive";
       ctx.lineWidth = 3;
       ctx.strokeStyle = 'rgba(251, 249, 244, 0.9)';
       ctx.strokeText(this.phew, x + 12, y - 14 - f * 14); // a pale edge so it reads on any cloth

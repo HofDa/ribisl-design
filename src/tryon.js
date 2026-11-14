@@ -1,6 +1,7 @@
 // Try the bucket hat on: the front camera, a face found on the device, and the hat sat on your head.
 // Loaded only when someone taps "Try it on". Nothing leaves the phone: the face model and its runtime
 // are served with the site, and the picture is only saved or shared if you take one.
+import './tryon.css';
 import { FaceDetector, FilesetResolver } from '@mediapipe/tasks-vision';
 import { drawHat, madeSides, fabricSrc } from './workbench.js';
 import { bindImageExport, canShareImage, downloadImage } from './image-export.js';
