@@ -7,7 +7,6 @@
 import { sound } from './sound.js';
 import { bindImageExport } from './image-export.js';
 
-const FABRICS = ['denim', 'scraps', 'rope', 'knit'];
 // a side the visitor hasn't filled yet is sewn from Katrin's default
 const DEFAULT = { out: 'scraps', in: 'denim' };
 let made = { out: null, in: null };
@@ -28,12 +27,24 @@ export function initWorkbench({ tr, reduced }) {
   try { localStorage.removeItem('ribisl-made'); } catch {}
   const state = made;
   const imgs = {};
-  const ready = Promise.all(FABRICS.map((f) => new Promise((res) => {
-    const im = new Image();
-    im.onload = im.onerror = () => res();
-    im.src = fabricSrc(f);
-    imgs[f] = im;
-  })));
+  const pendingImgs = {};
+  const loadFabric = (f) => {
+    if (f.startsWith('own-')) return Promise.resolve(imgs[f]);
+    if (!pendingImgs[f]) {
+      const im = new Image();
+      im.decoding = 'async';
+      imgs[f] = im;
+      pendingImgs[f] = new Promise((res) => {
+        im.onload = im.onerror = () => res(im);
+        im.src = fabricSrc(f);
+      });
+    }
+    return pendingImgs[f];
+  };
+  const ready = () => {
+    const { out, in: inside } = madeSides();
+    return Promise.all([loadFabric(out), loadFabric(inside)]);
+  };
 
   function save() {} // in memory only, on purpose
 
@@ -163,7 +174,7 @@ export function initWorkbench({ tr, reduced }) {
     board.classList.toggle('is-sewn', full);
     hint.dataset.i18n = full ? 's3.boardDone' : 's3.boardHint';
     hint.textContent = tr(hint.dataset.i18n);
-    refreshHat();
+    if (state.out || state.in || hatWanted) refreshHat();
   }
 
   // a sample tapped without a side goes to the empty one; once both are sewn, it takes turns
@@ -268,6 +279,8 @@ export function initWorkbench({ tr, reduced }) {
     tr,
   });
   let exportVersion = 0;
+  let hatDrawn = false;
+  let hatWanted = false;
 
   const sideImgs = () => {
     const { out, in: inside } = madeSides();
@@ -276,9 +289,11 @@ export function initWorkbench({ tr, reduced }) {
 
   function refreshHat() {
     const version = ++exportVersion;
+    hatDrawn = true;
     setExportFile(null);
     const mine = !!(state.out && state.in);
-    ready.then(() => {
+    ready().then(() => {
+      if (version !== exportVersion) return;
       drawReversible(hatCanvas, ...sideImgs(), hatTurn.dataset.front);
       hatFrame.classList.add('has-hat');
       hatFrame.classList.toggle('is-yours', mine);
@@ -295,6 +310,12 @@ export function initWorkbench({ tr, reduced }) {
     });
   }
 
+  function ensureHat() {
+    if (hatWanted) return;
+    hatWanted = true;
+    if (!hatDrawn) refreshHat();
+  }
+
   // tap the hat on screen 5 and it turns inside out
   hatTurn.addEventListener('click', async () => {
     const front = other(hatTurn.dataset.front);
@@ -302,6 +323,7 @@ export function initWorkbench({ tr, reduced }) {
     hatTurn.setAttribute('aria-pressed', String(front === 'in'));
     sound.pop();
     if (!reduced()) await hatCanvas.animate([{ transform: 'none' }, { transform: 'scaleX(0) rotate(-6deg)' }], { duration: 170, easing: 'ease-in' }).finished;
+    await ready();
     drawReversible(hatCanvas, ...sideImgs(), front);
     if (!reduced()) hatCanvas.animate([{ transform: 'scaleX(0) rotate(6deg)' }, { transform: 'none' }], { duration: 320, easing: 'cubic-bezier(0.34, 1.56, 0.64, 1)' });
   });
@@ -310,7 +332,7 @@ export function initWorkbench({ tr, reduced }) {
   renderBoard();
 
   // re-translate the board hint after a language change
-  return { relabel: () => { hint.textContent = tr(hint.dataset.i18n); } };
+  return { relabel: () => { hint.textContent = tr(hint.dataset.i18n); }, ensureHat };
 }
 
 

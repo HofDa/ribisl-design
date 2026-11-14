@@ -69,6 +69,7 @@ function head(lang, fonts = []) {
     `<link rel="alternate" hreflang="x-default" href="${url('de')}" />`,
     // the fonts the first screen needs (text and the wordmark), fetched alongside the CSS instead of after it
     ...fonts.map((f) => `<link rel="preload" href="${f}" as="font" type="font/woff2" crossorigin />`),
+    `<link rel="preload" href="${BASE}fabric/yellow.webp" as="image" type="image/webp" />`,
     '<meta property="og:type" content="website" />',
     '<meta property="og:site_name" content="ribisl design" />',
     `<meta property="og:title" content="${title}" />`,
@@ -79,7 +80,7 @@ function head(lang, fonts = []) {
     '<meta name="twitter:card" content="summary" />',
     `<script type="application/ld+json">${jsonLd(lang)}</script>`,
     // without JavaScript the nine screens simply stack, readable top to bottom
-    '<noscript><style>html,body{height:auto;overflow:auto}body{background:#F3EDE2;touch-action:auto}#cloth,.hud{display:none}#plate{position:static;width:auto;height:auto;transform:none}.screen{position:relative;left:auto;top:auto;width:auto;height:auto;min-height:100vh;opacity:1;overflow:visible;content-visibility:visible}.tag--big .smile-red{opacity:1}</style></noscript>',
+    '<noscript><style>html,body{height:auto;overflow:auto}body{background:#F3EDE2;touch-action:auto}#cloth-background,#cloth,.hud{display:none}#plate{position:static;width:auto;height:auto;transform:none}.screen{position:relative;left:auto;top:auto;width:auto;height:auto;min-height:100vh;opacity:1;overflow:visible;content-visibility:visible}.tag--big .smile-red{opacity:1}</style></noscript>',
     '<!--/seo-->',
   ].filter(Boolean).join('\n  ');
 }

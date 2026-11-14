@@ -32,6 +32,11 @@ const root = document.documentElement;
 const plate = document.getElementById('plate');
 const canvas = document.getElementById('cloth');
 const ctx = canvas.getContext('2d');
+// Keep the fabric on its own retained layer: sewing only clears the transparent thread canvas.
+const background = document.getElementById('cloth-background');
+const backgroundCtx = background.getContext('2d', { alpha: false });
+let backgroundKey = null;
+let backgroundView = null;
 const screens = [...document.querySelectorAll('.screen')];
 const nextBtn = document.getElementById('next');
 const plateBtn = document.getElementById('plate-btn');
@@ -52,6 +57,7 @@ const cam = { cx: 0.5, cy: 0.5, s: 1, r: 0 }; // r: a little swing, in radians
 let anim = null;
 let grain;
 const fabrics = [];
+let workbench = null;
 
 /* ---------- copy ---------- */
 
@@ -69,6 +75,7 @@ function applyLang(l) {
   for (const link of document.querySelectorAll('[data-legal]')) link.href = import.meta.env.BASE_URL + LEGAL_PATHS[l][link.dataset.legal];
   for (const b of document.querySelectorAll('[data-lang]')) b.setAttribute('aria-pressed', String(b.dataset.lang === l));
   if (thread) thread.phew = t(l, 'thread.phew');
+  workbench?.relabel();
   marketNeedsLayout = true;
   layoutMarket();
   buildMap();
@@ -269,6 +276,9 @@ function applyCamera() {
       && (r + 1) * H > top + 0.5 && r * H < bottom - 0.5;
     screen.classList.toggle('is-rendered', visible);
   });
+  if (screens[3].classList.contains('is-rendered') || screens[4].classList.contains('is-rendered')) {
+    workbench?.ensureHat();
+  }
   layoutMarket();
 }
 
@@ -329,6 +339,11 @@ function go(i, { instant = false, focus = true, prog } = {}) {
   root.classList.remove('is-overview');
   const back = i < current;
   current = i;
+  loadFabric(i, 'high');
+  if (!instant) {
+    loadFabric(i - 1);
+    loadFabric(i + 1);
+  }
   screens.forEach((s, k) => s.classList.toggle('is-here', k === i));
   if (i === 1) snipAlong();
   // arriving forward the needle has just entered; stepping back it waits near that screen's exit
@@ -455,7 +470,10 @@ function toggleOverview(on = !overview) {
   root.classList.toggle('is-overview', on);
   setInert();
   updateHud();
-  if (on) { fly(overviewCam()); focusOn(current, 0); renext(0); }
+  if (on) {
+    PATCHES.forEach((_, i) => loadFabric(i));
+    fly(overviewCam()); focusOn(current, 0); renext(0);
+  }
   else go(current);
 }
 
@@ -730,32 +748,47 @@ function makeGrain() {
   });
 }
 
-// The screen you land on gets its fabric first, then its neighbours along the spiral; the rest come
-// once the page is idle. Until a scan arrives, its patch is painted in the fabric's average colour.
-let siteShown;
-const shown = new Promise((r) => { siteShown = r; });
-function loadFabrics(first) {
-  const loaded = new Set();
-  const load = (i) => new Promise((resolve) => {
-    if (i < 0 || i >= PATCHES.length || loaded.has(i)) return resolve();
-    loaded.add(i);
-    const p = PATCHES[i];
+// The screen you land on gets its fabric first; once the page has loaded, its neighbours and the rest
+// trickle in during idle time so they never compete with the first view.
+const loadedFabrics = new Set();
+function loadFabric(i, priority = 'low') {
+  if (i < 0 || i >= PATCHES.length || loadedFabrics.has(i)) return Promise.resolve();
+  loadedFabrics.add(i);
+  const p = PATCHES[i];
+  return new Promise((resolve) => {
     const img = new Image();
     img.decoding = 'async';
+    img.fetchPriority = priority;
     img.onload = () => {
       const pat = ctx.createPattern(img, 'repeat');
       pat.setTransform(new DOMMatrix().scale(p.scale));
       fabrics[i] = pat;
-      kick();
+      const [c, r] = ORDER[i];
+      if (!backgroundView || (c * W < backgroundView.x + backgroundView.w
+        && (c + 1) * W > backgroundView.x && r * H < backgroundView.y + backgroundView.h
+        && (r + 1) * H > backgroundView.y)) {
+        backgroundKey = null;
+        kick();
+      }
       resolve();
     };
     img.onerror = resolve;
     img.src = `${import.meta.env.BASE_URL}fabric/${p.fabric}.webp`;
   });
+}
+
+function prefetchFabrics(first) {
+  loadFabric(first, 'high');
   const idle = window.requestIdleCallback || ((f) => setTimeout(f, 300));
-  load(first)
-    .then(() => Promise.all([load(first - 1), load(first + 1), shown]))
-    .then(() => idle(() => PATCHES.forEach((_, i) => load(i))));
+  const afterLoad = (fn) => (document.readyState === 'complete' ? fn() : addEventListener('load', fn, { once: true }));
+  afterLoad(() => idle(async () => {
+    await Promise.all([loadFabric(first - 1), loadFabric(first + 1)]);
+    document.fonts?.load("600 1em 'Caveat Variable'").catch(() => {});
+    for (let i = 0; i < PATCHES.length; i++) {
+      await new Promise((r) => idle(r));
+      await loadFabric(i);
+    }
+  }));
 }
 
 // the thread's inset from the screen edge: inside the padding, clear of the copy
@@ -771,6 +804,9 @@ function relayout(instant = true) {
   const dpr = Math.min(devicePixelRatio || 1, 2);
   canvas.width = Math.round(W * dpr);
   canvas.height = Math.round(H * dpr);
+  background.width = canvas.width;
+  background.height = canvas.height;
+  backgroundKey = null;
   if (!anim) Object.assign(cam, overview ? overviewCam() : target(current));
   applyCamera();
   const tag = worldRect(endTag);
@@ -791,10 +827,8 @@ function frame(now) {
 
   const dpr = canvas.width / W;
   ctx.setTransform(1, 0, 0, 1, 0, 0);
-  ctx.fillStyle = MAT;
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
   const ox = W / 2 - cam.s * cam.cx * W, oy = H / 2 - cam.s * cam.cy * H;
-  ctx.setTransform(1, 0, 0, 1, 0, 0);
   if (cam.r) {
     ctx.translate((dpr * W) / 2, (dpr * H) / 2);
     ctx.rotate(cam.r);
@@ -805,8 +839,17 @@ function frame(now) {
   const m = cam.r ? Math.max(W, H) * 0.12 / cam.s : 0;
   const view = { x: -ox / cam.s - m, y: -oy / cam.s - m, w: W / cam.s + 2 * m, h: H / cam.s + 2 * m };
 
-  drawMat(view);
-  drawCloth(view);
+  const key = [W, H, cam.cx, cam.cy, cam.s, cam.r].join(',');
+  if (key !== backgroundKey) {
+    backgroundCtx.setTransform(1, 0, 0, 1, 0, 0);
+    backgroundCtx.fillStyle = MAT;
+    backgroundCtx.fillRect(0, 0, background.width, background.height);
+    backgroundCtx.setTransform(ctx.getTransform());
+    drawMat(view, backgroundCtx);
+    drawCloth(view, backgroundCtx);
+    backgroundKey = key;
+    backgroundView = view;
+  }
   const fraying = drawFray(view);
   thread.render(ctx, view, now, growing);
 
@@ -869,7 +912,7 @@ function drawFray(view) {
   return moving;
 }
 
-function drawMat(view) {
+function drawMat(view, ctx) {
   // the grid of a cutting mat, outside the cloth
   const g = 40;
   ctx.lineWidth = 1 / cam.s;
@@ -889,7 +932,7 @@ function drawMat(view) {
   }
 }
 
-function drawCloth(view) {
+function drawCloth(view, ctx) {
   ORDER.forEach(([c, r], i) => {
     const x = c * W, y = r * H;
     if (x > view.x + view.w || x + W < view.x || y > view.y + view.h || y + H < view.y) return;
@@ -966,7 +1009,7 @@ thread.onDone = (done) => {
   sewTimers.push(setTimeout(() => sound.pop(), 1600));
 };
 applyLang(lang);
-initWorkbench({ tr: (k) => t(lang, k), reduced: () => reducedQuery.matches });
+workbench = initWorkbench({ tr: (k) => t(lang, k), reduced: () => reducedQuery.matches });
 
 // try the hat on with the front camera; the face tracking only loads when someone asks for it
 const tryBtn = document.getElementById('tryon-btn');
@@ -989,16 +1032,15 @@ if (navigator.mediaDevices?.getUserMedia) {
   });
 }
 grain = makeGrain();
-loadFabrics(start);
+prefetchFabrics(start);
 Object.assign(cam, target(start));
 setInert();
-// show the site once its fonts are in, but never wait longer than a moment on a slow line:
-// a late font simply swaps in, and the layout is measured again when it does
-const fontsOrTimeout = Promise.race([document.fonts.ready, new Promise((r) => setTimeout(r, 1500))]);
-fontsOrTimeout.then(() => {
+// Paint the landing screen right away with fallback fonts, then re-measure once the webfonts swap in.
+relayout(false);
+go(start, { instant: true, focus: false });
+root.classList.add('is-ready');
+document.fonts?.ready.then(() => {
   relayout(false);
-  go(start, { instant: true, focus: false });
-  root.classList.add('is-ready');
-  siteShown();
+  marketNeedsLayout = true;
+  layoutMarket();
 });
-document.fonts.ready.then(() => { if (root.classList.contains('is-ready')) relayout(false); });

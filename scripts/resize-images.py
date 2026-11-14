@@ -11,9 +11,9 @@ for folder in ('pieces', 'katrin', 'swatch'):
         if source.name in ('fabric-ink.webp', 'fabric-swirl.webp'):
             continue
         with Image.open(source) as image:
-            for width in ((80,) if folder == 'swatch' else (160, 320)):
+            for width in ((80, 160) if folder == 'swatch' else (160, 320)):
                 if width >= image.width:
                     continue
                 height = round(image.height * width / image.width)
-                image.resize((width, height), Image.Resampling.LANCZOS).save(
+                image.resize((width, height), getattr(Image, 'Resampling', Image).LANCZOS).save(
                     source.with_stem(f'{source.stem}-{width}w'), quality=82, method=6)

@@ -20,6 +20,7 @@
     <symbol id="i-plate" viewBox="0 0 24 24"><path d="M3.5 3.5h17v17h-17zM9.2 3.5v17M14.8 3.5v17M3.5 9.2h17M3.5 14.8h17" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></symbol>
   </svg>
 
+  <canvas id="cloth-background" aria-hidden="true"></canvas>
   <canvas id="cloth" aria-hidden="true"></canvas>
 
   <main id="plate">
@@ -33,7 +34,7 @@
           <div class="bench bench--jeans" data-hands>
             <svg class="jeans" viewBox="0 0 220 232" aria-hidden="true">
               <defs>
-                <pattern id="denim-fill" patternUnits="userSpaceOnUse" width="150" height="150"><image href="/swatch/denim.webp" width="150" height="150"/></pattern>
+                <pattern id="denim-fill" patternUnits="userSpaceOnUse" width="150" height="150"><image href="/swatch/denim-160w.webp" width="150" height="150"/></pattern>
                 <mask id="jeans-hole" maskUnits="userSpaceOnUse" x="-20" y="-20" width="260" height="272"><rect x="-20" y="-20" width="260" height="272" fill="#fff"/><path class="hole" d="M58 64H162V168H58Z" fill="#000"/></mask>
               </defs>
               <g class="under">
@@ -179,10 +180,10 @@
         <p class="board-hint" aria-live="polite" data-i18n="s3.boardHint">Tipp eine Seite an</p>
       </div>
       <ul class="rows">
-        <li><button type="button" class="swatch" data-fabric="denim" data-hands data-i18n-label="s3.a.h" aria-label=""><img fetchpriority="low" src="/swatch/denim.webp" srcset="/swatch/denim-80w.webp 80w, /swatch/denim.webp 360w" sizes="auto, (max-width: 600px) 45vw, 360px" alt="" width="360" height="360" loading="lazy" decoding="async" draggable="false"><span class="yours-tag" data-i18n="s3.cutByYou">von dir geschnitten</span></button><h3 data-i18n="s3.a.h"></h3><p data-i18n="s3.a.p"></p></li>
-        <li><button type="button" class="swatch" data-fabric="scraps" data-hands data-i18n-label="s3.b.h" aria-label=""><img fetchpriority="low" src="/swatch/scraps.webp" srcset="/swatch/scraps-80w.webp 80w, /swatch/scraps.webp 360w" sizes="auto, (max-width: 600px) 45vw, 360px" alt="" width="360" height="360" loading="lazy" decoding="async" draggable="false"><span class="yours-tag" data-i18n="s3.cutByYou">von dir geschnitten</span></button><h3 data-i18n="s3.b.h"></h3><p data-i18n="s3.b.p"></p></li>
-        <li><button type="button" class="swatch" data-fabric="rope" data-hands data-i18n-label="s3.c.h" aria-label=""><img fetchpriority="low" src="/swatch/rope.webp" srcset="/swatch/rope-80w.webp 80w, /swatch/rope.webp 360w" sizes="auto, (max-width: 600px) 45vw, 360px" alt="" width="360" height="360" loading="lazy" decoding="async" draggable="false"><span class="yours-tag" data-i18n="s3.cutByYou">von dir geschnitten</span></button><h3 data-i18n="s3.c.h"></h3><p data-i18n="s3.c.p"></p></li>
-        <li><button type="button" class="swatch" data-fabric="knit" data-hands data-i18n-label="s3.d.h" aria-label=""><img fetchpriority="low" src="/swatch/knit.webp" srcset="/swatch/knit-80w.webp 80w, /swatch/knit.webp 360w" sizes="auto, (max-width: 600px) 45vw, 360px" alt="" width="360" height="360" loading="lazy" decoding="async" draggable="false"><span class="yours-tag" data-i18n="s3.cutByYou">von dir geschnitten</span></button><h3 data-i18n="s3.d.h"></h3><p data-i18n="s3.d.p"></p></li>
+        <li><button type="button" class="swatch" data-fabric="denim" data-hands data-i18n-label="s3.a.h" aria-label=""><img fetchpriority="low" src="/swatch/denim.webp" srcset="/swatch/denim-80w.webp 80w, /swatch/denim-160w.webp 160w, /swatch/denim.webp 360w" sizes="auto, (max-width: 600px) 45vw, 360px" alt="" width="360" height="360" loading="lazy" decoding="async" draggable="false"><span class="yours-tag" data-i18n="s3.cutByYou">von dir geschnitten</span></button><h3 data-i18n="s3.a.h"></h3><p data-i18n="s3.a.p"></p></li>
+        <li><button type="button" class="swatch" data-fabric="scraps" data-hands data-i18n-label="s3.b.h" aria-label=""><img fetchpriority="low" src="/swatch/scraps.webp" srcset="/swatch/scraps-80w.webp 80w, /swatch/scraps-160w.webp 160w, /swatch/scraps.webp 360w" sizes="auto, (max-width: 600px) 45vw, 360px" alt="" width="360" height="360" loading="lazy" decoding="async" draggable="false"><span class="yours-tag" data-i18n="s3.cutByYou">von dir geschnitten</span></button><h3 data-i18n="s3.b.h"></h3><p data-i18n="s3.b.p"></p></li>
+        <li><button type="button" class="swatch" data-fabric="rope" data-hands data-i18n-label="s3.c.h" aria-label=""><img fetchpriority="low" src="/swatch/rope.webp" srcset="/swatch/rope-80w.webp 80w, /swatch/rope-160w.webp 160w, /swatch/rope.webp 360w" sizes="auto, (max-width: 600px) 45vw, 360px" alt="" width="360" height="360" loading="lazy" decoding="async" draggable="false"><span class="yours-tag" data-i18n="s3.cutByYou">von dir geschnitten</span></button><h3 data-i18n="s3.c.h"></h3><p data-i18n="s3.c.p"></p></li>
+        <li><button type="button" class="swatch" data-fabric="knit" data-hands data-i18n-label="s3.d.h" aria-label=""><img fetchpriority="low" src="/swatch/knit.webp" srcset="/swatch/knit-80w.webp 80w, /swatch/knit-160w.webp 160w, /swatch/knit.webp 360w" sizes="auto, (max-width: 600px) 45vw, 360px" alt="" width="360" height="360" loading="lazy" decoding="async" draggable="false"><span class="yours-tag" data-i18n="s3.cutByYou">von dir geschnitten</span></button><h3 data-i18n="s3.d.h"></h3><p data-i18n="s3.d.p"></p></li>
       </ul>
     </section>
 
