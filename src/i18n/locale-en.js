@@ -1,6 +1,7 @@
 export default {
   "meta.title": "ribisl design · upcycling & redesign from Bolzano · sewing art, markets, courses",
   "meta.desc": "ribisl design is Katrin’s upcycling sewing art from Bolzano, South Tyrol: vests, bags, hats and baskets made from what already exists. At local markets and in sewing courses.",
+  "meta.ogAlt": "ribisl design – Upcycling & Redesign from Bolzano: card with handmade reversible bucket hat",
   "t1": "Start",
   "t2": "Who is Ribisl?",
   "t3": "How a piece is made",
@@ -171,5 +172,16 @@ export default {
   "s8.f": "With a wry smile",
   "s9.h": "Let’s make something new of it.",
   "s9.p": "Questions about a piece, the markets or the courses? Write to Katrin on Instagram. She replies in German, Italian or English.",
-  "s9.write": "Write on Instagram"
+  "s9.write": "Write on Instagram",
+  "alt.swatch.denim": "Denim swatch upcycled from old jeans",
+  "alt.swatch.scraps": "Colourful fabric scraps for patchwork and hats",
+  "alt.swatch.rope": "Coiled rope and cord for stitched baskets",
+  "alt.swatch.knit": "Upcycled knitwear fabric from old sweaters",
+  "alt.vestFlowers": "Handmade floral upcycled vest",
+  "alt.vestMushrooms": "Handmade upcycled vest with appliquéd mushrooms",
+  "alt.bagBelt": "Handmade belt and crossbody bag from reclaimed fabrics",
+  "alt.pouches": "Small zip pouches sewn from fabric scraps",
+  "alt.backpack": "Handmade upcycled backpack",
+  "alt.hatSwirl": "Reversible bucket hat featuring the colourful swirl side",
+  "alt.hatInk": "Reversible bucket hat featuring the black-and-white side"
 };

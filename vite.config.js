@@ -19,6 +19,20 @@ function stripHtmlComments(html) {
   });
 }
 
+function minifyHtml(html) {
+  const held = [];
+  const hold = (m) => `\0H${held.push(m) - 1}\0`;
+  const structural = 'html|head|meta|link|title|script|style|noscript|body|canvas|main|section|header|footer|nav|aside|div|ul|ol|li|dl|dt|dd|figure|figcaption|p|h[1-6]|svg|br';
+  const openOrClose = new RegExp(`(<\\/?(?:${structural})\\b[^>]*>)\\s*\\n\\s*`, 'g');
+  const beforeTag = new RegExp(`\\s*\\n\\s*(<\\/?(?:${structural})\\b[^>]*>)`, 'g');
+  return html
+    .replace(/<(script|style)\b[^>]*>[\s\S]*?<\/\1>/gi, hold)
+    .replace(/<svg\b[^>]*>[\s\S]*?<\/svg>/g, (svg) => hold(svg.replace(/>\s+</g, '><').replace(/\s{2,}/g, ' ')))
+    .replace(openOrClose, '$1')
+    .replace(beforeTag, '$1')
+    .replace(/\0H(\d+)\0/g, (_, i) => held[Number(i)]);
+}
+
 function inlineCriticalAndDeferCss(html, lang, { gabaritoHref = '', outfitDataUri = '', localeHref = '' } = {}, outDir = 'dist') {
   const cssMatch = html.match(/<link rel="stylesheet" crossorigin href="([^"]*\/assets\/index-[^"]+\.css)">/);
   if (!cssMatch) return html;
@@ -51,7 +65,7 @@ function inlineCriticalAndDeferCss(html, lang, { gabaritoHref = '', outfitDataUr
   if (lang === 'de') {
     out = out.replace('</main>', `</main>\n  ${S1_PREPAINT_LANG}`);
   }
-  return stripHtmlComments(out);
+  return minifyHtml(stripHtmlComments(out));
 }
 
 // The page fills its copy in with JavaScript, which many crawlers and AI answer engines never run.
@@ -68,18 +82,64 @@ const ITEMS = ['a', 'b', 'c', 'd'];
 const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 const url = (lang) => `${SITE_URL}/${PATHS[lang]}`;
 
+const FAQ_BY_LANG = {
+  de: [
+    ['Wo kann man Stücke von ribisl design kaufen?', 'Es gibt keinen Onlineshop. Alle Upcycling-Einzelstücke entstehen in Handarbeit in Bozen und werden auf lokalen Märkten in Südtirol sowie auf Instagram (@ribisl_design) gezeigt und angefragt.'],
+    ['Welche Materialien und Stücke fertigt Katrin Unterhofer?', 'Aus altem Denim, Stoffresten, Seil & Kordel sowie Strick entstehen handgenähte Unikate: Westen, Bauchtaschen / Crossbags, Täschchen, Wendehüte, Körbe und Rucksäcke.'],
+    ['Kann man Nähkurse oder einen Marktstand für ein Event buchen?', 'Ja. Katrin bietet Upcycling-Nähkurse (Grundlagen, Auftrennen & neu denken, das erste eigene Stück) an und baut auf Anfrage Stände bei Märkten und Events auf – Anfragen über Instagram (@ribisl_design).'],
+    ['In welchen Sprachen ist der Kontakt möglich?', 'Katrin antwortet auf Instagram auf Deutsch, Italienisch und Englisch.'],
+  ],
+  it: [
+    ['Dove si possono acquistare i pezzi di ribisl design?', 'Non c’è uno shop online. Tutti i pezzi unici in upcycling nascono a mano a Bolzano e vengono presentati ai mercatini locali in Alto Adige e su Instagram (@ribisl_design), dove si può scrivere per informazioni.'],
+    ['Che materiali e creazioni realizza Katrin Unterhofer?', 'Da vecchi jeans (denim), ritagli di stoffa, corda e maglia nascono pezzi unici cuciti a mano: gilet, marsupi e borse, pochette, cappelli reversibili, cestini e zaini.'],
+    ['Si possono prenotare corsi di cucito o uno stand per un evento?', 'Sì. Katrin tiene corsi di cucito creativo e upcycling (basi dell’upcycling, scucire e ripensare, il primo pezzo tuo) ed è disponibile su richiesta per allestire uno stand a mercatini ed eventi tramite Instagram (@ribisl_design).'],
+    ['In quali lingue risponde ribisl design?', 'Katrin risponde su Instagram in tedesco, italiano e inglese.'],
+  ],
+  en: [
+    ['Where can I buy ribisl design pieces?', 'There is no online shop. Every one-of-a-kind upcycled piece is handmade in Bolzano, shown at local markets across South Tyrol, and featured on Instagram (@ribisl_design) for inquiries.'],
+    ['What materials and pieces does Katrin Unterhofer make?', 'From old denim, fabric scraps, coiled rope and reclaimed knitwear, Katrin sews one-off pieces including vests, belt and crossbody bags, pouches, reversible bucket hats, baskets and backpacks.'],
+    ['Can I book a sewing workshop or a market stall for an event?', 'Yes. Katrin runs sewing and upcycling workshops (basics, unpicking & rethinking, making your first piece) and sets up market stalls for events on request via Instagram (@ribisl_design).'],
+    ['Which languages can I write in?', 'Katrin replies on Instagram in German, Italian and English.'],
+  ],
+};
+
 function jsonLd(lang) {
   const brand = SITE_URL + '/#ribisl';
+  const katrin = SITE_URL + '/#katrin';
+  const ogImg = `${SITE_URL}/og-image.jpg`;
+  const courses = ['a', 'b', 'c'].map((k) => ({
+    '@type': 'Course',
+    name: t(lang, `s7.${k}.h`),
+    description: t(lang, `s7.${k}.p`),
+    provider: { '@id': brand },
+    inLanguage: ['de', 'it', 'en'],
+  }));
+  const pieceCategories = [
+    t(lang, 's5.vests'),
+    t(lang, 's5.bags'),
+    t(lang, 's5.hats'),
+    t(lang, 's5.packs'),
+    t(lang, 's3.c.h'),
+  ];
   const data = {
     '@context': 'https://schema.org',
     '@graph': [
       {
         '@type': 'Person',
-        '@id': SITE_URL + '/#katrin',
-        name: 'Katrin',
-        jobTitle: { de: 'Künstlerin', it: 'Artista', en: 'Artist' }[lang],
+        '@id': katrin,
+        name: 'Katrin Unterhofer',
+        givenName: 'Katrin',
+        familyName: 'Unterhofer',
+        jobTitle: { de: 'Upcycling-Künstlerin & Schneiderin', it: 'Artista tessile & upcycling', en: 'Upcycling Artist & Maker' }[lang],
         worksFor: { '@id': brand },
+        homeLocation: { '@type': 'Place', name: 'Bozen / Bolzano, Südtirol / Alto Adige, Italia' },
+        knowsLanguage: ['de', 'it', 'en'],
         sameAs: [INSTAGRAM],
+        performerIn: [
+          { '@type': 'Event', name: t(lang, 's7.ref1sr'), location: { '@type': 'Place', name: t(lang, 's7.ref1p') } },
+          { '@type': 'Event', name: t(lang, 's7.ref2sr'), location: { '@type': 'Place', name: t(lang, 's7.ref2p') } },
+          { '@type': 'Event', name: t(lang, 's7.ref3sr'), location: { '@type': 'Place', name: t(lang, 's7.ref3p') } },
+        ],
       },
       {
         '@type': 'LocalBusiness',
@@ -87,12 +147,23 @@ function jsonLd(lang) {
         name: 'ribisl design',
         url: SITE_URL + '/',
         logo: SITE_URL + '/favicon.svg',
+        image: ogImg,
         description: t(lang, 'meta.desc'),
         slogan: t(lang, 's1.tagline'),
-        founder: { '@id': SITE_URL + '/#katrin' },
+        founder: { '@id': katrin },
         address: { '@type': 'PostalAddress', addressLocality: 'Bozen / Bolzano', addressRegion: 'Südtirol / Alto Adige', addressCountry: 'IT' },
-        areaServed: 'Südtirol / Alto Adige',
+        geo: { '@type': 'GeoCoordinates', latitude: 46.4983, longitude: 11.3548 },
+        areaServed: ['Bozen', 'Bolzano', 'Brixen', 'Bressanone', 'Südtirol', 'Alto Adige'],
         knowsLanguage: ['de', 'it', 'en'],
+        knowsAbout: [t(lang, 's3.a.h'), t(lang, 's3.b.h'), t(lang, 's3.c.h'), t(lang, 's3.d.h'), ...pieceCategories, 'Upcycling'],
+        hasOfferCatalog: {
+          '@type': 'OfferCatalog',
+          name: { de: 'Einzelstücke & Nähkurse', it: 'Pezzi unici & corsi di cucito', en: 'One-of-a-kind pieces & sewing courses' }[lang],
+          itemListElement: [
+            ...pieceCategories.map((name) => ({ '@type': 'Offer', itemOffered: { '@type': 'Product', name } })),
+            ...courses.map((course) => ({ '@type': 'Offer', itemOffered: course })),
+          ],
+        },
         sameAs: [INSTAGRAM],
       },
       {
@@ -103,6 +174,16 @@ function jsonLd(lang) {
         inLanguage: lang,
         publisher: { '@id': brand },
       },
+      {
+        '@type': 'FAQPage',
+        '@id': url(lang) + '#faq',
+        inLanguage: lang,
+        mainEntity: FAQ_BY_LANG[lang].map(([name, text]) => ({
+          '@type': 'Question',
+          name,
+          acceptedAnswer: { '@type': 'Answer', text },
+        })),
+      },
     ],
   };
   return JSON.stringify(data).replace(/</g, '\\u003c');
@@ -111,6 +192,8 @@ function jsonLd(lang) {
 function head(lang, fonts = []) {
   const title = esc(t(lang, 'meta.title'));
   const desc = esc(t(lang, 'meta.desc'));
+  const ogImg = `${SITE_URL}/og-image.jpg`;
+  const ogAlt = esc(t(lang, 'meta.ogAlt'));
   return [
     '<!--seo-->',
     `<link rel="canonical" href="${url(lang)}" />`,
@@ -125,9 +208,17 @@ function head(lang, fonts = []) {
     `<meta property="og:title" content="${title}" />`,
     `<meta property="og:description" content="${desc}" />`,
     `<meta property="og:url" content="${url(lang)}" />`,
+    `<meta property="og:image" content="${ogImg}" />`,
+    '<meta property="og:image:width" content="1200" />',
+    '<meta property="og:image:height" content="630" />',
+    `<meta property="og:image:alt" content="${ogAlt}" />`,
     `<meta property="og:locale" content="${LOCALES[lang]}" />`,
     ...Object.keys(LOCALES).filter((l) => l !== lang).map((l) => `<meta property="og:locale:alternate" content="${LOCALES[l]}" />`),
-    '<meta name="twitter:card" content="summary" />',
+    '<meta name="twitter:card" content="summary_large_image" />',
+    `<meta name="twitter:title" content="${title}" />`,
+    `<meta name="twitter:description" content="${desc}" />`,
+    `<meta name="twitter:image" content="${ogImg}" />`,
+    `<meta name="twitter:image:alt" content="${ogAlt}" />`,
     `<script type="application/ld+json">${jsonLd(lang)}</script>`,
     // without JavaScript the nine screens simply stack, readable top to bottom
     '<noscript><style>html,body{height:auto;overflow:auto}body{background:#F3EDE2;touch-action:auto}#cloth-background,#cloth,.hud{display:none}#plate{position:static;width:auto;height:auto;transform:none}.screen{position:relative;left:auto;top:auto;width:auto;height:auto;min-height:100vh;opacity:1;overflow:visible;content-visibility:visible}.tag--big .smile-red{opacity:1}</style></noscript>',
@@ -145,11 +236,12 @@ function localize(html, lang, fonts) {
     .replace('</head>', `  ${head(lang, fonts)}\n</head>`)
     .replace(/<(\w+)(\s[^>]*?\bdata-i18n="([^"]+)"[^>]*)>[^<]*<\/\1>/g, (_, tag, attrs, key) => `<${tag}${attrs}>${esc(t(lang, key))}</${tag}>`)
     .replace(/<[^>]*\bdata-i18n-label="([^"]+)"[^>]*>/g, (tag, key) => tag.replace(/aria-label="[^"]*"/, `aria-label="${esc(t(lang, key))}"`))
+    .replace(/<img\b[^>]*\bdata-i18n-alt="([^"]+)"[^>]*>/g, (tag, key) => tag.replace(/(\s)alt="[^"]*"/, `$1alt="${esc(t(lang, key))}"`))
     .replace(/<a\b[^>]*\bdata-legal="(imprint|privacy)"[^>]*>/g, (tag, kind) => tag.replace(/href="[^"]*"/, `href="${BASE}${LEGAL_PATHS[lang][kind]}"`))
     .replace(/(<button[^>]*data-lang="(\w+)"[^>]*?)(?: aria-pressed="\w+")?>/g, (_, open, l) => `${open} aria-pressed="${l === lang}">`)
     .replace(/<span id="year">[^<]*<\/span>/, `<span id="year">${new Date().getFullYear()}</span>`)
     // files from public/ are addressed from the root; on a sub-path (GitHub Pages) they need the base in front
-    .replace(/([\s"'(])\/(fabric|swatch|pieces|katrin|mediapipe|favicon\.svg)/g, `$1${BASE}$2`);
+    .replace(/([\s"'(])\/(fabric|swatch|pieces|katrin|mediapipe|favicon\.svg|og-image\.jpg)/g, `$1${BASE}$2`);
 }
 
 function robots() {
@@ -167,7 +259,10 @@ function robots() {
 
 function sitemap() {
   const today = new Date().toISOString().slice(0, 10);
-  const alts = Object.keys(PATHS).map((l) => `    <xhtml:link rel="alternate" hreflang="${l}" href="${url(l)}" />`).join('\n');
+  const alts = [
+    ...Object.keys(PATHS).map((l) => `    <xhtml:link rel="alternate" hreflang="${l}" href="${url(l)}" />`),
+    `    <xhtml:link rel="alternate" hreflang="x-default" href="${url('de')}" />`,
+  ].join('\n');
   const urls = Object.keys(PATHS).map((l) => `  <url>\n    <loc>${url(l)}</loc>\n    <lastmod>${today}</lastmod>\n${alts}\n  </url>`);
   return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">\n${urls.join('\n')}\n</urlset>\n`;
 }
@@ -175,34 +270,51 @@ function sitemap() {
 // A plain summary for AI assistants (llmstxt.org), built from the same copy as the page.
 function llms() {
   const en = (k) => t('en', k);
+  const processSteps = ['a', 'b', 'e', 'c', 'd'];
   return [
     '# ribisl design',
     '',
     `> ${en('meta.desc')}`,
     '',
-    en('s2.p1'),
+    `Created by **Katrin Unterhofer** in Bozen / Bolzano, South Tyrol (Südtirol / Alto Adige), Italy. ${en('s2.p1')}`,
+    '',
+    '## Handmade One-of-a-Kind Pieces',
+    '- **Vests**: Upcycled denim and patterned vests, e.g. floral or appliquéd mushroom designs',
+    '- **Bags & pouches**: Handmade belt/crossbody bags and small zip pouches from fabric scraps',
+    '- **Reversible bucket hats**: Two-sided sun/rain hats sewn from contrasting textiles (also testable with on-device AR camera try-on and a custom fabric designer on the site)',
+    '- **Rope baskets & backpacks**: Coiled-rope stitched baskets and one-off backpacks',
+    '- **Availability**: No online shop; every piece exists once and is shown at local markets in and around Bolzano or inquired via Instagram.',
     '',
     '## Materials',
     ...ITEMS.map((k) => `- **${en(`s3.${k}.h`)}**: ${en(`s3.${k}.p`)}`),
     '',
     '## How a piece is made',
-    ...ITEMS.map((k) => `- **${en(`s4.${k}.h`)}**: ${en(`s4.${k}.p`)}`),
+    ...processSteps.map((k) => `- **${en(`s4.${k}.h`)}**: ${en(`s4.${k}.p`)}`),
     '',
-    '## Markets',
+    '## Markets & Past Events',
     en('s6.p'),
+    `- ${en('s7.ref1sr')}`,
+    `- ${en('s7.ref2sr')}`,
+    `- ${en('s7.ref3sr')}`,
+    `- ${en('s7.ref4sr')}`,
+    `- Event & market stall bookings: ${en('s7.ask')}`,
     '',
-    '## Courses',
+    '## Sewing & Upcycling Courses',
     en('s7.sub'),
     ...ITEMS.map((k) => `- **${en(`s7.${k}.h`)}**: ${en(`s7.${k}.p`)}`),
     '',
-    '## Contact',
-    `- Instagram: ${INSTAGRAM}`,
-    '- Based in Bolzano / Bozen, South Tyrol, Italy',
+    '## Frequently Asked Facts',
+    ...FAQ_BY_LANG.en.map(([q, a]) => `- **${q}** ${a}`),
     '',
-    '## Pages',
-    `- [Deutsch](${url('de')}): ${strings.de['meta.title']}`,
-    `- [Italiano](${url('it')}): ${strings.it['meta.title']}`,
-    `- [English](${url('en')}): ${strings.en['meta.title']}`,
+    '## Contact & Region',
+    `- Instagram: ${INSTAGRAM}`,
+    '- Base: Bozen / Bolzano, Südtirol / Alto Adige, Italy (serves Bozen, Brixen / Bressanone, and local South Tyrol markets/events)',
+    '- Languages spoken: German (Deutsch), Italian (Italiano), English',
+    '',
+    '## Pages & Legal',
+    `- [Deutsch (Start)](${url('de')}): ${strings.de['meta.title']} · [Impressum](${SITE_URL}/${LEGAL_PATHS.de.imprint}) · [Datenschutz](${SITE_URL}/${LEGAL_PATHS.de.privacy})`,
+    `- [Italiano](${url('it')}): ${strings.it['meta.title']} · [Note legali](${SITE_URL}/${LEGAL_PATHS.it.imprint}) · [Privacy](${SITE_URL}/${LEGAL_PATHS.it.privacy})`,
+    `- [English](${url('en')}): ${strings.en['meta.title']} · [Legal notice](${SITE_URL}/${LEGAL_PATHS.en.imprint}) · [Privacy](${SITE_URL}/${LEGAL_PATHS.en.privacy})`,
     '',
   ].join('\n');
 }

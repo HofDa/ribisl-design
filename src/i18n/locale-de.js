@@ -1,6 +1,7 @@
 export default {
   "meta.title": "ribisl design · Upcycling & Redesign aus Bozen · Nähkunst, Märkte, Kurse",
   "meta.desc": "ribisl design ist Katrins Upcycling-Nähkunst aus Bozen, Südtirol: Westen, Taschen, Hüte und Körbe aus dem, was schon da ist. Auf lokalen Märkten und in Nähkursen.",
+  "meta.ogAlt": "ribisl design – Upcycling & Redesign aus Bozen: Karte mit genähtem Wendehut",
   "t1": "Start",
   "t2": "Wer ist Ribisl?",
   "t3": "So entsteht ein Stück",
@@ -171,5 +172,16 @@ export default {
   "s8.f": "Mit Schmunzel(steinchen)",
   "s9.h": "Machen wir was Neues draus.",
   "s9.p": "Fragen zu einem Stück, zu Märkten oder Kursen? Schreib Katrin auf Instagram. Sie antwortet auf Deutsch, Italienisch oder Denglisch.",
-  "s9.write": "Auf Instagram schreiben"
+  "s9.write": "Auf Instagram schreiben",
+  "alt.swatch.denim": "Stoffprobe Denim aus alten Jeans",
+  "alt.swatch.scraps": "Bunte Stoffreste für Patchwork und Hüte",
+  "alt.swatch.rope": "Gedrehtes Seil und Kordel für Körbe",
+  "alt.swatch.knit": "Gestrickter Stoff aus alten Pullovern",
+  "alt.vestFlowers": "Genähte Upcycling-Weste mit Blumenmuster",
+  "alt.vestMushrooms": "Genähte Upcycling-Weste mit aufgenähten Pilzen",
+  "alt.bagBelt": "Handgenähte Bauchtasche / Crossbag aus geretteten Stoffen",
+  "alt.pouches": "Kleine Upcycling-Täschchen aus Stoffresten",
+  "alt.backpack": "Handgefertigter Rucksack aus Upcycling-Stoffen",
+  "alt.hatSwirl": "Wendehut mit farbigem Wirbelmuster (Außenseite)",
+  "alt.hatInk": "Wendehut mit schwarz-weißem Muster (Innenseite)"
 };

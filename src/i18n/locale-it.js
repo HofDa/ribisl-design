@@ -1,6 +1,7 @@
 export default {
   "meta.title": "ribisl design · Upcycling & Redesign da Bolzano · cucito artistico, mercatini, corsi",
   "meta.desc": "ribisl design è l’arte del cucito in upcycling di Katrin, da Bolzano, Alto Adige: gilet, borse, cappelli e cestini da ciò che esiste già. Ai mercatini locali e nei corsi di cucito.",
+  "meta.ogAlt": "ribisl design – Upcycling & Redesign da Bolzano: cartolina con cappello reversibile cucito a mano",
   "t1": "Inizio",
   "t2": "Chi è Ribisl?",
   "t3": "Come nasce un pezzo",
@@ -171,5 +172,16 @@ export default {
   "s8.f": "Sotto i baffi",
   "s9.h": "Facciamone qualcosa di nuovo.",
   "s9.p": "Domande su un pezzo, sui mercatini o sui corsi? Scrivi a Katrin su Instagram. Risponde in tedesco, italiano o inglese.",
-  "s9.write": "Scrivi su Instagram"
+  "s9.write": "Scrivi su Instagram",
+  "alt.swatch.denim": "Campione di denim recuperato da vecchi jeans",
+  "alt.swatch.scraps": "Ritagli di stoffa colorati per patchwork e cappelli",
+  "alt.swatch.rope": "Corda avvolta per cestini cuciti a mano",
+  "alt.swatch.knit": "Maglia recuperata da vecchi maglioni",
+  "alt.vestFlowers": "Gilet upcycling cucito a mano con stampa floreale",
+  "alt.vestMushrooms": "Gilet upcycling cucito a mano con funghi applicati",
+  "alt.bagBelt": "Marsupio / tracolla fatta a mano con stoffe recuperate",
+  "alt.pouches": "Piccole pochette cucite con ritagli di stoffa",
+  "alt.backpack": "Zaino artigianale in stile upcycling",
+  "alt.hatSwirl": "Cappello reversibile lato a spirale colorata",
+  "alt.hatInk": "Cappello reversibile lato bianco e nero"
 };

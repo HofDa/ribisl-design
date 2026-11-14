@@ -20,7 +20,7 @@ def make_subset(src_glob, out_name, text, wght=None):
     font = TTFont(src)
     if wght is not None and 'fvar' in font:
         font = instancer.instantiateVariableFont(font, {'wght': wght})
-    sub = subset.Subsetter(subset.Options(flavor='woff2', layout_features=['kern', 'liga', 'calt']))
+    sub = subset.Subsetter(subset.Options(flavor='woff2', layout_features=['kern', 'liga']))
     sub.populate(text=text)
     sub.subset(font)
     font.flavor = 'woff2'

@@ -15,14 +15,14 @@ const DIRS = { down: [0, 1], up: [0, -1], left: [-1, 0], right: [1, 0] };
 // 768 px and drawn larger (scale), so every weave shows at the same size as at 1024 px.
 const PATCHES = [
   { fabric: 'yellow', base: '#F7AB28', scale: 0.8 },
-  { fabric: 'pink', base: '#EE6EA4', scale: 1.07 },
-  { fabric: 'denim', base: '#4D718D', scale: 1.2 },
-  { fabric: 'orange', base: '#E5770F', scale: 0.8 },
-  { fabric: 'plaid', base: '#8EA390', scale: 0.73 },
+  { fabric: 'pink', base: '#EE6EA4', scale: 1.07, w: 768 },
+  { fabric: 'denim', base: '#4D718D', scale: 1.2, w: 768 },
+  { fabric: 'orange', base: '#E5770F', scale: 0.8, w: 1024 },
+  { fabric: 'plaid', base: '#8EA390', scale: 0.73, w: 768 },
   { fabric: 'lime', base: '#B6D363', scale: 0.8 },
-  { fabric: 'cobalt', base: '#054896', scale: 1.07 },
-  { fabric: 'scuba', base: '#056F81', scale: 0.8 },
-  { fabric: 'linen', base: '#91ABCD', scale: 1.07 },
+  { fabric: 'cobalt', base: '#054896', scale: 1.07, w: 768 },
+  { fabric: 'scuba', base: '#056F81', scale: 0.8, w: 1024 },
+  { fabric: 'linen', base: '#91ABCD', scale: 1.07, w: 768 },
 ];
 const MAT = '#3D6A5A'; // the cutting mat beyond the cloth, seen in dips and the overview
 
@@ -56,6 +56,16 @@ let anim = null;
 let grain;
 const fabrics = [];
 let workbench = null;
+let screensCss = null;
+function loadScreensCss() {
+  return (screensCss ??= import('./screens.css').then(() => {
+    if (document.querySelector('.s7.is-rendered, .s8.is-rendered, .s9.is-rendered')) {
+      marketNeedsLayout = true;
+      layoutMarket();
+      relayout(false);
+    }
+  }));
+}
 
 /* ---------- copy ---------- */
 
@@ -74,6 +84,7 @@ function applyLang(l) {
     document.querySelector('meta[name="description"]').content = t(l, 'meta.desc');
     for (const el of document.querySelectorAll('[data-i18n]')) el.textContent = t(l, el.dataset.i18n);
     for (const el of document.querySelectorAll('[data-i18n-label]')) el.setAttribute('aria-label', t(l, el.dataset.i18nLabel));
+    for (const el of document.querySelectorAll('[data-i18n-alt]')) el.alt = t(l, el.dataset.i18nAlt);
     for (const link of document.querySelectorAll('[data-legal]')) link.href = import.meta.env.BASE_URL + LEGAL_PATHS[l][link.dataset.legal];
     for (const b of document.querySelectorAll('[data-lang]')) b.setAttribute('aria-pressed', String(b.dataset.lang === l));
   }
@@ -341,6 +352,7 @@ function go(i, { instant = false, focus = true, prog } = {}) {
   root.classList.remove('is-overview');
   const back = i < current;
   current = i;
+  if (i > 0) loadScreensCss();
   loadFabric(i, 'high');
   if (!instant) {
     loadFabric(i - 1);
@@ -473,6 +485,7 @@ function toggleOverview(on = !overview) {
   setInert();
   updateHud();
   if (on) {
+    loadScreensCss();
     PATCHES.forEach((_, i) => loadFabric(i));
     fly(overviewCam()); focusOn(current, 0); renext(0);
   }
@@ -769,7 +782,7 @@ function loadFabric(i, priority = 'low') {
     img.fetchPriority = priority;
     img.onload = () => {
       const pat = ctx.createPattern(img, 'repeat');
-      pat.setTransform(new DOMMatrix().scale(p.scale));
+      pat.setTransform(new DOMMatrix().scale(p.scale * (p.w ? p.w / img.naturalWidth : 1)));
       fabrics[i] = pat;
       const [c, r] = ORDER[i];
       if (!backgroundView || (c * W < backgroundView.x + backgroundView.w
@@ -781,7 +794,8 @@ function loadFabric(i, priority = 'low') {
       resolve();
     };
     img.onerror = resolve;
-    img.src = `${import.meta.env.BASE_URL}fabric/${p.fabric}.webp`;
+    const useSmall = p.w && (W <= 768 || navigator.connection?.saveData);
+    img.src = `${import.meta.env.BASE_URL}fabric/${p.fabric}${useSmall ? '-512w' : ''}.webp`;
   });
 }
 
@@ -1059,7 +1073,13 @@ thread.onDone = (done) => {
 grain = makeGrain();
 prefetchFabrics(start);
 const cssReady = whenCssReady();
-await Promise.all([loadLang(lang), start !== 0 ? cssReady : Promise.resolve()]);
+if (start === 0 && !navigator.connection?.saveData) {
+  cssReady.then(() => {
+    const idle = window.requestIdleCallback || ((f) => setTimeout(f, 150));
+    idle(() => loadScreensCss());
+  });
+}
+await Promise.all([loadLang(lang), start !== 0 ? Promise.all([cssReady, loadScreensCss()]) : Promise.resolve()]);
 applyLang(lang);
 workbench = initWorkbench({ tr: (k) => t(lang, k), reduced: () => reducedQuery.matches });
 
