@@ -4,12 +4,14 @@ import { join } from 'node:path';
 import { strings, t } from './src/i18n/all.js';
 import { SITE, INSTAGRAM, PATHS, LEGAL_PATHS } from './src/site.js';
 import { renderLegalPage } from './src/legal-pages.js';
+import { FAQ } from './src/faq.js';
+import { BOT } from './src/i18n.js';
 
 const CRITICAL_S1_CSS = ':root{--linen:#f3ede2;--tag:#fbf9f4;--red:#c4122f;--red-deep:#9e0e26;--red-soft:#f5cdd3;--ink:#1e181a;--mat:#3d6a5a;--hair:1px;--mark:"Outfit Variable","Outfit",var(--font);--hand:"Caveat Variable","Caveat",cursive;--font:"Gabarito Variable","Gabarito",ui-rounded,system-ui,sans-serif;--pad:clamp(22px,5vw,84px);--pad-top:max(var(--pad),76px);--pad-bottom:max(var(--pad),104px);--W:100vw;--H:100vh;color-scheme:light only}@media (resolution>=2x){:root{--hair:.5px}}*,:before,:after{box-sizing:border-box}html,body{overscroll-behavior:none;height:100%;margin:0;overflow:hidden}body{background:var(--mat);color:var(--ink);font-family:var(--font);-webkit-font-smoothing:antialiased;text-rendering:optimizelegibility;touch-action:none;font-size:1.0625rem;line-height:1.5}h1,h2,h3,p,ul,ol,dl,dd,figure{margin:0;padding:0}.sr-only{clip:rect(0 0 0 0);white-space:nowrap;width:1px;height:1px;position:absolute;overflow:hidden}.ico{flex:none;width:1.15em;height:1.15em}.smile{color:var(--ink);display:block;overflow:visible}.smile-red{color:var(--red);transform:translate(5px,4px)}#cloth-background,#cloth{pointer-events:none;width:100%;height:100%;display:block;position:fixed;inset:0}#plate{width:calc(var(--W) * 3);height:calc(var(--H) * 3);transform-origin:0 0;will-change:transform;position:fixed;top:0;left:0}.screen{left:calc(var(--c,0) * var(--W));top:calc(var(--r,0) * var(--H));width:var(--W);height:var(--H);padding:var(--pad-top) var(--pad) var(--pad-bottom);overscroll-behavior:contain;touch-action:pan-y;content-visibility:hidden;position:absolute;overflow:hidden auto}.screen.is-rendered,.screen.is-measuring{content-visibility:visible}:root:not(.is-ready) body:not(:has(.screen:target:not(.s1))) .s1{content-visibility:visible;background:#f7ab28 url(/fabric/yellow.webp) 0 0/819px 818px}:root:not(.is-css-ready) .hud{opacity:0;pointer-events:none}.s1{--c:0;--r:0}.s2{--c:0;--r:1}.s3{--c:0;--r:2}.s4{--c:1;--r:2}.s5{--c:2;--r:2}.s6{--c:2;--r:1}.s7{--c:2;--r:0}.s8{--c:1;--r:0}.s9{--c:1;--r:1}.wordmark{width:fit-content;font-family:var(--mark);font-size:clamp(4.6rem,17vw,16.5rem);font-weight:var(--mark-w,200);letter-spacing:-.015em;align-items:flex-end;gap:.12em;margin-left:-.05em;line-height:.8;display:flex}.lede{text-wrap:pretty;max-width:34ch;font-size:clamp(1.15rem,1.55vw,1.5rem);font-weight:420;line-height:1.38}p{text-wrap:pretty}.textlink{text-underline-offset:.24em;text-decoration:underline;text-decoration-thickness:2px;-webkit-text-decoration-color:var(--line,var(--red));text-decoration-color:var(--line,var(--red));font-weight:640;text-decoration-style:dashed;display:inline-block}.label{font:640 .8rem/1.2 var(--font);letter-spacing:.05em;text-transform:uppercase;color:var(--ink);align-items:center;gap:.5em;display:inline-flex;background:var(--tag);outline-offset:-4px;outline:1px dashed #1e181a80;padding:.55em .85em;box-shadow:0 1px #1e181a1f}.tag{aspect-ratio:1;background:var(--tag);outline-offset:-4px;outline:1px dashed #1e181a73;place-items:center;width:3rem;display:grid;box-shadow:0 1px 2px #1e181a29}.tag .smile{width:58%;height:58%}.label--intro{top:var(--pad-top);left:var(--pad);position:absolute}.s1-body{left:var(--pad);right:var(--pad);bottom:var(--pad-bottom);position:absolute}.s1-copy{grid-template-columns:minmax(0,auto) minmax(0,34ch);align-items:start;gap:.6rem clamp(1.5rem,4vw,4rem);max-width:64rem;margin-top:clamp(1.2rem,2.6vw,2.4rem);display:grid}.tagline{letter-spacing:-.025em;width:fit-content;font-size:clamp(1.6rem,2.7vw,2.6rem);font-weight:700;line-height:1}.s1-copy .textlink{grid-column:2}.hint{top:calc(var(--pad-top) + 3.4rem);right:var(--pad);text-align:right;max-width:18ch;font-size:.9rem;font-weight:550;position:absolute}.mark-row{flex-wrap:wrap;align-items:flex-end;gap:.6rem clamp(.8rem,2vw,2rem);display:flex}.bench--jeans{align-items:flex-end;gap:clamp(.8rem,1.6vw,1.6rem);display:flex}.jeans{touch-action:none;cursor:crosshair;filter:drop-shadow(0 3px 2px #1e181a40)drop-shadow(0 14px 18px #1e181a38);width:auto;height:clamp(4.4rem,15vw,14.5rem);margin-bottom:.2rem;display:block;overflow:visible;rotate:3deg}.jeans .hop{transform-box:fill-box;transform-origin:50% 80%}.jeans .cut-guide{fill:none;stroke:#fbf9f4;stroke-width:1.6px;stroke-dasharray:5 4}.jeans .cut-done{fill:none;stroke:#fbf9f4;stroke-width:2px;stroke-dasharray:100;stroke-dashoffset:100px}.jeans .cut-scissors{pointer-events:none}.jeans .hole,.jeans .piece-out{opacity:0}.bench-note{justify-items:start;gap:.45rem;max-width:12rem;margin-bottom:.6rem;display:grid}.cut-btn{font:600 .9rem/1.3 var(--font);color:inherit;text-align:left;-webkit-text-decoration:underline dashed var(--red) 2px;text-decoration:underline dashed var(--red) 2px;text-underline-offset:.25em;cursor:pointer;background:0 0;border:0;padding:0}.cut-done-note{display:none}@media (max-width:900px){.s1-copy{grid-template-columns:1fr}.s1-copy .textlink{grid-column:1}}@media (max-width:600px){:root{--pad-top:68px;--pad-bottom:96px}.hint{display:none}.s1{display:flex;flex-direction:column}.label--intro{position:static;align-self:flex-start}.s1-body{position:static;flex:1;display:flex;flex-direction:column;justify-content:space-evenly;gap:1.2rem;margin-top:.8rem}.mark-row{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:0 .9rem}.wordmark{grid-column:1/-1;position:relative;z-index:1;font-size:min(31vw,9.5rem)}.bench--jeans{display:contents}.jeans{grid-column:2;grid-row:2;height:min(47vw,220px);margin:-.9rem 0 0;rotate:4deg}.bench-note{grid-column:1;grid-row:2;max-width:none;margin:.6rem 0 0;gap:.6rem}.bench-note .label{font-size:.7rem;line-height:1.3;rotate:-1.5deg}.cut-btn{font-size:.85rem}.s1-copy{margin-top:0}}@media (max-width:600px) and (max-height:700px){:root{--pad-top:64px;--pad-bottom:92px}.wordmark{font-size:min(25vw,9.5rem)}.jeans{height:min(36vw,170px)}.s1-body{gap:.8rem;margin-top:.4rem}}@media (min-width:901px){.s1{display:grid;align-items:center}.s1-body{position:static;display:grid;grid-template-columns:minmax(0,1.08fr) minmax(0,1fr);column-gap:clamp(2rem,6vw,8rem);row-gap:clamp(1.5rem,3vh,3rem);align-content:center;width:100%;padding-top:2rem}.s1 .mark-row{display:contents}.s1 .wordmark{grid-column:1;grid-row:1;align-self:end;font-size:clamp(8rem,18vw,21rem)}.s1 .bench--jeans{grid-column:2;grid-row:1/3;display:grid;justify-items:center;align-self:center;gap:1.5rem}.s1 .jeans{height:clamp(220px,min(49vh,40vw),620px);margin:0}.s1 .bench-note{max-width:23rem;margin:0;justify-items:center;text-align:center}.s1 .s1-copy{grid-column:1;grid-row:2;grid-template-columns:minmax(0,1fr);margin:0;gap:1.2rem}.s1 .s1-copy .textlink{grid-column:1;justify-self:start}.s1 .tagline{font-size:clamp(1.8rem,3vw,3.2rem)}.s1 .lede{max-width:40ch}.s1 .hint{top:var(--pad-top);max-width:28ch}}@media (min-width:901px) and (max-height:780px){.s1 .jeans{height:min(45vh,40vw)}.s1 .s1-copy{gap:.8rem}}';
 
 const S1_KEYS = ['s1.langs', 's1.cut', 's1.cutBtn', 's1.cutDone', 's1.tagline', 's1.intro', 's1.skip', 's1.hint'];
 const pickKeys = (obj, keys) => Object.fromEntries(keys.map((k) => [k, obj[k]]));
-const S1_PREPAINT_LANG = `<script>(function(){try{var s=localStorage.getItem('ribisl-lang'),l=s||(navigator.languages||[navigator.language]).map(function(x){return(x||'').slice(0,2)}).find(function(x){return x==='de'||x==='it'||x==='en'})||'de';if(l!=='de'){var t=l==='it'?${JSON.stringify(pickKeys(strings.it, S1_KEYS))}:${JSON.stringify(pickKeys(strings.en, S1_KEYS))};var p=document.querySelector('.s1');document.documentElement.lang=l;document.documentElement.dataset.prepaintLang=l;p.querySelectorAll('[data-i18n]').forEach(function(e){var k=e.getAttribute('data-i18n');if(t[k])e.textContent=t[k]})}}catch(e){}})()</script>`;
+const S1_PREPAINT_LANG = `<script>(function(){try{var ok=function(x){return x==='de'||x==='it'||x==='en'},s=localStorage.getItem('ribisl-lang'),l=ok(s)?s:${BOT}.test(navigator.userAgent)||navigator.webdriver?'de':(navigator.languages||[navigator.language]).map(function(x){return(x||'').slice(0,2).toLowerCase()}).find(ok)||'de';if(l!=='de'){var t=l==='it'?${JSON.stringify(pickKeys(strings.it, S1_KEYS))}:${JSON.stringify(pickKeys(strings.en, S1_KEYS))};var p=document.querySelector('.s1');document.documentElement.lang=l;document.documentElement.dataset.prepaintLang=l;p.querySelectorAll('[data-i18n]').forEach(function(e){var k=e.getAttribute('data-i18n');if(t[k])e.textContent=t[k]})}}catch(e){}})()</script>`;
 
 function stripHtmlComments(html) {
   return html.replace(/<!--[\s\S]*?-->\s*/g, (m, offset, str) => {
@@ -82,27 +84,6 @@ const ITEMS = ['a', 'b', 'c', 'd'];
 const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 const url = (lang) => `${SITE_URL}/${PATHS[lang]}`;
 
-const FAQ_BY_LANG = {
-  de: [
-    ['Wo kann man Stücke von ribisl design kaufen?', 'Es gibt keinen Onlineshop. Alle Upcycling-Einzelstücke entstehen in Handarbeit in Bozen und werden auf lokalen Märkten in Südtirol sowie auf Instagram (@ribisl_design) gezeigt und angefragt.'],
-    ['Welche Materialien und Stücke fertigt Katrin Unterhofer?', 'Aus altem Denim, Stoffresten, Seil & Kordel sowie Strick entstehen handgenähte Unikate: Westen, Bauchtaschen / Crossbags, Täschchen, Wendehüte, Körbe und Rucksäcke.'],
-    ['Kann man Nähkurse oder einen Marktstand für ein Event buchen?', 'Ja. Katrin bietet Upcycling-Nähkurse (Grundlagen, Auftrennen & neu denken, das erste eigene Stück) an und baut auf Anfrage Stände bei Märkten und Events auf – Anfragen über Instagram (@ribisl_design).'],
-    ['In welchen Sprachen ist der Kontakt möglich?', 'Katrin antwortet auf Instagram auf Deutsch, Italienisch und Englisch.'],
-  ],
-  it: [
-    ['Dove si possono acquistare i pezzi di ribisl design?', 'Non c’è uno shop online. Tutti i pezzi unici in upcycling nascono a mano a Bolzano e vengono presentati ai mercatini locali in Alto Adige e su Instagram (@ribisl_design), dove si può scrivere per informazioni.'],
-    ['Che materiali e creazioni realizza Katrin Unterhofer?', 'Da vecchi jeans (denim), ritagli di stoffa, corda e maglia nascono pezzi unici cuciti a mano: gilet, marsupi e borse, pochette, cappelli reversibili, cestini e zaini.'],
-    ['Si possono prenotare corsi di cucito o uno stand per un evento?', 'Sì. Katrin tiene corsi di cucito creativo e upcycling (basi dell’upcycling, scucire e ripensare, il primo pezzo tuo) ed è disponibile su richiesta per allestire uno stand a mercatini ed eventi tramite Instagram (@ribisl_design).'],
-    ['In quali lingue risponde ribisl design?', 'Katrin risponde su Instagram in tedesco, italiano e inglese.'],
-  ],
-  en: [
-    ['Where can I buy ribisl design pieces?', 'There is no online shop. Every one-of-a-kind upcycled piece is handmade in Bolzano, shown at local markets across South Tyrol, and featured on Instagram (@ribisl_design) for inquiries.'],
-    ['What materials and pieces does Katrin Unterhofer make?', 'From old denim, fabric scraps, coiled rope and reclaimed knitwear, Katrin sews one-off pieces including vests, belt and crossbody bags, pouches, reversible bucket hats, baskets and backpacks.'],
-    ['Can I book a sewing workshop or a market stall for an event?', 'Yes. Katrin runs sewing and upcycling workshops (basics, unpicking & rethinking, making your first piece) and sets up market stalls for events on request via Instagram (@ribisl_design).'],
-    ['Which languages can I write in?', 'Katrin replies on Instagram in German, Italian and English.'],
-  ],
-};
-
 function jsonLd(lang) {
   const brand = SITE_URL + '/#ribisl';
   const katrin = SITE_URL + '/#katrin';
@@ -174,16 +155,6 @@ function jsonLd(lang) {
         inLanguage: lang,
         publisher: { '@id': brand },
       },
-      {
-        '@type': 'FAQPage',
-        '@id': url(lang) + '#faq',
-        inLanguage: lang,
-        mainEntity: FAQ_BY_LANG[lang].map(([name, text]) => ({
-          '@type': 'Question',
-          name,
-          acceptedAnswer: { '@type': 'Answer', text },
-        })),
-      },
     ],
   };
   return JSON.stringify(data).replace(/</g, '\\u003c');
@@ -237,8 +208,10 @@ function localize(html, lang, fonts) {
     .replace(/<(\w+)(\s[^>]*?\bdata-i18n="([^"]+)"[^>]*)>[^<]*<\/\1>/g, (_, tag, attrs, key) => `<${tag}${attrs}>${esc(t(lang, key))}</${tag}>`)
     .replace(/<[^>]*\bdata-i18n-label="([^"]+)"[^>]*>/g, (tag, key) => tag.replace(/aria-label="[^"]*"/, `aria-label="${esc(t(lang, key))}"`))
     .replace(/<img\b[^>]*\bdata-i18n-alt="([^"]+)"[^>]*>/g, (tag, key) => tag.replace(/(\s)alt="[^"]*"/, `$1alt="${esc(t(lang, key))}"`))
-    .replace(/<a\b[^>]*\bdata-legal="(imprint|privacy)"[^>]*>/g, (tag, kind) => tag.replace(/href="[^"]*"/, `href="${BASE}${LEGAL_PATHS[lang][kind]}"`))
-    .replace(/(<button[^>]*data-lang="(\w+)"[^>]*?)(?: aria-pressed="\w+")?>/g, (_, open, l) => `${open} aria-pressed="${l === lang}">`)
+    .replace(/<a\b[^>]*\bdata-legal="(\w+)"[^>]*>/g, (tag, kind) => tag.replace(/href="[^"]*"/, `href="${BASE}${LEGAL_PATHS[lang][kind]}"`))
+    .replace(/<a\b[^>]*\bdata-lang="(\w+)"[^>]*>/g, (tag, l) => tag
+      .replace(/ aria-current="[^"]*"/, '')
+      .replace(/href="[^"]*"/, `href="${BASE}${PATHS[l]}"${l === lang ? ' aria-current="true"' : ''}`))
     .replace(/<span id="year">[^<]*<\/span>/, `<span id="year">${new Date().getFullYear()}</span>`)
     // files from public/ are addressed from the root; on a sub-path (GitHub Pages) they need the base in front
     .replace(/([\s"'(])\/(fabric|swatch|pieces|katrin|mediapipe|favicon\.svg|og-image\.jpg)/g, `$1${BASE}$2`);
@@ -259,11 +232,15 @@ function robots() {
 
 function sitemap() {
   const today = new Date().toISOString().slice(0, 10);
-  const alts = [
-    ...Object.keys(PATHS).map((l) => `    <xhtml:link rel="alternate" hreflang="${l}" href="${url(l)}" />`),
-    `    <xhtml:link rel="alternate" hreflang="x-default" href="${url('de')}" />`,
-  ].join('\n');
-  const urls = Object.keys(PATHS).map((l) => `  <url>\n    <loc>${url(l)}</loc>\n    <lastmod>${today}</lastmod>\n${alts}\n  </url>`);
+  // the start page and the FAQ page, each in three languages that point at one another
+  const groups = [url, (l) => `${SITE_URL}/${LEGAL_PATHS[l].faq}`];
+  const urls = groups.flatMap((at) => {
+    const alts = [
+      ...Object.keys(PATHS).map((l) => `    <xhtml:link rel="alternate" hreflang="${l}" href="${at(l)}" />`),
+      `    <xhtml:link rel="alternate" hreflang="x-default" href="${at('de')}" />`,
+    ].join('\n');
+    return Object.keys(PATHS).map((l) => `  <url>\n    <loc>${at(l)}</loc>\n    <lastmod>${today}</lastmod>\n${alts}\n  </url>`);
+  });
   return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">\n${urls.join('\n')}\n</urlset>\n`;
 }
 
@@ -304,7 +281,7 @@ function llms() {
     ...ITEMS.map((k) => `- **${en(`s7.${k}.h`)}**: ${en(`s7.${k}.p`)}`),
     '',
     '## Frequently Asked Facts',
-    ...FAQ_BY_LANG.en.map(([q, a]) => `- **${q}** ${a}`),
+    ...FAQ.en.map(([q, a]) => `- **${q}** ${a}`),
     '',
     '## Contact & Region',
     `- Instagram: ${INSTAGRAM}`,
@@ -312,9 +289,9 @@ function llms() {
     '- Languages spoken: German (Deutsch), Italian (Italiano), English',
     '',
     '## Pages & Legal',
-    `- [Deutsch (Start)](${url('de')}): ${strings.de['meta.title']} · [Impressum](${SITE_URL}/${LEGAL_PATHS.de.imprint}) · [Datenschutz](${SITE_URL}/${LEGAL_PATHS.de.privacy})`,
-    `- [Italiano](${url('it')}): ${strings.it['meta.title']} · [Note legali](${SITE_URL}/${LEGAL_PATHS.it.imprint}) · [Privacy](${SITE_URL}/${LEGAL_PATHS.it.privacy})`,
-    `- [English](${url('en')}): ${strings.en['meta.title']} · [Legal notice](${SITE_URL}/${LEGAL_PATHS.en.imprint}) · [Privacy](${SITE_URL}/${LEGAL_PATHS.en.privacy})`,
+    `- [Deutsch (Start)](${url('de')}): ${strings.de['meta.title']} · [Impressum](${SITE_URL}/${LEGAL_PATHS.de.imprint}) · [Häufige Fragen](${SITE_URL}/${LEGAL_PATHS.de.faq}) · [Datenschutz](${SITE_URL}/${LEGAL_PATHS.de.privacy})`,
+    `- [Italiano](${url('it')}): ${strings.it['meta.title']} · [Note legali](${SITE_URL}/${LEGAL_PATHS.it.imprint}) · [Privacy](${SITE_URL}/${LEGAL_PATHS.it.privacy}) · [Domande frequenti](${SITE_URL}/${LEGAL_PATHS.it.faq})`,
+    `- [English](${url('en')}): ${strings.en['meta.title']} · [Legal notice](${SITE_URL}/${LEGAL_PATHS.en.imprint}) · [Privacy](${SITE_URL}/${LEGAL_PATHS.en.privacy}) · [FAQ](${SITE_URL}/${LEGAL_PATHS.en.faq})`,
     '',
   ].join('\n');
 }
@@ -331,6 +308,7 @@ function seo() {
             res.setHeader('Content-Type', 'text/html; charset=utf-8');
             res.end(renderLegalPage(lang, kind, {
               base: BASE,
+              siteUrl: SITE_URL,
               fontUrl: `${BASE}src/assets/fonts/gabarito-latin.woff2`,
             }));
             return;
@@ -359,7 +337,7 @@ function seo() {
         for (const [kind, route] of Object.entries(LEGAL_PATHS[lang])) {
           const legalOut = join(dir, route);
           mkdirSync(legalOut, { recursive: true });
-          writeFileSync(join(legalOut, 'index.html'), renderLegalPage(lang, kind, { base: BASE, fontUrl: gabaritoHref }));
+          writeFileSync(join(legalOut, 'index.html'), renderLegalPage(lang, kind, { base: BASE, siteUrl: SITE_URL, fontUrl: gabaritoHref }));
         }
       }
       writeFileSync(join(dir, 'robots.txt'), robots());

@@ -9,7 +9,7 @@ export const HANDLE = '@ribisl_design';
 export const PATHS = { de: '', it: 'it/', en: 'en/' };
 
 export const LEGAL_PATHS = {
-  de: { imprint: 'impressum/', privacy: 'datenschutz/' },
-  it: { imprint: 'it/note-legali/', privacy: 'it/privacy/' },
-  en: { imprint: 'en/legal-notice/', privacy: 'en/privacy/' },
+  de: { imprint: 'impressum/', privacy: 'datenschutz/', faq: 'fragen/' },
+  it: { imprint: 'it/note-legali/', privacy: 'it/privacy/', faq: 'it/domande/' },
+  en: { imprint: 'en/legal-notice/', privacy: 'en/privacy/', faq: 'en/faq/' },
 };

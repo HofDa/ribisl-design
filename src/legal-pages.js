@@ -1,4 +1,5 @@
 import { INSTAGRAM, LEGAL_PATHS, PATHS } from './site.js';
+import { FAQ } from './faq.js';
 
 // Confirmed by Katrin: publish the city only, with Instagram as the contact channel.
 export const LEGAL_OWNER = { name: 'Katrin Unterhofer', city: 'Bozen / Bolzano', country: 'Italia' };
@@ -11,9 +12,10 @@ const instagram = link(INSTAGRAM, '@ribisl_design');
 
 const COPY = {
   de: {
-    imprint: 'Impressum', privacy: 'Datenschutz', back: 'Zurück zur Website', languages: 'Sprache',
+    imprint: 'Impressum', privacy: 'Datenschutz', faq: 'Häufige Fragen', back: 'Zurück zur Website', languages: 'Sprache',
     updated: 'Stand', owner: 'Verantwortlich für diese Website', contact: 'Kontakt',
     imprintIntro: 'Die private Hobbyseite von ribisl design. Hier zeigt Katrin ihre Näharbeiten und Upcycling-Ideen aus Bozen.',
+    faqIntro: 'Kurze Antworten zu ribisl design: wo es die Upcycling-Einzelstücke von Katrin Unterhofer aus Bozen gibt, woraus sie genäht sind und wie man Kurse oder einen Marktstand anfragt.',
     privacyIntro: 'Hier steht, welche Daten beim Besuch dieser Website und bei ihren freiwilligen Mitmach-Funktionen verarbeitet werden.',
     imprintSections: [
       ['Über diese Seite', 'Diese Website stellt Katrins Hobby, ihre Arbeiten und Aktivitäten vor. Sie bietet keinen Online-Shop, kein Kundenkonto und keine Bestell- oder Zahlungsfunktion. Fragen zu Stücken, Märkten und Kursen können über Instagram gestellt werden.'],
@@ -31,9 +33,10 @@ const COPY = {
     ],
   },
   it: {
-    imprint: 'Note legali', privacy: 'Privacy', back: 'Torna al sito', languages: 'Lingua',
+    imprint: 'Note legali', privacy: 'Privacy', faq: 'Domande frequenti', back: 'Torna al sito', languages: 'Lingua',
     updated: 'Aggiornamento', owner: 'Responsabile del sito', contact: 'Contatto',
     imprintIntro: 'Il sito personale di ribisl design. Katrin presenta i suoi lavori di cucito e le sue idee di upcycling da Bolzano.',
+    faqIntro: 'Risposte brevi su ribisl design: dove trovare i pezzi unici in upcycling di Katrin Unterhofer di Bolzano, con che cosa sono cuciti e come richiedere un corso o uno stand.',
     privacyIntro: 'Questa pagina spiega quali dati vengono trattati durante la visita del sito e l’uso delle sue funzioni facoltative.',
     imprintSections: [
       ['Informazioni sul sito', 'Il sito presenta l’hobby, i lavori e le attività di Katrin. Non offre un negozio online, account cliente, ordini o pagamenti. Per informazioni su pezzi, mercatini e corsi puoi contattarla su Instagram.'],
@@ -51,9 +54,10 @@ const COPY = {
     ],
   },
   en: {
-    imprint: 'Legal notice', privacy: 'Privacy', back: 'Back to the website', languages: 'Language',
+    imprint: 'Legal notice', privacy: 'Privacy', faq: 'Frequently asked questions', back: 'Back to the website', languages: 'Language',
     updated: 'Updated', owner: 'Responsible for this website', contact: 'Contact',
     imprintIntro: 'The personal hobby website of ribisl design. Katrin shares her sewing and upcycling ideas from Bolzano.',
+    faqIntro: 'Short answers about ribisl design: where to find Katrin Unterhofer’s one-of-a-kind upcycled pieces from Bolzano, what they are made from, and how to ask about courses or a market stall.',
     privacyIntro: 'This notice explains how data is processed when you visit the website or use its optional creative features.',
     imprintSections: [
       ['About this website', 'This site presents Katrin’s hobby, work and activities. It has no online shop, customer accounts, ordering or payment facility. Questions about pieces, markets and courses can be sent through Instagram.'],
@@ -74,16 +78,38 @@ const COPY = {
 
 const escape = (value) => String(value).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
-export function renderLegalPage(lang, kind, { base = '/', fontUrl = '' } = {}) {
+// The FAQ page is content, not a legal notice: it is indexable, has its own canonical and language
+// alternates, and carries the FAQPage markup for the questions it shows.
+function faqHead(lang, siteUrl) {
+  const at = (l) => `${siteUrl}/${LEGAL_PATHS[l].faq}`;
+  const data = {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    '@id': at(lang) + '#faq',
+    url: at(lang),
+    inLanguage: lang,
+    about: { '@id': siteUrl + '/#ribisl' },
+    mainEntity: FAQ[lang].map(([name, text]) => ({ '@type': 'Question', name, acceptedAnswer: { '@type': 'Answer', text } })),
+  };
+  return [
+    `<link rel="canonical" href="${at(lang)}">`,
+    ...Object.keys(COPY).map((l) => `<link rel="alternate" hreflang="${l}" href="${at(l)}">`),
+    `<link rel="alternate" hreflang="x-default" href="${at('de')}">`,
+    `<script type="application/ld+json">${JSON.stringify(data).replace(/</g, '\\u003c')}</script>`,
+  ].join('\n  ');
+}
+
+export function renderLegalPage(lang, kind, { base = '/', fontUrl = '', siteUrl = '' } = {}) {
   const copy = COPY[lang];
   const title = copy[kind];
-  const sections = copy[kind + 'Sections'];
+  const isFaq = kind === 'faq';
+  const sections = isFaq ? FAQ[lang].map((qa) => qa.map(escape)) : copy[kind + 'Sections'];
   return `<!doctype html>
 <html lang="${lang}">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="robots" content="noindex,follow">
+  ${isFaq ? faqHead(lang, siteUrl) : '<meta name="robots" content="noindex,follow">'}
   <meta name="description" content="${escape(copy[kind + 'Intro'])}">
   <title>${title} · ribisl design</title>
   <link rel="icon" href="${base}favicon.svg" type="image/svg+xml">
@@ -102,12 +128,13 @@ export function renderLegalPage(lang, kind, { base = '/', fontUrl = '' } = {}) {
     <main id="content">
       <h1>${title}</h1>
       <p class="intro">${copy[kind + 'Intro']}</p>
-      <section class="owner" aria-labelledby="owner"><h2 id="owner">${copy.owner}</h2><p>${escape(LEGAL_OWNER.name)}<br>${escape(LEGAL_OWNER.city)} · ${escape(LEGAL_OWNER.country)}</p><p>${copy.contact}: ${instagram}</p></section>
+      ${isFaq ? '' : `<section class="owner" aria-labelledby="owner"><h2 id="owner">${copy.owner}</h2><p>${escape(LEGAL_OWNER.name)}<br>${escape(LEGAL_OWNER.city)} · ${escape(LEGAL_OWNER.country)}</p><p>${copy.contact}: ${instagram}</p></section>`}
       ${sections.map(([heading, body]) => `<section><h2>${heading}</h2><p>${body}</p></section>`).join('\n      ')}
+      ${isFaq ? `<p class="owner">${copy.contact}: ${instagram}</p>` : ''}
       <p class="updated">${copy.updated}: <time datetime="${UPDATED}">${UPDATED}</time></p>
       <a class="back" href="${base}${PATHS[lang]}#contact">← ${copy.back}</a>
     </main>
-    <footer><span>© ${new Date().getFullYear()} ribisl design</span>${['imprint', 'privacy'].map((k) => `<a href="${base}${LEGAL_PATHS[lang][k]}"${k === kind ? ' aria-current="page"' : ''}>${copy[k]}</a>`).join('')}</footer>
+    <footer><span>© ${new Date().getFullYear()} ribisl design</span>${['imprint', 'privacy', 'faq'].map((k) => `<a href="${base}${LEGAL_PATHS[lang][k]}"${k === kind ? ' aria-current="page"' : ''}>${copy[k]}</a>`).join('')}</footer>
   </div>
 </body>
 </html>`;

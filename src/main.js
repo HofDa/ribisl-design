@@ -86,7 +86,7 @@ function applyLang(l) {
     for (const el of document.querySelectorAll('[data-i18n-label]')) el.setAttribute('aria-label', t(l, el.dataset.i18nLabel));
     for (const el of document.querySelectorAll('[data-i18n-alt]')) el.alt = t(l, el.dataset.i18nAlt);
     for (const link of document.querySelectorAll('[data-legal]')) link.href = import.meta.env.BASE_URL + LEGAL_PATHS[l][link.dataset.legal];
-    for (const b of document.querySelectorAll('[data-lang]')) b.setAttribute('aria-pressed', String(b.dataset.lang === l));
+    for (const b of document.querySelectorAll('[data-lang]')) b.toggleAttribute('aria-current', b.dataset.lang === l);
   }
   if (thread) thread.phew = t(l, 'thread.phew');
   workbench?.relabel();
@@ -609,7 +609,10 @@ function toggleMenu(open = menuList.hidden, refocus = true) {
 menuBtn.addEventListener('click', () => toggleMenu());
 
 for (const b of document.querySelectorAll('[data-lang]')) {
-  b.addEventListener('click', async () => {
+  // real links for crawlers and new tabs; a plain click swaps the language in place
+  b.addEventListener('click', async (e) => {
+    if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    e.preventDefault();
     await loadLang(b.dataset.lang);
     applyLang(b.dataset.lang);
     relayout();

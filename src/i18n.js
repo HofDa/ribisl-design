@@ -24,14 +24,19 @@ export function t(lang, key, vars = {}) {
   return s;
 }
 
+export const BOT = /bot|crawl|spider|slurp|inspect|lighthouse|headless|preview|facebookexternalhit|gpt|claude|perplexity/i;
+
 export function detectLang() {
-  // a language's own address wins; the root page falls back to the visitor's choice or browser
+  // a language's own address wins; the root page falls back to the visitor's choice, then to the browser's language.
+  // Crawlers are left out of that last step: they render as English and would index the German "/" in English.
+  // (The same rule is repeated in the pre-paint script in vite.config.js.)
   const m = location.pathname.match(/\/(it|en)\/(index\.html)?$/);
   if (m) return m[1];
   try {
     const saved = localStorage.getItem('ribisl-lang');
     if (LANGS.includes(saved)) return saved;
   } catch {}
+  if (BOT.test(navigator.userAgent) || navigator.webdriver) return 'de';
   for (const l of navigator.languages || [navigator.language]) {
     const code = (l || '').slice(0, 2).toLowerCase();
     if (LANGS.includes(code)) return code;
