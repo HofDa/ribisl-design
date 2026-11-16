@@ -811,7 +811,7 @@ button.swatch:active { cursor: grabbing; }
   .pen--dare { margin: -0.3rem 0 0 4.5rem; translate: none; }
   .pen--dare .pen-arrow { rotate: 40deg; }
   .s9 .made { width: 100%; text-align: left; }
-  .s9 .colophon { position: static; align-self: flex-start; margin-top: 1rem; }
+  .s9 .colophon { position: static; align-self: center; max-width: 100%; margin-top: 1rem; }
   /* once you've designed a hat, its picture and buttons join in, so everything above makes room */
   .s9:has(.made:not([hidden])) .s9-body { justify-content: flex-start; gap: 1rem; padding-bottom: 0; }
   .s9:has(.made:not([hidden])) .tag--big { width: 84px; }
