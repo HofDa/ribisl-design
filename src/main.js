@@ -503,7 +503,7 @@ function moveToward(dx, dy) {
 
 function canScroll(el, dy) {
   const s = el?.closest?.('.screen');
-  if (!s || s.scrollHeight <= s.clientHeight + 2) return false;
+  if (!s || s.scrollHeight <= s.clientHeight + 2 || getComputedStyle(s).overflowY === 'hidden') return false;
   return dy > 0 ? s.scrollTop + s.clientHeight < s.scrollHeight - 2 : s.scrollTop > 2;
 }
 
